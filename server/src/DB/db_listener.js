@@ -1,13 +1,7 @@
 /////////////////////Event Listener Stuff///////////////////////////////
 
-module.exports = function (connection) {
+module.exports = function (connection, pool) {
   return new Promise((innerResolve, reject) => {  
-    //You cannot keep the connection open with sequelize, so this part must be done with pg
-    const pg = require ('pg')
-    const db_config = require('./db_config')
-    // Creation of the pool to connect to postgres
-    const connStr = db_config.db_dialect + '://' + db_config.db_user + ':' + db_config.db_password + '@' + db_config.db_host + ':' + db_config.db_port + '/' + db_config.db_name
-    var pool = new pg.Pool({connectionString: connStr})
     innerResolve(pool)
     // Creation of the callback that calls pg_notify -> Can also be done with sequelize (better with pg maybe, sequelize need a fixing in the trigger creation - see README.MD)
     pool.query("CREATE OR REPLACE FUNCTION return_data() RETURNS trigger AS $BODY$ BEGIN PERFORM pg_notify('rts_changes', row_to_json(NEW)::text); RETURN NULL; END; $BODY$ LANGUAGE plpgsql VOLATILE COST 100",
@@ -17,7 +11,7 @@ module.exports = function (connection) {
         } else {
           console.log("Function created: ", result)
           // Creation of the trigger that calls the callback
-          pool.query("CREATE OR REPLACE TRIGGER \"RTsCh\" AFTER UPDATE ON \"RTs\" FOR EACH ROW EXECUTE PROCEDURE return_data();",
+          pool.query("CREATE OR REPLACE TRIGGER \"TagCh\" AFTER UPDATE ON \"Tag\" FOR EACH ROW EXECUTE PROCEDURE return_data();",
           (err, result) => {
             if (err) {
               return console.error('Error executing query', err.stack)

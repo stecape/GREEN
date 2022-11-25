@@ -10,8 +10,7 @@ var ReactWSConnection = wsRet.connection
 var expressApp = wsRet.expressApp
 
 //DB filling
-var pool
-db_filler().then(()=>{
+db_filler().then((pool)=>{
   //DB events listening and emitter toward React websocket
-  db_listener(ReactWSConnection).then((pool) => app_api(expressApp, pool))
+  db_listener(ReactWSConnection, pool).then((pool) => app_api(expressApp, pool))
 })

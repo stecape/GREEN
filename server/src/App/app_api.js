@@ -1,5 +1,5 @@
 module.exports = function (app, pool) {
-    
+  const uuid = require('uuid');  
   //You cannot keep the connection open with sequelize, so this part must be done with pg
   const pg = require ('pg')
 
@@ -8,8 +8,8 @@ module.exports = function (app, pool) {
     res.status(200).send('<p>Express.js BackEnd Server. Ciao!</p>')
   });
 
-  app.post('/api/setTag', (req, res) => {
-    var queryString="UPDATE \"RTs\" SET \"value\" = " + req.body.value + " where \"TagId\" = " + req.body.TagId; 
+  /* app.post('/api/setTag', (req, res) => {
+    var queryString="UPDATE \"RTs\" SET \"value\" = " + req.body.value + " where \"var\" = " + uuid.parse(); 
     pool.query({
       text: queryString,
       rowMode: 'array'
@@ -25,7 +25,7 @@ module.exports = function (app, pool) {
   });
 
   app.post('/api/getTag', (req, res) => {
-    var queryString="SELECT \"value\" from \"RTs\" where \"TagId\" = " + req.body.TagId; 
+    var queryString="SELECT \"value\" from \"Tag\" where \"var\" = " + uuid.parse(req.body.TagId); 
     pool.query({
       text: queryString,
       rowMode: 'array'
@@ -33,6 +33,6 @@ module.exports = function (app, pool) {
       res.status(200).json({value: data.rows[0][0]})
     
     })
-  });
+  }); */
 
 }
