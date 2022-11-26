@@ -1,6 +1,10 @@
-import { ReactElement, useRef, useLayoutEffect } from "react";
-import { Layout, useLayoutNavigation } from "@react-md/layout";
-import { useCrossFadeTransition } from "@react-md/transition";
+import { ReactElement, useRef } from "react";
+import {
+  Layout,
+  useLayoutNavigation,
+  useCrossFadeTransition,
+  useIsomorphicLayoutEffect
+} from "react-md";
 import { useLocation, Link } from "react-router-dom";
 
 import navItems from "./navItems";
@@ -11,7 +15,7 @@ export default function MyLayout(): ReactElement {
   const { pathname } = useLocation();
   const prevPathname = useRef(pathname);
   const { elementProps, transitionTo } = useCrossFadeTransition();
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
         if (pathname === prevPathname.current) {
           return
         }

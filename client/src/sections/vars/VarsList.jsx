@@ -1,5 +1,4 @@
 import { FC } from "react";
-import { Typography } from "react-md";
 import {
   Table,
   TableBody,
@@ -8,11 +7,10 @@ import {
   TableRow,
 } from '@react-md/table';
 
-import styles from './types.scss';
+import styles from './vars.scss';
 
-const Types: FC = () => (
+const VarsList: FC = () => (
   <>
-    <Typography type="headline-4">Types</Typography>
     <Table className={styles.centered}>
       <TableHeader>
         <TableRow>
@@ -41,4 +39,4 @@ const Types: FC = () => (
     </Table>
   </>
 )
-export default Types;
+export default VarsList;

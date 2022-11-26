@@ -1,8 +1,8 @@
 import { render } from "react-dom";
-import { BrowserRouter } from "react-router-dom";
 import { Configuration, ConfigurationProps } from "@react-md/layout";
+import { BrowserRouter } from "react-router-dom";
 
-import './index.scss';
+import './styles/index.scss';
 
 import Layout from "./Layout";
 
