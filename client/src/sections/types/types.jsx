@@ -1,44 +1,25 @@
 import { FC } from "react";
 import { Typography } from "react-md";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from '@react-md/table';
+import cn from 'classnames';
+import { Grid, GridCell } from '@react-md/utils';
+import TypesList from './TypesList'
+import NewType from './NewType'
+import grid_styles from '../../styles/Grid.module.scss';
 
-import styles from './types.scss';
-
-const Types: FC = () => (
+const Types: FC = (props) => (
   <>
-    <Typography type="headline-4">Types</Typography>
-    <Table className={styles.centered}>
-      <TableHeader>
-        <TableRow>
-          <TableCell>Column 1</TableCell>
-          <TableCell>Column 2</TableCell>
-          <TableCell>Column 3</TableCell>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableRow>
-          <TableCell>Cell 1-1</TableCell>
-          <TableCell>Cell 1-2</TableCell>
-          <TableCell>Cell 1-3</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>Cell 2-1</TableCell>
-          <TableCell>Cell 2-2</TableCell>
-          <TableCell>Cell 2-3</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>Cell 3-1</TableCell>
-          <TableCell>Cell 3-2</TableCell>
-          <TableCell>Cell 3-3</TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
+  <Grid className={cn(grid_styles.grid, grid_styles.smallGrid)}>
+    <GridCell className={cn(grid_styles.item, grid_styles.leftAlignedItem)} colSpan={12} >
+      <Typography type="headline-4">Types</Typography>
+    </GridCell>
+    <GridCell className={grid_styles.item} colSpan={4}>
+      <TypesList socket={props.socket}/>
+    </GridCell>
+    <GridCell className={grid_styles.item} colSpan={8}>
+      <NewType socket={props.socket}/>
+    </GridCell>
+  </Grid>
   </>
-)
-export default Types;
+);
+
+export default Types

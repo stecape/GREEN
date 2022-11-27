@@ -7,60 +7,54 @@ module.exports = function () {
     var queryString=`
     CREATE TABLE IF NOT EXISTS public."Field"
       (
-        id uuid NOT NULL,
+        id SERIAL PRIMARY KEY,
         name text COLLATE pg_catalog."default" NOT NULL,
-        type uuid NOT NULL,
+        type integer NOT NULL,
         logic_values text COLLATE pg_catalog."default",
         um text COLLATE pg_catalog."default",
-        CONSTRAINT field_id PRIMARY KEY (id),
         CONSTRAINT unique_field_name UNIQUE (name)
       );
       
       CREATE TABLE IF NOT EXISTS public."FieldPath"
       (
-        id uuid NOT NULL,
-        CONSTRAINT field_path_id PRIMARY KEY (id)
+        id SERIAL PRIMARY KEY
       );
       
       CREATE TABLE IF NOT EXISTS public."FieldPathElement"
       (
-        id uuid NOT NULL,
-        field_path uuid NOT NULL,
+        id SERIAL PRIMARY KEY,
+        field_path integer NOT NULL,
         index integer NOT NULL,
-        field uuid NOT NULL,
-        CONSTRAINT field_path_element_id PRIMARY KEY (id)
+        field integer NOT NULL
       );
       
       CREATE TABLE IF NOT EXISTS public."Tag"
       (
-        var uuid NOT NULL,
-        field_path uuid NOT NULL,
+        var integer NOT NULL,
+        field_path integer NOT NULL,
         value bytea NOT NULL,
         CONSTRAINT tag_id PRIMARY KEY (var, field_path)
       );
       
       CREATE TABLE IF NOT EXISTS public."Type"
       (
-        id uuid NOT NULL,
+        id SERIAL PRIMARY KEY,
         name text NOT NULL,
-        CONSTRAINT type_id PRIMARY KEY (id),
         CONSTRAINT unique_type_name UNIQUE (name)
       );
       
       CREATE TABLE IF NOT EXISTS public."TypeFieldPath"
       (
-        id uuid NOT NULL,
-        type uuid NOT NULL,
-        field_path uuid NOT NULL,
-        CONSTRAINT type_field_path_id PRIMARY KEY (id)
+        id SERIAL PRIMARY KEY,
+        type integer NOT NULL,
+        field_path integer NOT NULL
       );
       
       CREATE TABLE IF NOT EXISTS public."Var"
       (
-        id uuid NOT NULL,
-        type uuid NOT NULL,
+        id SERIAL PRIMARY KEY,
+        type integer NOT NULL,
         name text COLLATE pg_catalog."default" NOT NULL,
-        CONSTRAINT var_id PRIMARY KEY (id),
         CONSTRAINT unique_var_name UNIQUE (name)
       );
       
@@ -142,7 +136,13 @@ module.exports = function () {
         NOT VALID;
       CREATE INDEX IF NOT EXISTS fki_type_id
         ON public."Var"(type);
+
+      INSERT INTO "Type"(id,name) VALUES (DEFAULT, 'Real') ON CONFLICT (name) DO NOTHING;
+      INSERT INTO "Type"(id,name) VALUES (DEFAULT, 'Text') ON CONFLICT (name) DO NOTHING;
+      INSERT INTO "Type"(id,name) VALUES (DEFAULT, 'Int') ON CONFLICT (name) DO NOTHING;
+      INSERT INTO "Type"(id,name) VALUES (DEFAULT, 'Bool') ON CONFLICT (name) DO NOTHING;
     `;
+   /*   */
     pool.query({
       text: queryString
     }).then(() => {innerResolve(pool)})

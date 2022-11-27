@@ -8,10 +8,10 @@ import {
 } from '@react-md/table'
 import axios from 'axios'
 
-import styles from './vars.scss'
+import styles from './types.scss'
 
 
-function VarsList (props) {
+function TypesList (props) {
   const [varsList, setVarsList] = useState({});
   useEffect(() => {
     props.socket.on('connect', () => {
@@ -67,4 +67,4 @@ function VarsList (props) {
       </Table>
     </>
   )}
-export default VarsList;
+export default TypesList;
