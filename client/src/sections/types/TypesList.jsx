@@ -12,13 +12,13 @@ import styles from './types.scss'
 
 
 function TypesList (props) {
-  const [varsList, setVarsList] = useState({});
+  const [typesList, setTypesList] = useState([]);
   useEffect(() => {
     props.socket.on('connect', () => {
-      axios.post('http://localhost:3001/api/getVars', {table: "Var", fields:["name", "type"]})
+      axios.post('http://localhost:3001/api/getVars', {table: "Type", fields:["name", "id"]})
         .then(response => {
           console.log(response.data.value)
-          setVarsList(response.data.value)
+          setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
         });
     });
 
@@ -26,43 +26,38 @@ function TypesList (props) {
       console.log(error)
     });
 
-    props.socket.on("newVar", (value) => {
-      var items = varsList
-      items.push(value)
-      setVarsList(items)
+    props.socket.on("update", (value) => {
+      if (value.table === "Type" && value.operation === 'INSERT') {
+        var items = typesList
+        items.push(value.data)
+        setTypesList(items)
+      }
     });
 
     return () => {
       props.socket.off('connect');
       props.socket.off('disconnect');
     };
-  }, [varsList, props.socket]);
+  }, [typesList, props.socket]);
   return(
     <>
       <Table className={styles.centered}>
         <TableHeader>
           <TableRow>
-            <TableCell>Column 1</TableCell>
-            <TableCell>Column 2</TableCell>
-            <TableCell>Column 3</TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell>Actions</TableCell>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell>Cell 1-1</TableCell>
-            <TableCell>Cell 1-2</TableCell>
-            <TableCell>Cell 1-3</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Cell 2-1</TableCell>
-            <TableCell>Cell 2-2</TableCell>
-            <TableCell>Cell 2-3</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Cell 3-1</TableCell>
-            <TableCell>Cell 3-2</TableCell>
-            <TableCell>Cell 3-3</TableCell>
-          </TableRow>
+        <TableBody hAlign="right">
+          {typesList.map((item) => {
+            return (
+              <TableRow
+                key={item.id}
+              >
+                <TableCell hAlign="left">{item.name}</TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </>

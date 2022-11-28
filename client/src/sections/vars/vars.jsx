@@ -12,11 +12,11 @@ const Vars: FC = (props) => (
     <GridCell className={cn(styles.item, styles.leftAlignedItem)} colSpan={12} >
       <Typography type="headline-4">Vars</Typography>
     </GridCell>
-    <GridCell className={styles.item} colSpan={4}>
-      <VarsList socket={props.socket}/>
-    </GridCell>
     <GridCell className={styles.item} colSpan={8}>
       <NewVar socket={props.socket}/>
+    </GridCell>
+    <GridCell className={styles.item} colSpan={4}>
+      <VarsList socket={props.socket}/>
     </GridCell>
   </Grid>
   </>

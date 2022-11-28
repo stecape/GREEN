@@ -17,7 +17,8 @@ module.exports = function (app, pool) {
 
   //Insert a Var
   app.post('/api/addVar', (req, res) => {
-    var queryString="INSERT INTO \"" + req.body.table + "\" (\"" + req.body.fields.join('","') + "\") VALUES (\"" + req.body.values.join('","') + "\")"
+    var queryString="INSERT INTO \"" + req.body.table + "\" (\"id\",\"" + req.body.fields.join('","') + "\") VALUES (DEFAULT,'" + req.body.values.join("','") + "')"
+    console.log (queryString)
     pool.query({
       text: queryString,
       rowMode: 'array'

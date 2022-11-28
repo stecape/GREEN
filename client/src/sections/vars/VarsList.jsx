@@ -12,13 +12,13 @@ import styles from './vars.scss'
 
 
 function VarsList (props) {
-  const [varsList, setVarsList] = useState({});
+  const [varsList, setVarsList] = useState([]);
   useEffect(() => {
     props.socket.on('connect', () => {
-      axios.post('http://localhost:3001/api/getVars', {table: "Var", fields:["name", "type"]})
+      axios.post('http://localhost:3001/api/getVars', {table: "Var", fields:["name", "type", "id"]})
         .then(response => {
           console.log(response.data.value)
-          setVarsList(response.data.value)
+          setVarsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
         });
     });
 
@@ -26,10 +26,12 @@ function VarsList (props) {
       console.log(error)
     });
 
-    props.socket.on("newVar", (value) => {
-      var items = varsList
-      items.push(value)
-      setVarsList(items)
+    props.socket.on("update", (value) => {
+      if (value.table === "Var" && value.operation === 'INSERT') {
+        var items = varsList
+        items.push(value.data)
+        setVarsList(items)
+      }
     });
 
     return () => {
@@ -42,27 +44,21 @@ function VarsList (props) {
       <Table className={styles.centered}>
         <TableHeader>
           <TableRow>
-            <TableCell>Column 1</TableCell>
-            <TableCell>Column 2</TableCell>
-            <TableCell>Column 3</TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell>Type</TableCell>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell>Cell 1-1</TableCell>
-            <TableCell>Cell 1-2</TableCell>
-            <TableCell>Cell 1-3</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Cell 2-1</TableCell>
-            <TableCell>Cell 2-2</TableCell>
-            <TableCell>Cell 2-3</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Cell 3-1</TableCell>
-            <TableCell>Cell 3-2</TableCell>
-            <TableCell>Cell 3-3</TableCell>
-          </TableRow>
+        <TableBody hAlign="right">
+          {varsList.map((item) => {
+              return (
+                <TableRow
+                  key={item.id}
+                >
+                  <TableCell hAlign="left">{item.name}</TableCell>
+                  <TableCell hAlign="left">{item.type}</TableCell>
+                </TableRow>
+              );
+            })}
         </TableBody>
       </Table>
     </>

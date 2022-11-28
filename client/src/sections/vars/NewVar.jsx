@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { Divider } from '@react-md/divider';
+import { Button } from '@react-md/button';
 import {
   Form,
   TextField,
@@ -8,9 +9,21 @@ import {
 } from '@react-md/form';
 import axios from 'axios'
 
+
 function NewVar (props) {
   const [typesList, setTypesList] = useState([]);
   const [type, setType] = useState({});
+  const [name, setName] = useState("");
+  
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log(name, type)
+    axios.post('http://localhost:3001/api/addVar', {table: "Var", fields:["name", "type"], values:[name, type]})
+        .then(response => {
+          console.log(response.data.value)
+        });
+  }
+
   useEffect(() => {
     props.socket.on('connect', () => {
       axios.post('http://localhost:3001/api/getVars', {table: "Type", fields:["name", "id"]})
@@ -24,10 +37,12 @@ function NewVar (props) {
       console.log(error)
     });
 
-    props.socket.on("newVar", (value) => {
-      var items = typesList
-      items.push(value)
-      setTypesList(items)
+    props.socket.on("update", (value) => {
+      if (value.table === "Type" && value.operation === 'INSERT') {
+        var items = typesList
+        items.push(value.data)
+        setTypesList(items)
+      }
     });
 
     return () => {
@@ -38,13 +53,15 @@ function NewVar (props) {
   return(
     <>
     <FormThemeProvider theme='outline'>
-      <Form >
+      <Form onSubmit={handleSubmit}>
         <TextField
           id='name'
           key='name'
           type='string'
           placeholder="Var Name"
           label="Var Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
         <Divider />
         <Select
@@ -60,6 +77,13 @@ function NewVar (props) {
           label="Var Type"
           onChange={(type) => setType(type)}
         />
+        <Button
+          type="submit"
+          theme="primary"
+          themeType="outline"
+        >
+          Submit
+        </Button>
       </Form>
     </FormThemeProvider>
     </>
