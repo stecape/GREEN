@@ -37,12 +37,13 @@ const VarsList: FC = (props) => {
         </TableHeader>
         <TableBody hAlign="left">
           {varsList.map((item) => {
+              var typeItem = typesList.find(i => i.id === item.type)
               return (
                 <TableRow
                   key={item.id}
                 >
                   <TableCell hAlign="left">{item.name}</TableCell>
-                  <TableCell hAlign="left">{props.typesList.find(i => i.id === item.type)!== undefined ? item.type : props.typesList}</TableCell>
+                  <TableCell hAlign="left">{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
                   <TableCell hAlign="left">
                     <Button
                       id="icon-button-4"

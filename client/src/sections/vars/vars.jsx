@@ -48,7 +48,6 @@ const Vars: FC = (props) => {
       else if (value.table === "Var" && value.operation === 'UPDATE') {
         var updVars = varsList
         var index = updVars.findIndex(i => i.id === value.data.id)
-        console.log(index)
         updVars[index] = value.data
         setVarsList([...updVars])
       }
