@@ -1,16 +1,14 @@
 import { useState, useEffect } from "react"
-import { Divider } from '@react-md/divider';
 import {
   Form,
   TextField,
-  FormThemeProvider,
-  Select
+  FormThemeProvider
 } from '@react-md/form';
 import axios from 'axios'
 
 function NewType (props) {
   const [fieldsList, setFieldsList] = useState([]);
-  const [field, setField] = useState({});
+  //const [field, setField] = useState({});
   useEffect(() => {
     props.socket.on('connect', () => {
       axios.post('http://localhost:3001/api/getVars', {table: "Field", fields:["name", "id"]})

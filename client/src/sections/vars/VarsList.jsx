@@ -1,4 +1,8 @@
-import { useState, useEffect } from "react"
+import { FC, useState, useEffect } from "react";
+import { Button } from "@react-md/button";
+import DeletePopup from "../../Helpers/DeletePopup"
+import ModifyPopup from "../../Helpers/ModifyPopup"
+import { DeleteSVGIcon, EditSVGIcon } from "@react-md/material-icons";
 import {
   Table,
   TableBody,
@@ -10,57 +14,84 @@ import axios from 'axios'
 
 import styles from './vars.scss'
 
+const VarsList: FC = (props) => {
 
-function VarsList (props) {
-  const [varsList, setVarsList] = useState([]);
+  const [varsList, setVarsList] = useState(props.varsList);
+  const [typesList, setTypesList] = useState(props.typesList);
+  const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' });
+  const [modifyPopup, setModifyPopup] = useState({ visible: false, id: 0, type: 0, name: '' });
   useEffect(() => {
-    props.socket.on('connect', () => {
-      axios.post('http://localhost:3001/api/getVars', {table: "Var", fields:["name", "type", "id"]})
-        .then(response => {
-          console.log(response.data.value)
-          setVarsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
-        });
-    });
+    setVarsList(props.varsList)
+    setTypesList(props.typesList)
+  }, [props.varsList, props.typesList]);
 
-    props.socket.io.on("error", (error) => {
-      console.log(error)
-    });
-
-    props.socket.on("update", (value) => {
-      if (value.table === "Var" && value.operation === 'INSERT') {
-        var items = varsList
-        items.push(value.data)
-        setVarsList(items)
-      }
-    });
-
-    return () => {
-      props.socket.off('connect');
-      props.socket.off('disconnect');
-    };
-  }, [varsList, props.socket]);
   return(
     <>
       <Table className={styles.centered}>
         <TableHeader>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Type</TableCell>
+            <TableCell hAlign="center">Name</TableCell>
+            <TableCell hAlign="center">Type</TableCell>
+            <TableCell hAlign="center">Actions</TableCell>
           </TableRow>
         </TableHeader>
-        <TableBody hAlign="right">
+        <TableBody hAlign="left">
           {varsList.map((item) => {
               return (
                 <TableRow
                   key={item.id}
                 >
                   <TableCell hAlign="left">{item.name}</TableCell>
-                  <TableCell hAlign="left">{item.type}</TableCell>
+                  <TableCell hAlign="left">{props.typesList.find(i => i.id === item.type)!== undefined ? item.type : props.typesList}</TableCell>
+                  <TableCell hAlign="left">
+                    <Button
+                      id="icon-button-4"
+                      buttonType="icon"
+                      theme="error"
+                      aria-label="Permanently Delete"
+                      onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
+                    >
+                      <DeleteSVGIcon />
+                    </Button>
+                    <Button
+                      id="icon-button-4"
+                      buttonType="icon"
+                      aria-label="Edit"
+                      onClick={()=> setModifyPopup({visible: true, id: item.id, type: item.type, name: item.name})}
+                    >
+                      <EditSVGIcon />
+                    </Button>
+                </TableCell>
                 </TableRow>
               );
             })}
         </TableBody>
       </Table>
+
+      <DeletePopup 
+        visible={deletePopup.visible}
+        name={deletePopup.name}
+        delVar={()=>{
+          axios.post('http://localhost:3001/api/removeVar', {table: "Var", id: deletePopup.id})
+            .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
+        }}
+        cancelCommand={()=>{
+          setDeletePopup((prevState) => ({ ...prevState, visible: false }))
+        }}
+      />
+      <ModifyPopup 
+        visible={modifyPopup.visible}
+        name={modifyPopup.name}
+        type={modifyPopup.type}
+        typesList={typesList}
+        updVar={(data)=>{
+          axios.post('http://localhost:3001/api/updateVar', {table: "Var", id: modifyPopup.id, "fields": data.fields, "values": data.values})
+            .then(setModifyPopup((prevState) => ({ ...prevState, visible: false })))
+        }}
+        cancelCommand={()=>{
+          setModifyPopup((prevState) => ({ ...prevState, visible: false }))
+        }}
+      />
     </>
   )}
 export default VarsList;

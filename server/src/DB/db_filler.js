@@ -154,6 +154,7 @@ module.exports = function () {
       DECLARE
         obj text := '';
       BEGIN 
+	  	RAISE NOTICE 'obj: %', OLD::text;
         IF (TG_OP = 'UPDATE') THEN
         obj = '{"operation":' || to_json(TG_OP)::text || ',"table":' || to_json(TG_TABLE_NAME)::text || ',"data":' || row_to_json(NEW)::text || '}';
           PERFORM pg_notify('changes', obj);
@@ -162,6 +163,9 @@ module.exports = function () {
           PERFORM pg_notify('changes', obj);
           ELSIF (TG_OP = 'DELETE') THEN 
         obj = '{"operation":' || to_json(TG_OP)::text || ',"table":' || to_json(TG_TABLE_NAME)::text || ',"data":' || row_to_json(OLD)::text || '}';
+          PERFORM pg_notify('changes', obj);
+          ELSIF (TG_OP = 'TRUNCATE') THEN 
+        obj = '{"operation":' || to_json(TG_OP)::text || ',"table":' || to_json(TG_TABLE_NAME)::text || '}';
           PERFORM pg_notify('changes', obj);
         END IF;
         RETURN NULL;
@@ -172,18 +176,22 @@ module.exports = function () {
       CREATE OR REPLACE TRIGGER \"TagInsertionTrigger\" AFTER INSERT ON \"Tag\" FOR EACH ROW EXECUTE PROCEDURE return_data();
       CREATE OR REPLACE TRIGGER \"TagUpdatingTrigger\" AFTER UPDATE ON \"Tag\" FOR EACH ROW EXECUTE PROCEDURE return_data();
       CREATE OR REPLACE TRIGGER \"TagDeletingTrigger\" AFTER DELETE ON \"Tag\" FOR EACH ROW EXECUTE PROCEDURE return_data();
+      CREATE OR REPLACE TRIGGER \"TagTruncatingTrigger\" AFTER TRUNCATE ON \"Tag\" FOR EACH STATEMENT EXECUTE PROCEDURE return_data();
       -- triggers on Var
       CREATE OR REPLACE TRIGGER \"VarInsertionTrigger\" AFTER INSERT ON \"Var\" FOR EACH ROW EXECUTE PROCEDURE return_data();
       CREATE OR REPLACE TRIGGER \"VarUpdatingTrigger\" AFTER UPDATE ON \"Var\" FOR EACH ROW EXECUTE PROCEDURE return_data();
       CREATE OR REPLACE TRIGGER \"VarDeletingTrigger\" AFTER DELETE ON \"Var\" FOR EACH ROW EXECUTE PROCEDURE return_data();
+      CREATE OR REPLACE TRIGGER \"VarTruncatingTrigger\" AFTER TRUNCATE ON \"Var\" FOR EACH STATEMENT EXECUTE PROCEDURE return_data();
       -- triggers on Type
       CREATE OR REPLACE TRIGGER \"TypeInsertionTrigger\" AFTER INSERT ON \"Type\" FOR EACH ROW EXECUTE PROCEDURE return_data();
       CREATE OR REPLACE TRIGGER \"TypeUpdatingTrigger\" AFTER UPDATE ON \"Type\" FOR EACH ROW EXECUTE PROCEDURE return_data();
       CREATE OR REPLACE TRIGGER \"TypeDeletingTrigger\" AFTER DELETE ON \"Type\" FOR EACH ROW EXECUTE PROCEDURE return_data();
+      CREATE OR REPLACE TRIGGER \"TypeTruncatingTrigger\" AFTER TRUNCATE ON \"Type\" FOR EACH STATEMENT EXECUTE PROCEDURE return_data();
       -- triggers on Field
       CREATE OR REPLACE TRIGGER \"FieldInsertionTrigger\" AFTER INSERT ON \"Field\" FOR EACH ROW EXECUTE PROCEDURE return_data();
       CREATE OR REPLACE TRIGGER \"FieldUpdatingTrigger\" AFTER UPDATE ON \"Field\" FOR EACH ROW EXECUTE PROCEDURE return_data();
       CREATE OR REPLACE TRIGGER \"FieldDeletingTrigger\" AFTER DELETE ON \"Field\" FOR EACH ROW EXECUTE PROCEDURE return_data();
+      CREATE OR REPLACE TRIGGER \"FieldTruncatingTrigger\" AFTER TRUNCATE ON \"Field\" FOR EACH STATEMENT EXECUTE PROCEDURE return_data();
     `;
    /*   */
     pool.query({

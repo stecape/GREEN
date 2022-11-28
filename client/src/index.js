@@ -1,4 +1,5 @@
-import { render } from "react-dom";
+import {StrictMode} from 'react';
+import {createRoot} from 'react-dom/client';
 import { Configuration, ConfigurationProps } from "@react-md/layout";
 import { BrowserRouter } from "react-router-dom";
 
@@ -13,11 +14,15 @@ const overrides: ConfigurationProps = {
   // your configuration overrides
 };
 
-render(
-  <BrowserRouter>
-    <Configuration {...overrides}>
-      <Layout />
-    </Configuration>
-  </BrowserRouter>,
-  document.getElementById("root")
+const rootElement = document.getElementById('root');
+const root = createRoot(rootElement);
+
+root.render(
+  <StrictMode>
+    <BrowserRouter>
+      <Configuration {...overrides}>
+        <Layout />
+      </Configuration>
+    </BrowserRouter>
+  </StrictMode>,
 );
