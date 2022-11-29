@@ -7,6 +7,7 @@ import {
   Select
 } from '@react-md/form';
 import axios from 'axios'
+import formStyles from '../../styles/Form.module.scss'
 
 
 function NewVar (props) {
@@ -16,23 +17,23 @@ function NewVar (props) {
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault();
-    axios.post('http://localhost:3001/api/addVar', {table: "Var", fields:["name", "type"], values:[name, type]})
+    axios.post('http://localhost:3001/api/add', {table: "Var", fields:["name", "type"], values:[name, type]})
   }
   const handleReset = (event) => {
     event.preventDefault();
-    axios.post('http://localhost:3001/api/cleanVars', {table: "Var"})
+    axios.post('http://localhost:3001/api/removeAll', {table: "Var"})
   }
 
   return(
-    <>
+    <div className={formStyles.container}>
     <FormThemeProvider theme='outline'>
-      <Form onSubmit={handleSubmit} onReset={handleReset}>
+      <Form className={formStyles.form} onSubmit={handleSubmit} onReset={handleReset}>
         <TextField
           id='name'
           key='name'
           type='string'
-          placeholder="Var Name"
           label="Var Name"
+          className={formStyles.item}
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -47,24 +48,29 @@ function NewVar (props) {
           value={type.toString()}
           placeholder="Choose..."
           label="Var Type"
+          className={formStyles.item}
           onChange={(type) => setType(type)}
         />
-        <Button
-          type="submit"
-          theme="primary"
-          themeType="outline"
-        >
-          Create
-        </Button>
-        <Button
-          type="reset"
-          theme="error"
-          themeType="outline"
-        >
-          Delete All
-        </Button>
+        <div className={formStyles.btn_container}>
+          <Button
+            type="submit"
+            theme="primary"
+            themeType="outline"
+            className={formStyles.btn}
+          >
+            Create
+          </Button>
+          <Button
+            type="reset"
+            theme="error"
+            themeType="outline"
+            className={formStyles.btn}
+          >
+            Delete All
+          </Button>
+        </div>
       </Form>
     </FormThemeProvider>
-    </>
+    </div>
   )}
 export default NewVar;

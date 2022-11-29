@@ -18,7 +18,7 @@ function NewType (props) {
         });
     });
 
-    props.socket.io.on("error", (error) => {
+    props.socket.on("error", (error) => {
       console.log(error)
     });
 
@@ -32,7 +32,8 @@ function NewType (props) {
 
     return () => {
       props.socket.off('connect');
-      props.socket.off('disconnect');
+      props.socket.off('error');
+      props.socket.off('update');
     };
   }, [fieldsList, props.socket]);
   return(

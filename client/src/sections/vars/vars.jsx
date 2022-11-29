@@ -1,30 +1,28 @@
-import { FC, useState, useEffect } from "react";
-import { Typography } from "react-md";
-import cn from 'classnames';
+import { useState, useEffect } from "react";
 import { Grid, GridCell } from '@react-md/utils';
 import VarsList from './VarsList'
 import NewVar from './NewVar'
-import styles from '../../styles/Grid.module.scss';
+import gridStyles from "../../styles/Grid.module.scss";
 import axios from 'axios'
 
-const Vars: FC = (props) => {
+function Vars (props) {
   const [varsList, setVarsList] = useState([]);
   const [typesList, setTypesList] = useState([]);
 
   //State management
   useEffect(() => {
     props.socket.on('connect', () => {
-      axios.post('http://localhost:3001/api/getVars', {table: "Type", fields:["name", "id"]})
+      axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
         .then(response => {
           setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
         });
-      axios.post('http://localhost:3001/api/getVars', {table: "Var", fields:["name", "type", "id"]})
+      axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:["name", "type", "id"]})
         .then(response => {
           setVarsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
         });
     });
 
-    props.socket.io.on("error", (error) => {
+    props.socket.on("error", (error) => {
       console.log(error)
     });
 
@@ -54,19 +52,18 @@ const Vars: FC = (props) => {
     });
 
     return () => {
+      props.socket.off("connect");
+      props.socket.off("error");
       props.socket.off("update");
     };
   },[props.socket, varsList, typesList]);
   return (
   <>
-  <Grid className={cn(styles.grid, styles.smallGrid)}>
-    <GridCell className={cn(styles.item, styles.leftAlignedItem)} colSpan={12} >
-      <Typography type="headline-4">Vars</Typography>
-    </GridCell>
-    <GridCell className={styles.item} colSpan={4}>
+  <Grid>
+    <GridCell colSpan={12} className={gridStyles.item}>
       <NewVar typesList={typesList} id={() => {return varsList.length>0 ? varsList[0].id : 0}}/>
     </GridCell>
-    <GridCell className={styles.item} colSpan={8}>
+    <GridCell colSpan={12} className={gridStyles.item}>
       <VarsList typesList={typesList} varsList={varsList}/>
     </GridCell>
   </Grid>

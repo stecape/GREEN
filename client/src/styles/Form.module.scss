@@ -1,0 +1,38 @@
+@use './everything' as *;
+
+.container {
+  max-height: 30rem;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center
+}
+
+.form{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.title {
+  margin-bottom: 0rem;
+  margin-top: 0rem;
+}
+
+.item {
+  margin-bottom: 0rem;
+  margin-top: 1rem;
+  margin-right: 1rem;
+  flex-grow: 4;
+  min-width: 12rem;
+}
+
+.btn_container {
+  justify-content: right;
+  align-self: flex-end;
+}
+
+.btn {
+  margin-top: 1rem;
+  margin-right: 1rem;
+}

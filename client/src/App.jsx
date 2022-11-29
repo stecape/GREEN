@@ -1,4 +1,3 @@
-import { FC } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import Home from "./sections/Home/Home";
@@ -9,8 +8,8 @@ import NoPage from "./sections/NoPage/NoPage";
 import io from 'socket.io-client'
 
 
-const App: FC = () => {
-  const socket = io("ws://localhost:3001");
+function App () {
+  const socket = io("ws://localhost:3001",{transports: ['websocket'], upgrade: false});
   return (
   <>
     <Routes>

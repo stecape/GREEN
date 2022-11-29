@@ -1,4 +1,4 @@
-import { ReactElement, useRef } from "react";
+import { useRef } from "react";
 import {
   Layout,
   useLayoutNavigation,
@@ -11,7 +11,7 @@ import navItems from "./navItems";
 
 import App from "./App";
 
-export default function MyLayout(): ReactElement {
+export default function MyLayout() {
   const { pathname } = useLocation();
   const prevPathname = useRef(pathname);
   const { elementProps, transitionTo } = useCrossFadeTransition();
@@ -26,7 +26,7 @@ export default function MyLayout(): ReactElement {
 
   return (
     <Layout
-      title="Green"
+      title={<>Green - {pathname.replace("/", "").toUpperCase()}</>}
       navHeaderTitle="Menu"
       treeProps={useLayoutNavigation(navItems, pathname, Link)}
       mainProps={elementProps}

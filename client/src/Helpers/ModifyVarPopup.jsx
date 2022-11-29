@@ -9,7 +9,7 @@ import {
   Select
 } from '@react-md/form';
 
-const ModifyPopup: FC = (props) => {
+const ModifyVarPopup: FC = (props) => {
 
   const [modalState, setModalState] = useState({ visible: false, name: '', type: "1", typesList: props.typesList });
   
@@ -21,9 +21,6 @@ const ModifyPopup: FC = (props) => {
   const handleReset = (event) => {
     event.preventDefault();
     props.cancelCommand()
-  }
-  const handleChange = (value) => {
-    setModalState((prevState) => ({ ...prevState, type: value}))
   }
 
   useEffect(() => {
@@ -69,7 +66,7 @@ const ModifyPopup: FC = (props) => {
               }))}
               value={modalState.type.toString()}
               label="Type"
-              onChange={(value) => handleChange(value)}
+              onChange={(value) => setModalState((prevState) => ({ ...prevState, type: value}))}
             />
           </DialogContent>
           <DialogFooter>
@@ -92,4 +89,4 @@ const ModifyPopup: FC = (props) => {
     </Dialog>
   )
 }
-export default ModifyPopup;
+export default ModifyVarPopup;

@@ -1,4 +1,3 @@
-// Note: Outside of codesandbox, this can be `@use 'react-md' as *;`
 @use './everything' as *;
 
 .grid {
@@ -14,7 +13,7 @@
 }
 
 .item {
-  @include rmd-elevation(0);
+  @include rmd-elevation(1);
   @include rmd-theme-dark-elevation(0, true);
   @include rmd-theme(background-color, surface);
   @include rmd-theme(color, text-primary-on-background);
@@ -22,19 +21,10 @@
   align-items: center;
   display: flex;
   justify-content: center;
-  min-height: 10rem;
-  text-align: center;
+  min-height: 4rem;
 }
 
-.smallGrid {
-  .item {
-    min-height: 3rem;
-  }
-}
-
-.leftAlignedItem{
-  align-items: left;
+.titleBar {
   justify-content: left;
-  text-align: left;
   padding-left: 1rem;
 }

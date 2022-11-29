@@ -1,0 +1,13 @@
+@use './everything' as *;
+
+.container {
+  max-height: 30rem;
+}
+
+.table {
+  margin-top: 1rem;
+}
+
+.cell:nth-child(2) {
+  max-width: 10rem;
+}
