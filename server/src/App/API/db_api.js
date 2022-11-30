@@ -65,7 +65,7 @@ module.exports = function (app, pool) {
       rowMode: 'array'
     })
     .then((result) => {
-      res.status(200)
+      res.status(200).send(result.rowCount)
     })
     .catch((error) => {
       res.status(400).send(error)
@@ -91,7 +91,7 @@ module.exports = function (app, pool) {
       text: queryString
     })
     .then((data)=>{
-      res.status(200)
+      res.status(200).send(result.rowCount)
     })
     .catch((error) => {
       res.status(400).send(error)
@@ -121,7 +121,7 @@ module.exports = function (app, pool) {
       rowMode: 'array'
     })
     .then((data)=>{
-      res.status(200)
+      res.status(200).send(result.rowCount)
     })
     .catch((error) => {
       res.status(400).send(error)
@@ -161,7 +161,7 @@ module.exports = function (app, pool) {
       rowMode: 'array'
     })
     .then((result) => {
-      res.status(200)
+      res.status(200).send(result.rowCount)
     })
     .catch((error) => {
       res.status(400).send(error)

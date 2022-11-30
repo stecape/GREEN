@@ -1,9 +1,9 @@
-import { FC, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@react-md/button";
 import { Dialog, DialogContent, DialogFooter } from "@react-md/dialog";
 import { Typography } from "@react-md/typography";
 
-const DeletePopup: FC = (props) => {
+function DeletePopup (props) {
 
   const [modalState, setModalState] = useState({ visible: false, name: '' });
 

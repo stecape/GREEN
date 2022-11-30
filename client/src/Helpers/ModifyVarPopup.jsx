@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@react-md/button";
 import { Dialog, DialogContent, DialogFooter } from "@react-md/dialog";
 import { Typography } from "@react-md/typography";
@@ -9,7 +9,7 @@ import {
   Select
 } from '@react-md/form';
 
-const ModifyVarPopup: FC = (props) => {
+function ModifyVarPopup (props) {
 
   const [modalState, setModalState] = useState({ visible: false, name: '', type: "1", typesList: props.typesList });
   

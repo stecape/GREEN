@@ -1,32 +1,58 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Grid, GridCell } from '@react-md/utils';
 import VarsList from './VarsList'
 import NewVar from './NewVar'
 import gridStyles from "../../styles/Grid.module.scss";
 import axios from 'axios'
 
-function Vars (props) {
-  const [varsList, setVarsList] = useState([]);
-  const [typesList, setTypesList] = useState([]);
+import {SocketContext} from "../../Helpers/socket"
+
+function Vars () {
+  const socket = useContext(SocketContext);
+  const [varsList, setVarsList] = useState([])
+  const [typesList, setTypesList] = useState([])
+  const [init, setInit] = useState({types: false, vars: false})
 
   //State management
   useEffect(() => {
-    props.socket.on('connect', () => {
+    //On component load request the lists
+    if(init.types === false){
       axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
         .then(response => {
           setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
-        });
+          setInit((prevState) => ({ ...prevState, types: true}))
+        })
+    }
+    if(init.vars === false){
       axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:["name", "type", "id"]})
         .then(response => {
           setVarsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
-        });
+          setInit((prevState) => ({ ...prevState, vars: true}))
+        })
+    }
+
+    //On (re)connection request the lists
+    socket.on("connect", () => {
+      console.log("connection to ws")
+      axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
+        .then(response => {
+          setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
+          setInit((prevState) => ({ ...prevState, types: true}))
+        })
+      axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:["name", "type", "id"]})
+        .then(response => {
+          setVarsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
+          setInit((prevState) => ({ ...prevState, vars: true}))
+        })
     });
 
-    props.socket.on("error", (error) => {
+    //Error logging
+    socket.on("error", (error) => {
       console.log(error)
     });
 
-    props.socket.on("update", (value) => {
+    //react on update
+    socket.on("update", (value) => {
       if (value.table === "Type" && value.operation === 'INSERT') {
         var types = typesList
         types.push(value.data)
@@ -51,12 +77,13 @@ function Vars (props) {
       }
     });
 
+    //dismantling listeners
     return () => {
-      props.socket.off("connect");
-      props.socket.off("error");
-      props.socket.off("update");
+      socket.off("connect");
+      socket.off("error");
+      socket.off("update");
     };
-  },[props.socket, varsList, typesList]);
+  },[init, varsList, typesList, socket]);
   return (
   <>
   <Grid>
