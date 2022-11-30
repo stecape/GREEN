@@ -1,27 +1,27 @@
-import { useRef } from "react";
+import { useRef } from "react"
 import {
   Layout,
   useLayoutNavigation,
   useCrossFadeTransition,
   useIsomorphicLayoutEffect
-} from "react-md";
-import { useLocation, Link } from "react-router-dom";
+} from "react-md"
+import { useLocation, Link } from "react-router-dom"
 
-import navItems from "./navItems";
+import navItems from "./navItems"
 
-import App from "./App";
+import App from "./App"
 
 export default function MyLayout() {
-  const { pathname } = useLocation();
-  const prevPathname = useRef(pathname);
-  const { elementProps, transitionTo } = useCrossFadeTransition();
+  const { pathname } = useLocation()
+  const prevPathname = useRef(pathname)
+  const { elementProps, transitionTo } = useCrossFadeTransition()
   useIsomorphicLayoutEffect(() => {
         if (pathname === prevPathname.current) {
           return
         }
     
-        prevPathname.current = pathname;
-        transitionTo('enter');
+        prevPathname.current = pathname
+        transitionTo('enter')
       }, [pathname, transitionTo])
 
   return (
@@ -33,5 +33,5 @@ export default function MyLayout() {
     >
       <App />
     </Layout>
-  );
+  )
 }

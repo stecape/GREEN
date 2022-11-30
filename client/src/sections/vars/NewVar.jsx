@@ -1,26 +1,26 @@
 import { useState } from "react"
-import { Button } from '@react-md/button';
+import { Button } from '@react-md/button'
 import {
   Form,
   TextField,
   FormThemeProvider,
   Select
-} from '@react-md/form';
+} from '@react-md/form'
 import axios from 'axios'
 import formStyles from '../../styles/Form.module.scss'
 
 
 function NewVar (props) {
-  const [type, setType] = useState({});
-  const [name, setName] = useState("");
+  const [type, setType] = useState({})
+  const [name, setName] = useState("")
   
   //Form Events
   const handleSubmit = (event) => {
-    event.preventDefault();
+    event.preventDefault()
     axios.post('http://localhost:3001/api/add', {table: "Var", fields:["name", "type"], values:[name, type]})
   }
   const handleReset = (event) => {
-    event.preventDefault();
+    event.preventDefault()
     axios.post('http://localhost:3001/api/removeAll', {table: "Var"})
   }
 
@@ -73,4 +73,4 @@ function NewVar (props) {
     </FormThemeProvider>
     </div>
   )}
-export default NewVar;
+export default NewVar

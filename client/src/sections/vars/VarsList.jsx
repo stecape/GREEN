@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import { Button } from "@react-md/button";
+import { useState, useEffect } from "react"
+import { Button } from "@react-md/button"
 import DeletePopup from "../../Helpers/DeletePopup"
 import ModifyVarPopup from "../../Helpers/ModifyVarPopup"
-import { DeleteSVGIcon, EditSVGIcon } from "@react-md/material-icons";
+import { DeleteSVGIcon, EditSVGIcon } from "@react-md/material-icons"
 import {
   Table,
   TableBody,
@@ -15,14 +15,14 @@ import tableStyles from '../../styles/Table.module.scss'
 
 function VarsList (props) {
 
-  const [varsList, setVarsList] = useState(props.varsList);
-  const [typesList, setTypesList] = useState(props.typesList);
-  const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' });
-  const [modifyVarPopup, setModifyVarPopup] = useState({ visible: false, id: 0, type: 0, name: '' });
+  const [varsList, setVarsList] = useState(props.varsList)
+  const [typesList, setTypesList] = useState(props.typesList)
+  const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
+  const [modifyVarPopup, setModifyVarPopup] = useState({ visible: false, id: 0, type: 0, name: '' })
   useEffect(() => {
     setVarsList(props.varsList)
     setTypesList(props.typesList)
-  }, [props.varsList, props.typesList]);
+  }, [props.varsList, props.typesList])
 
   return(
     <>
@@ -63,7 +63,7 @@ function VarsList (props) {
                     </Button>
                 </TableCell>
                 </TableRow>
-              );
+              )
             })}
         </TableBody>
       </Table>
@@ -94,4 +94,4 @@ function VarsList (props) {
       />
     </>
   )}
-export default VarsList;
+export default VarsList

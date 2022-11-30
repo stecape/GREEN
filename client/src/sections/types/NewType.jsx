@@ -1,54 +1,61 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { Button } from '@react-md/button'
 import {
   Form,
   TextField,
   FormThemeProvider
-} from '@react-md/form';
+} from '@react-md/form'
 import axios from 'axios'
+import formStyles from '../../styles/Form.module.scss'
+
 
 function NewType (props) {
-  const [fieldsList, setFieldsList] = useState([]);
-  //const [field, setField] = useState({});
-  useEffect(() => {
-    props.socket.on('connect', () => {
-      axios.post('http://localhost:3001/api/getVars', {table: "Field", fields:["name", "id"]})
-        .then(response => {
-          console.log(response.data.value)
-          setFieldsList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
-        });
-    });
+  const [type, setType] = useState("")
+  const [field, setField] = useState([])
+  
+  //Form Events
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    axios.post('http://localhost:3001/api/add', {table: "Type", fields:["type", "field"], values:[type, field]})
+  }
+  const handleReset = (event) => {
+    event.preventDefault()
+    axios.post('http://localhost:3001/api/removeAll', {table: "Field"})
+  }
 
-    props.socket.on("error", (error) => {
-      console.log(error)
-    });
-
-    props.socket.on("update", (value) => {
-      if (value.table === "Field" && value.operation === 'INSERT') {
-        var items = fieldsList
-        items.push(value.data)
-        setFieldsList(items)
-      }
-    });
-
-    return () => {
-      props.socket.off('connect');
-      props.socket.off('error');
-      props.socket.off('update');
-    };
-  }, [fieldsList, props.socket]);
   return(
-    <>
+    <div className={formStyles.container}>
     <FormThemeProvider theme='outline'>
-      <Form >
+      <Form className={formStyles.form} onSubmit={handleSubmit} onReset={handleReset}>
         <TextField
-          id='type_name'
-          key='type_name'
+          id='name'
+          key='name'
           type='string'
-          placeholder="Type Name"
           label="Type Name"
+          className={formStyles.item}
+          value={type}
+          onChange={(e) => setType(e.target.value)}
         />
+        <div className={formStyles.btn_container}>
+          <Button
+            type="submit"
+            theme="primary"
+            themeType="outline"
+            className={formStyles.btn}
+          >
+            Create
+          </Button>
+          <Button
+            type="reset"
+            theme="error"
+            themeType="outline"
+            className={formStyles.btn}
+          >
+            Delete All
+          </Button>
+        </div>
       </Form>
     </FormThemeProvider>
-    </>
+    </div>
   )}
-export default NewType;
+export default NewType

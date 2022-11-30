@@ -25,7 +25,7 @@ module.exports = function (app, pool) {
   Err:    400
   */
   app.post('/api/getAll', (req, res) => {
-    var queryString="SELECT \"" + req.body.fields.join('","') + "\" from \"" + req.body.table + "\"";
+    var queryString="SELECT \"" + req.body.fields.join('","') + "\" from \"" + req.body.table + "\""
     pool.query({
       text: queryString,
       rowMode: 'array'
@@ -34,9 +34,9 @@ module.exports = function (app, pool) {
       res.status(200).json({value: data.rows})
     })
     .catch((error) => {
-      res.status(400).send(error)
+      res.sendStatus(400)
     })
-  });
+  })
 
 
 
@@ -65,12 +65,12 @@ module.exports = function (app, pool) {
       rowMode: 'array'
     })
     .then((result) => {
-      res.status(200).send(result.rowCount)
+      res.sendStatus(200)
     })
     .catch((error) => {
-      res.status(400).send(error)
-    });
-  });
+      res.sendStatus(400)
+    })
+  })
 
 
 
@@ -86,17 +86,17 @@ module.exports = function (app, pool) {
   Err:    400
   */
   app.post('/api/removeAll', (req, res) => {
-    var queryString="TRUNCATE \"" + req.body.table + "\" CASCADE";
+    var queryString="TRUNCATE \"" + req.body.table + "\" CASCADE"
     pool.query({
       text: queryString
     })
     .then((data)=>{
-      res.status(200).send(result.rowCount)
+      res.sendStatus(200)
     })
     .catch((error) => {
-      res.status(400).send(error)
-    });
-  });
+      res.sendStatus(400)
+    })
+  })
 
 
 
@@ -115,18 +115,18 @@ module.exports = function (app, pool) {
   Err:    400
   */
   app.post('/api/removeOne', (req, res) => {
-    var queryString="DELETE FROM \"" + req.body.table + "\" WHERE \"id\" = " + req.body.id;
+    var queryString="DELETE FROM \"" + req.body.table + "\" WHERE \"id\" = " + req.body.id
     pool.query({
       text: queryString,
       rowMode: 'array'
     })
     .then((data)=>{
-      res.status(200).send(result.rowCount)
+      res.sendStatus(200)
     })
     .catch((error) => {
-      res.status(400).send(error)
-    });
-  });
+      res.sendStatus(400)
+    })
+  })
 
 
   
@@ -161,10 +161,10 @@ module.exports = function (app, pool) {
       rowMode: 'array'
     })
     .then((result) => {
-      res.status(200).send(result.rowCount)
+      res.sendStatus(200)
     })
     .catch((error) => {
-      res.status(400).send(error)
-    });
-  });
+      res.sendStatus(400)
+    })
+  })
 }

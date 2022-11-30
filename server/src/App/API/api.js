@@ -4,9 +4,9 @@ module.exports = function (app, pool) {
   const pg = require ('pg')
 
   app.get('/', (req, res) => {
-    console.log('express connection');
+    console.log('express connection')
     res.status(200).send('<p>Express.js BackEnd Server. Ciao!</p>')
-  });
+  })
 
   vars_api(app, pool)
 }

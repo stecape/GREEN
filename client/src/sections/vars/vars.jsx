@@ -1,17 +1,19 @@
-import { useState, useEffect, useContext } from "react";
-import { Grid, GridCell } from '@react-md/utils';
+import { useState, useEffect, useContext } from "react"
+import { ExpansionPanel } from "@react-md/expansion-panel"
+import { Grid, GridCell } from '@react-md/utils'
 import VarsList from './VarsList'
 import NewVar from './NewVar'
-import gridStyles from "../../styles/Grid.module.scss";
+import gridStyles from "../../styles/Grid.module.scss"
 import axios from 'axios'
 
 import {SocketContext} from "../../Helpers/socket"
 
 function Vars () {
-  const socket = useContext(SocketContext);
+  const socket = useContext(SocketContext)
   const [varsList, setVarsList] = useState([])
   const [typesList, setTypesList] = useState([])
   const [init, setInit] = useState({types: false, vars: false})
+  const [expanded, setExpanded] = useState(false);
 
   //State management
   useEffect(() => {
@@ -33,7 +35,6 @@ function Vars () {
 
     //On (re)connection request the lists
     socket.on("connect", () => {
-      console.log("connection to ws")
       axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
         .then(response => {
           setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
@@ -44,12 +45,12 @@ function Vars () {
           setVarsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
           setInit((prevState) => ({ ...prevState, vars: true}))
         })
-    });
+    })
 
     //Error logging
     socket.on("error", (error) => {
       console.log(error)
-    });
+    })
 
     //react on update
     socket.on("update", (value) => {
@@ -75,26 +76,33 @@ function Vars () {
         updVars[index] = value.data
         setVarsList([...updVars])
       }
-    });
+    })
 
     //dismantling listeners
     return () => {
-      socket.off("connect");
-      socket.off("error");
-      socket.off("update");
-    };
-  },[init, varsList, typesList, socket]);
+      socket.off("connect")
+      socket.off("error")
+      socket.off("update")
+    }
+  },[init, varsList, typesList, socket])
   return (
   <>
   <Grid>
     <GridCell colSpan={12} className={gridStyles.item}>
-      <NewVar typesList={typesList} id={() => {return varsList.length>0 ? varsList[0].id : 0}}/>
+      <ExpansionPanel
+        id="new-var"
+        expanded={expanded}
+        onExpandClick={() => setExpanded(!expanded)}
+        header="Create new var"
+      >
+        <NewVar typesList={typesList} id={() => {return varsList.length>0 ? varsList[0].id : 0}}/>
+      </ExpansionPanel>
     </GridCell>
     <GridCell colSpan={12} className={gridStyles.item}>
       <VarsList typesList={typesList} varsList={varsList}/>
     </GridCell>
   </Grid>
   </>
-)};
+)}
 
 export default Vars

@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react"
+import { Button } from "@react-md/button"
+import DeletePopup from "../../Helpers/DeletePopup"
+//import ModifyTypePopup from "../../Helpers/ModifyTypePopup"
+import { DeleteSVGIcon, EditSVGIcon } from "@react-md/material-icons"
 import {
   Table,
   TableBody,
@@ -7,59 +11,90 @@ import {
   TableRow,
 } from '@react-md/table'
 import axios from 'axios'
-
-import styles from './types.scss'
-
+import tableStyles from '../../styles/Table.module.scss'
 
 function TypesList (props) {
-  const [typesList, setTypesList] = useState([]);
+
+  const [typesList, setTypesList] = useState(props.typesList)
+  const [fieldsList, setFieldsList] = useState(props.fieldsList)
+  const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
+  //const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, id: 0, field: 0, name: '' })
   useEffect(() => {
-    props.socket.on('connect', () => {
-      axios.post('http://localhost:3001/api/getVars', {table: "Type", fields:["name", "id"]})
-        .then(response => {
-          console.log(response.data.value)
-          setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
-        });
-    });
+    setTypesList(props.typesList)
+    setFieldsList(props.fieldsList)
+  }, [props.typesList, props.fieldsList])
 
-    props.socket.io.on("error", (error) => {
-      console.log(error)
-    });
-
-    props.socket.on("update", (value) => {
-      if (value.table === "Type" && value.operation === 'INSERT') {
-        var items = typesList
-        items.push(value.data)
-        setTypesList(items)
-      }
-    });
-
-    return () => {
-      props.socket.off('connect');
-      props.socket.off('disconnect');
-    };
-  }, [typesList, props.socket]);
   return(
     <>
-      <Table className={styles.centered}>
+      <Table fullWidth className={tableStyles.table}>
         <TableHeader>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Actions</TableCell>
+            <TableCell hAlign="left" grow >Name</TableCell>
+            <TableCell hAlign="center">Field</TableCell>
+            <TableCell hAlign="center">Actions</TableCell>
           </TableRow>
         </TableHeader>
-        <TableBody hAlign="right">
+        <TableBody>
           {typesList.map((item) => {
-            return (
-              <TableRow
-                key={item.id}
-              >
-                <TableCell hAlign="left">{item.name}</TableCell>
-              </TableRow>
-            );
-          })}
+              const fieldItem = fieldsList.find(i => i.id === item.field)
+              return (
+                <TableRow
+                  key={item.id}
+                >
+                  <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
+                  <TableCell className={tableStyles.cell}>{fieldItem !== undefined ? fieldItem.name : item.field}</TableCell>
+                  <TableCell className={tableStyles.cell}>
+                    <Button
+                      id="icon-button-4"
+                      buttonType="icon"
+                      theme="error"
+                      aria-label="Permanently Delete"
+                      onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
+                    >
+                      <DeleteSVGIcon />
+                    </Button>
+                    <Button
+                      id="icon-button-4"
+                      buttonType="icon"
+                      aria-label="Edit"
+                      //onClick={()=> setModifyTypePopup({visible: true, id: item.id, field: item.field, name: item.name})}
+                    >
+                      <EditSVGIcon />
+                    </Button>
+                </TableCell>
+                </TableRow>
+              )
+            })}
         </TableBody>
       </Table>
+
+      <DeletePopup 
+        visible={deletePopup.visible}
+        name={deletePopup.name}
+        delType={()=>{
+          axios.post('http://localhost:3001/api/removeOne', {table: "Type", id: deletePopup.id})
+            .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
+        }}
+        cancelCommand={()=>{
+          setDeletePopup((prevState) => ({ ...prevState, visible: false }))
+        }}
+      />
+      
     </>
   )}
-export default TypesList;
+export default TypesList
+
+
+/*<ModifyTypePopup 
+        visible={modifyTypePopup.visible}
+        name={modifyTypePopup.name}
+        field={modifyTypePopup.field}
+        fieldsList={fieldsList}
+        updType={(data)=>{
+          axios.post('http://localhost:3001/api/modify', {table: "Type", id: modifyTypePopup.id, fields: data.fields, values: data.values})
+            .then(setModifyTypePopup((prevState) => ({ ...prevState, visible: false })))
+        }}
+        cancelCommand={()=>{
+          setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
+        }}
+      />*/

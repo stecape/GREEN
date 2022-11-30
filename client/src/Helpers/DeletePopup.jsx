@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
-import { Button } from "@react-md/button";
-import { Dialog, DialogContent, DialogFooter } from "@react-md/dialog";
-import { Typography } from "@react-md/typography";
+import { useState, useEffect } from "react"
+import { Button } from "@react-md/button"
+import { Dialog, DialogContent, DialogFooter } from "@react-md/dialog"
+import { Typography } from "@react-md/typography"
 
 function DeletePopup (props) {
 
-  const [modalState, setModalState] = useState({ visible: false, name: '' });
+  const [modalState, setModalState] = useState({ visible: false, name: '' })
 
   useEffect(() => {
     setModalState((prevState) => ({ ...prevState, name: props.name, visible: props.visible}))
@@ -47,4 +47,4 @@ function DeletePopup (props) {
     </Dialog>
   )
 }
-export default DeletePopup;
+export default DeletePopup
