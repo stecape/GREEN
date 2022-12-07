@@ -68,7 +68,7 @@ module.exports = function (app, pool) {
       res.sendStatus(200)
     })
     .catch((error) => {
-      res.sendStatus(400)
+      error.code == '23505' ? res.status(200).json({code: error.code, detail: error.detail}) : res.status(200).json({code: '0', detail: 'Generic error (not reachable?)'})
     })
   })
 

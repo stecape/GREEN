@@ -95,7 +95,7 @@ function Vars () {
         onExpandClick={() => setExpanded(!expanded)}
         header="Create new var"
       >
-        <NewVar typesList={typesList} id={() => {return varsList.length>0 ? varsList[0].id : 0}}/>
+        <NewVar typesList={typesList}/>
       </ExpansionPanel>
     </GridCell>
     <GridCell colSpan={12} className={gridStyles.item}>

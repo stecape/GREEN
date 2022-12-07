@@ -1,8 +1,7 @@
 import { useState, useEffect, useContext } from "react"
-import { ExpansionPanel } from "@react-md/expansion-panel"
 import { Grid, GridCell } from '@react-md/utils'
 import TypesList from './TypesList'
-import NewType from './NewType'
+import NewType from './NewType/NewType'
 import gridStyles from "../../styles/Grid.module.scss"
 import axios from 'axios'
 
@@ -13,7 +12,7 @@ function Types () {
   const [fieldsList, setFieldsList] = useState([])
   const [typesList, setTypesList] = useState([])
   const [init, setInit] = useState({types: false, fields: false})
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false)
 
   //State management
   useEffect(() => {
@@ -26,9 +25,9 @@ function Types () {
         })
     }
     if(init.fields === false){
-      axios.post('http://localhost:3001/api/getAll', {table: "Field", fields:["name", "type", "id"]})
+      axios.post('http://localhost:3001/api/getAll', {table: "Field", fields:["name", "parent_type", "type", "id"]})
         .then(response => {
-          setFieldsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
+          setFieldsList(response.data.value.map((val) => ({name:val[0], type:val[1], parent_type:val[2], id:val[3]})))
           setInit((prevState) => ({ ...prevState, fields: true}))
         })
     }
@@ -89,14 +88,7 @@ function Types () {
   <>
   <Grid>
     <GridCell colSpan={12} className={gridStyles.item}>
-      <ExpansionPanel
-        id="new-type"
-        expanded={expanded}
-        onExpandClick={() => setExpanded(!expanded)}
-        header="Create new type"
-      >
-        <NewType typesList={typesList} id={() => {return fieldsList.length>0 ? fieldsList[0].id : 0}}/>
-      </ExpansionPanel>
+      <NewType typesList={typesList}/>
     </GridCell>
     <GridCell colSpan={12} className={gridStyles.item}>
       <TypesList typesList={typesList} fieldsList={fieldsList}/>

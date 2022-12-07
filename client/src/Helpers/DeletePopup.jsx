@@ -38,7 +38,7 @@ function DeletePopup (props) {
         </Button>
         <Button
           id="dialog-discard"
-          onClick={props.delVar}
+          onClick={()=>props.delVar(props.id)}
           theme="error"
         >
           Delete
