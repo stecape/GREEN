@@ -21,6 +21,7 @@ function NewTypeName (props) {
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
+    //si chiama una funzione in arrivo dalle props. La funzione deve eseguire la query di creazione e poi resettare il form
     //axios.post('http://localhost:3001/api/add', {table: "NewTypeTmp", fields:["name", "type"], values:[name, type]}).then((value)=>console.log(value.data)).catch((error)=>console.log(error))
   }
   const handleReset = (event) => {

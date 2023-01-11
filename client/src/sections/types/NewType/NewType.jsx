@@ -13,6 +13,7 @@ function NewType (props) {
   const socket = useContext(SocketContext)
   const [newTypeFieldsList, setNewTypeFieldsList] = useState([])
   const [fieldName, setFieldName] = useState('')
+  const [fieldType, setFieldType] = useState('')
   const [init, setInit] = useState({types: false, newTypeFields: false})
   const [expanded, setExpanded] = useState(false);
 
@@ -79,15 +80,27 @@ function NewType (props) {
       header="Create new type"
     >
       <Grid>
-          <GridCell colSpan={12} className={gridStyles.item}>
-              <NewTypeName typesList={props.typesList} reset={()=>setFieldName('')}/>
-          </GridCell>
-          <GridCell colSpan={12} className={gridStyles.item}>
-              <NewField typesList={props.typesList} fieldName={fieldName} setFieldName={(name)=>setFieldName(name)}/>
-          </GridCell>
-          <GridCell colSpan={12} className={gridStyles.item}>
-            <FieldsList typesList={props.typesList} newTypeFieldsList={newTypeFieldsList}/>
-          </GridCell>
+        <GridCell colSpan={12} className={gridStyles.item}>
+          <NewTypeName 
+            typesList={props.typesList}
+            reset={()=>{
+              setFieldName('')
+              setFieldType('')
+            }}
+          />
+        </GridCell>
+        <GridCell colSpan={12} className={gridStyles.item}>
+          <NewField 
+            typesList={props.typesList}
+            fieldName={fieldName}
+            setFieldName={(name)=>setFieldName(name)}
+            fieldType={fieldType}
+            setFieldType={(type)=>setFieldType(type)}
+          />
+        </GridCell>
+        <GridCell colSpan={12} className={gridStyles.item}>
+          <FieldsList typesList={props.typesList} newTypeFieldsList={newTypeFieldsList}/>
+        </GridCell>
       </Grid>
     </ExpansionPanel>
   </>

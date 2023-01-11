@@ -13,12 +13,13 @@ import formStyles from '../../../styles/Form.module.scss'
 function NewField (props) {
   const [typesList, setTypesList] = useState(props.typesList)
   const [name, setName] = useState(props.fieldName)
-  const [type, setType] = useState({})
+  const [type, setType] = useState(props.fieldType)
 
   useEffect(() => { 
     setTypesList(props.typesList)
     setName(props.fieldName)
-  }, [props.typesList, props.fieldName])
+    setType(props.fieldType)
+  }, [props.typesList, props.fieldName, props.fieldType])
 
 
   //Form Events
@@ -52,7 +53,7 @@ function NewField (props) {
           placeholder="Choose..."
           label="Field Type"
           className={formStyles.item}
-          onChange={(type) => setType(type)}
+          onChange={(type) => props.setFieldType(type)}
         />
         <div className={formStyles.btn_container}>
           <Button
