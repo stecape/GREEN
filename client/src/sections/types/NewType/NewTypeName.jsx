@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from '@react-md/button'
 import {
   Form,
@@ -10,19 +10,22 @@ import formStyles from '../../../styles/Form.module.scss'
 
 
 function NewTypeName (props) {
-  const [typesList, setTypesList] = useState(props.typesList)
   const [name, setName] = useState('')
 
-  useEffect(() => { 
-    setTypesList(props.typesList)
-  }, [props.typesList])
 
 
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    //si chiama una funzione in arrivo dalle props. La funzione deve eseguire la query di creazione e poi resettare il form
-    //axios.post('http://localhost:3001/api/add', {table: "NewTypeTmp", fields:["name", "type"], values:[name, type]}).then((value)=>console.log(value.data)).catch((error)=>console.log(error))
+    //si chiama una promise in arrivo dalle props. La funzione deve eseguire la query di creazione, sul then poi bisogna resettare il form
+    props.create(name)
+      .then(()=>{  
+        axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
+        setName('')
+        props.reset()
+      })
+      .catch(err => console.log(err))
+    
   }
   const handleReset = (event) => {
     event.preventDefault()

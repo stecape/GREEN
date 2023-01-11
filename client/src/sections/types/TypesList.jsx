@@ -16,13 +16,11 @@ import tableStyles from '../../styles/Table.module.scss'
 function TypesList (props) {
 
   const [typesList, setTypesList] = useState(props.typesList)
-  const [fieldsList, setFieldsList] = useState(props.fieldsList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   //const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, id: 0, field: 0, name: '' })
   useEffect(() => {
     setTypesList(props.typesList)
-    setFieldsList(props.fieldsList)
-  }, [props.typesList, props.fieldsList])
+  }, [props.typesList])
 
   return(
     <>
@@ -30,19 +28,16 @@ function TypesList (props) {
         <TableHeader>
           <TableRow>
             <TableCell hAlign="left" grow >Name</TableCell>
-            <TableCell hAlign="center">Field</TableCell>
             <TableCell hAlign="center">Actions</TableCell>
           </TableRow>
         </TableHeader>
         <TableBody>
           {typesList.map((item) => {
-              const fieldItem = fieldsList.find(i => i.id === item.field)
               return (
                 <TableRow
                   key={item.id}
                 >
                   <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{fieldItem !== undefined ? fieldItem.name : item.field}</TableCell>
                   <TableCell className={tableStyles.cell}>
                     <Button
                       id="icon-button-4"
@@ -71,7 +66,7 @@ function TypesList (props) {
       <DeletePopup 
         visible={deletePopup.visible}
         name={deletePopup.name}
-        delType={()=>{
+        delVar={()=>{
           axios.post('http://localhost:3001/api/removeOne', {table: "Type", id: deletePopup.id})
             .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
         }}

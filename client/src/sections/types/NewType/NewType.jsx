@@ -44,6 +44,7 @@ function NewType (props) {
 
     //react on update
     socket.on("update", (value) => {
+      console.log(value)
       if (value.table === "NewTypeTmp" && value.operation === 'INSERT') {
         var fields = newTypeFieldsList
         fields.push(value.data)
@@ -86,6 +87,16 @@ function NewType (props) {
             reset={()=>{
               setFieldName('')
               setFieldType('')
+            }}
+            create={(name)=>{
+              return new Promise((innerResolve, innerReject) => {
+                axios.post('http://localhost:3001/api/add', {table: "Type", fields:["name"], values:[name]}).then((res)=>{
+                  console.log(res)
+                  axios.post('http://localhost:3001/api/addMany', {table: "TypeDependencies", fields: ["type","dependent_type"], id: res.data.result[0], values: newTypeFieldsList.map(field => {return field.type})})
+                    .then((value)=>{innerResolve(value)})
+                    .catch((error)=>{innerReject(error)})
+                }).catch((error)=>{innerReject(error)})
+              })
             }}
           />
         </GridCell>

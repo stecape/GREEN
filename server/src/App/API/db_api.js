@@ -59,7 +59,42 @@ module.exports = function (app, pool) {
   Err:    400
   */
   app.post('/api/add', (req, res) => {
-    var queryString="INSERT INTO \"" + req.body.table + "\" (\"id\",\"" + req.body.fields.join('","') + "\") VALUES (DEFAULT,'" + req.body.values.join("','") + "')"
+    var queryString="INSERT INTO \"" + req.body.table + "\" (\"id\",\"" + req.body.fields.join('","') + "\") VALUES (DEFAULT,'" + req.body.values.join("','") + "') RETURNING \"id\",\"" + req.body.fields.join('","') + "\""
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then((result) => {
+      res.status(200).json({result: result.rows[0]})
+    })
+    .catch((error) => {
+      error.code == '23505' ? res.status(200).json({code: error.code, detail: error.detail}) : res.status(200).json({code: '0', detail: 'Generic error (not reachable?)'})
+    })
+  })
+
+
+
+  /*
+  Add many records for one ID
+  Type:   POST
+  Route:  '/api/addOneToMany'
+  Body:   {
+            table: 'TypeDependencies',
+            fields: [ 'type', 'dependant_type' ],
+            values: [ '1', '2', '3' ]
+          }
+  Query:  INSERT INTO "TypeDependencies" ("id","type","dependant_type") VALUES (DEFAULT,'5',unnest(array[ '1', '2', '3' ]))
+  Event:  {
+            operation: 'INSERT',
+            table: 'Var',
+            data: { id: 133, type: 1, name: 'Temperature 2' }
+          }
+  Res:    200
+  Err:    400
+  */
+  app.post('/api/addMany', (req, res) => {
+    var queryString="INSERT INTO \"" + req.body.table + "\" (\"id\",\"" + req.body.fields.join('","') + "\") VALUES (DEFAULT,'" + req.body.id + "', unnest(array[" + req.body.values.join(',') + "]))"
+    console.log("addMany queryString: ", queryString)
     pool.query({
       text: queryString,
       rowMode: 'array'
