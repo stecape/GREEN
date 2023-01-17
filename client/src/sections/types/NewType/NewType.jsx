@@ -42,7 +42,6 @@ function NewType (props) {
       if (value.table === "NewTypeTmp" && value.operation === 'INSERT') {
         var fields = newTypeFieldsList
         fields.push(value.data)
-        console.log(value, fields)
         setNewTypeFieldsList([...fields])
       }
       else if (value.table === "NewTypeTmp" && value.operation === 'DELETE') {
@@ -104,7 +103,6 @@ function NewType (props) {
             create={(name)=>{
               return new Promise((innerResolve, innerReject) => {
                 axios.post('http://localhost:3001/api/add', {table: "Type", fields:["name"], values:[name]}).then((res)=>{
-                  console.log(res)
                   axios.post('http://localhost:3001/api/addMany', {table: "TypeDependencies", fields: ["type","dependent_type"], id: res.data.result[0], values: newTypeFieldsList.map(field => {return field.type})})
                     .then((value)=>{innerResolve(value)})
                     .catch((error)=>{innerReject(error)})

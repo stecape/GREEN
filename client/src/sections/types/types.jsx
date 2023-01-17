@@ -43,7 +43,6 @@ function Types () {
       if (value.table === "Type" && value.operation === 'INSERT') {
         var types = typesList
         types.push(value.data)
-        console.log("types: ", types)
         setTypesList([...types])
       }
       else if (value.table === "Field" && value.operation === 'INSERT') {

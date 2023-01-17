@@ -25,7 +25,7 @@ function NewField (props) {
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    axios.post('http://localhost:3001/api/add', {table: "NewTypeTmp", fields:["name", "type"], values:[name, type]}).then((value)=>console.log(value.data)).catch((error)=>console.log(error))
+    axios.post('http://localhost:3001/api/add', {table: "NewTypeTmp", fields:["name", "type"], values:[name, type]}).then((value)=>{}).catch((error)=>console.log(error))
   }
 
   return(
