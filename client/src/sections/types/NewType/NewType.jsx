@@ -19,32 +19,26 @@ function NewType (props) {
 
   //State management
   useEffect(() => {
-    //On component load request the lists
-    if(init.newTypeFields === false){
-      axios.post('http://localhost:3001/api/getAll', {table: "NewTypeTmp", fields:["name", "type", "id"]})
-        .then(response => {
-          setNewTypeFieldsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
-          setInit((prevState) => ({ ...prevState, newTypeFields: true}))
-        })
-    }
 
-    //On (re)connection request the lists
-    socket.on("connect", () => {
+    //Socket listeners callbacks definition
+    //on connect
+    const new_type_on_connect = () => {
       axios.post('http://localhost:3001/api/getAll', {table: "NewTypeTmp", fields:["name", "type", "id"]})
         .then(response => {
           setNewTypeFieldsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
           setInit((prevState) => ({ ...prevState, vars: true}))
         })
-    })
+    }
 
-    //Error logging
-    socket.on("error", (error) => {
+    //on error
+    const new_type_on_error = (...args) => {
+      const error = args[0]
       console.log(error)
-    })
+    }
 
-    //react on update
-    socket.on("update", (value) => {
-      console.log(value)
+    //on update
+    const new_type_on_update = (...args) => {
+      const value = args[0]
       if (value.table === "NewTypeTmp" && value.operation === 'INSERT') {
         var fields = newTypeFieldsList
         fields.push(value.data)
@@ -63,14 +57,33 @@ function NewType (props) {
         updFields[index] = value.data
         setNewTypeFieldsList([...updFields])
       }
-    })
+    }
+
+    //On component load request the lists
+    if(init.newTypeFields === false){
+      axios.post('http://localhost:3001/api/getAll', {table: "NewTypeTmp", fields:["name", "type", "id"]})
+        .then(response => {
+          setNewTypeFieldsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
+          setInit((prevState) => ({ ...prevState, newTypeFields: true}))
+        })
+    }
+
+    //On (re)connection request the lists
+    socket.on("connect", new_type_on_connect)
+
+    //Error logging
+    socket.on("error", new_type_on_error)
+
+    //react on update
+    socket.on("update", new_type_on_update)
 
     //dismantling listeners
     return () => {
-      socket.off("connect")
-      socket.off("error")
-      socket.off("update")
+      socket.off("connect", new_type_on_connect)
+      socket.off("error", new_type_on_error)
+      socket.off("update", new_type_on_update)
     }
+
   },[init, newTypeFieldsList, socket])
   return (
   <>

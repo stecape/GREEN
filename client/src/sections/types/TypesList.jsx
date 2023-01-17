@@ -67,7 +67,7 @@ function TypesList (props) {
         visible={deletePopup.visible}
         name={deletePopup.name}
         delVar={()=>{
-          axios.post('http://localhost:3001/api/removeOne', {table: "Type", id: deletePopup.id})
+          axios.post('http://localhost:3001/api/removeType', {id: deletePopup.id})
             .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{

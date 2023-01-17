@@ -17,24 +17,10 @@ function Vars () {
 
   //State management
   useEffect(() => {
-    //On component load request the lists
-    if(init.types === false){
-      axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
-        .then(response => {
-          setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
-          setInit((prevState) => ({ ...prevState, types: true}))
-        })
-    }
-    if(init.vars === false){
-      axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:["name", "type", "id"]})
-        .then(response => {
-          setVarsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
-          setInit((prevState) => ({ ...prevState, vars: true}))
-        })
-    }
 
-    //On (re)connection request the lists
-    socket.on("connect", () => {
+    //Socket listeners callbacks definition
+    //on connect
+    const vars_on_connect = () => {
       axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
         .then(response => {
           setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
@@ -45,15 +31,17 @@ function Vars () {
           setVarsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
           setInit((prevState) => ({ ...prevState, vars: true}))
         })
-    })
+    }
 
-    //Error logging
-    socket.on("error", (error) => {
+    //on error
+    const vars_on_error = (...args) => {
+      const error = args[0]
       console.log(error)
-    })
+    }
 
-    //react on update
-    socket.on("update", (value) => {
+    //on update
+    const vars_on_update = (...args) => {
+      const value = args[0]
       if (value.table === "Type" && value.operation === 'INSERT') {
         var types = typesList
         types.push(value.data)
@@ -76,13 +64,38 @@ function Vars () {
         updVars[index] = value.data
         setVarsList([...updVars])
       }
-    })
+    }
+
+    //On component load request the lists
+    if(init.types === false){
+      axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
+        .then(response => {
+          setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
+          setInit((prevState) => ({ ...prevState, types: true}))
+        })
+    }
+    if(init.vars === false){
+      axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:["name", "type", "id"]})
+        .then(response => {
+          setVarsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
+          setInit((prevState) => ({ ...prevState, vars: true}))
+        })
+    }
+
+    //On (re)connection request the lists
+    socket.on("connect", vars_on_connect)
+
+    //Error logging
+    socket.on("error", vars_on_error)
+
+    //react on update
+    socket.on("update", vars_on_update)
 
     //dismantling listeners
     return () => {
-      socket.off("connect")
-      socket.off("error")
-      socket.off("update")
+      socket.off("connect", vars_on_connect)
+      socket.off("error", vars_on_error)
+      socket.off("update", vars_on_update)
     }
   },[init, varsList, typesList, socket])
   return (

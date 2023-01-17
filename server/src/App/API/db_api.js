@@ -151,6 +151,38 @@ module.exports = function (app, pool) {
   */
   app.post('/api/removeOne', (req, res) => {
     var queryString="DELETE FROM \"" + req.body.table + "\" WHERE \"id\" = " + req.body.id
+    console.log(queryString)
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then((data)=>{
+      res.sendStatus(200)
+    })
+    .catch((error) => {
+      res.sendStatus(400)
+    })
+  })
+
+
+
+  /*
+  Delete a TYPE
+  Type:   POST
+  Route:  '/api/removeType'
+  Body:   { id: 182 }
+  Query:  DELETE FROM "TypeDependencies"  WHERE "type" = 182; DELETE FROM "Type" WHERE "id" = 182
+  Event:  {
+            operation: 'DELETE',
+            table: 'Type',
+            data: { id: 182, name: 'Prova' }
+          }
+  Res:    200
+  Err:    400
+  */
+  app.post('/api/removeType', (req, res) => {
+    var queryString="DELETE FROM \"TypeDependencies\"  WHERE \"type\" = " + req.body.id + "; DELETE FROM \"Type\" WHERE \"id\" = " + req.body.id
+    console.log(queryString)
     pool.query({
       text: queryString,
       rowMode: 'array'
