@@ -1,6 +1,6 @@
 # What is GREEN
 It's a concept project in which is implemented a model manager and the model itself.
-It relies on a PostgreSQL database.
+It relies on a PostgreSQL database..
 # Getting Started
 You need a Postgres database running
 
