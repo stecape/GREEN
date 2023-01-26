@@ -9,14 +9,14 @@ import {
   Select
 } from '@react-md/form'
 
-function ModifyTypePopup (props) {
+function ModifyFieldPopup (props) {
 
   const [modalState, setModalState] = useState({ visible: false, name: '', type: "1", typesList: props.typesList })
   
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.updType({fields: ["name", "type"], values: [modalState.name, modalState.type]})
+    props.updField({fields: ["name", "type"], values: [modalState.name, modalState.type]})
   }
   const handleReset = (event) => {
     event.preventDefault()
@@ -51,8 +51,8 @@ function ModifyTypePopup (props) {
               id='name'
               key='name'
               type='string'
-              placeholder="Type Name"
-              label="Type Name"
+              placeholder="Var Name"
+              label="Var Name"
               value={modalState.name}
               onChange={(e) => setModalState((prevState) => ({ ...prevState, name: e.target.value}))}
             />
@@ -89,4 +89,4 @@ function ModifyTypePopup (props) {
     </Dialog>
   )
 }
-export default ModifyTypePopup
+export default ModifyFieldPopup

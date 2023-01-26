@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@react-md/button"
-import DeletePopup from "../../Helpers/DeletePopup"
-//import ModifyTypePopup from "../../Helpers/ModifyTypePopup"
+import DeleteTypePopup from "./DeleteTypePopup"
+//import ModifyTypePopup from "./ModifyTypePopup"
 import { DeleteSVGIcon, EditSVGIcon } from "@react-md/material-icons"
 import {
   Table,
@@ -63,10 +63,10 @@ function TypesList (props) {
         </TableBody>
       </Table>
 
-      <DeletePopup 
+      <DeleteTypePopup 
         visible={deletePopup.visible}
         name={deletePopup.name}
-        delVar={()=>{
+        delType={()=>{
           axios.post('http://localhost:3001/api/removeType', {id: deletePopup.id})
             .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
         }}

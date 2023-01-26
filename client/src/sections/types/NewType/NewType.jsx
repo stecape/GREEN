@@ -33,7 +33,7 @@ function NewType (props) {
     //on error
     const new_type_on_error = (...args) => {
       const error = args[0]
-      console.log(error)
+      console.log("Error: " + error)
     }
 
     //on update

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@react-md/button"
-import DeletePopup from "../../Helpers/DeletePopup"
-import ModifyVarPopup from "../../Helpers/ModifyVarPopup"
+import DeleteVarPopup from "./DeleteVarPopup"
+import ModifyVarPopup from "./ModifyVarPopup"
 import { DeleteSVGIcon, EditSVGIcon } from "@react-md/material-icons"
 import {
   Table,
@@ -68,7 +68,7 @@ function VarsList (props) {
         </TableBody>
       </Table>
 
-      <DeletePopup 
+      <DeleteVarPopup 
         visible={deletePopup.visible}
         name={deletePopup.name}
         delVar={()=>{

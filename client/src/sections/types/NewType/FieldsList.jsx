@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@react-md/button"
-import DeletePopup from "../../../Helpers/DeletePopup"
-import ModifyFieldPopup from "../../../Helpers/ModifyVarPopup"
+import DeleteFieldPopup from "./DeleteFieldPopup"
+import ModifyFieldPopup from "./ModifyFieldPopup"
 import { DeleteSVGIcon, EditSVGIcon } from "@react-md/material-icons"
 import {
   Table,
@@ -68,10 +68,10 @@ function FieldsList (props) {
         </TableBody>
       </Table>
 
-      <DeletePopup 
+      <DeleteFieldPopup 
         visible={deletePopup.visible}
         name={deletePopup.name}
-        delVar={()=>{
+        delField={()=>{
           axios.post('http://localhost:3001/api/removeOne', {table: "NewTypeTmp", id: deletePopup.id})
             .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
         }}
@@ -84,7 +84,7 @@ function FieldsList (props) {
         name={modifyFieldPopup.name}
         type={modifyFieldPopup.type}
         typesList={typesList}
-        updVar={(data)=>{
+        updField={(data)=>{
           axios.post('http://localhost:3001/api/modify', {table: "NewTypeTmp", id: modifyFieldPopup.id, fields: data.fields, values: data.values})
             .then(setModifyFieldPopup((prevState) => ({ ...prevState, visible: false })))
         }}

@@ -24,7 +24,9 @@ function NewTypeName (props) {
         setName('')
         props.reset()
       })
-      .catch(err => console.log(err))
+      .catch(err => {
+        console.log(err)
+      })
     
   }
   const handleReset = (event) => {

@@ -3,7 +3,7 @@ import { Button } from "@react-md/button"
 import { Dialog, DialogContent, DialogFooter } from "@react-md/dialog"
 import { Typography } from "@react-md/typography"
 
-function DeletePopup (props) {
+function DeleteTypePopup (props) {
 
   const [modalState, setModalState] = useState({ visible: false, name: '' })
 
@@ -38,7 +38,7 @@ function DeletePopup (props) {
         </Button>
         <Button
           id="dialog-discard"
-          onClick={()=>props.delVar(props.id)}
+          onClick={()=>props.delType(props.id)}
           theme="error"
         >
           Delete
@@ -47,4 +47,4 @@ function DeletePopup (props) {
     </Dialog>
   )
 }
-export default DeletePopup
+export default DeleteTypePopup
