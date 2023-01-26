@@ -4,9 +4,7 @@ import { Dialog, DialogContent, DialogFooter } from "@react-md/dialog"
 import { Typography } from "@react-md/typography"
 import {
   Form,
-  TextField,
-  FormThemeProvider,
-  Select
+  FormThemeProvider
 } from '@react-md/form'
 
 function ModifyTypePopup (props) {
@@ -47,7 +45,6 @@ function ModifyTypePopup (props) {
             >
               Modifying {modalState.name}:
             </Typography>
-            <NewType typesList={props.typesList}/>
           </DialogContent>
           <DialogFooter>
             <Button
