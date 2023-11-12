@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react"
+import { useAddMessage } from "@react-md/alert";
 import { ExpansionPanel } from "@react-md/expansion-panel"
 import { Grid, GridCell } from '@react-md/utils'
 import FieldsList from './FieldsList'
@@ -11,11 +12,12 @@ import {SocketContext} from "../../../Helpers/socket"
 
 function NewType (props) {
   const socket = useContext(SocketContext)
+  const addMessage = useAddMessage()
   const [newTypeFieldsList, setNewTypeFieldsList] = useState([])
   const [fieldName, setFieldName] = useState('')
   const [fieldType, setFieldType] = useState('')
   const [init, setInit] = useState({types: false, newTypeFields: false})
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false)
 
   //State management
   useEffect(() => {
@@ -34,6 +36,9 @@ function NewType (props) {
     const new_type_on_error = (...args) => {
       const error = args[0]
       console.log("Error: " + error)
+      addMessage({
+        children: "Errore!",
+      })
     }
 
     //on update
@@ -56,6 +61,11 @@ function NewType (props) {
         updFields[index] = value.data
         setNewTypeFieldsList([...updFields])
       }
+      console.log(args)
+      //var msg = () => {return isMember ? '$2.00' : '$10.00'}
+      addMessage({
+        children: "Types table updated correctly",
+      })
     }
 
     //On component load request the lists
@@ -64,6 +74,9 @@ function NewType (props) {
         .then(response => {
           setNewTypeFieldsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
           setInit((prevState) => ({ ...prevState, newTypeFields: true}))
+          addMessage({
+            children: "Connesso!",
+          })
         })
     }
 
@@ -83,7 +96,7 @@ function NewType (props) {
       socket.off("update", new_type_on_update)
     }
 
-  },[init, newTypeFieldsList, socket])
+  },[init, newTypeFieldsList, socket, addMessage])
   return (
   <>
     <ExpansionPanel

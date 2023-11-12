@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom"
+import { MessageQueue } from "@react-md/alert";
 import Home from "./sections/Home/Home"
 import Types from "./sections/Types/Types"
 import Vars from "./sections/Vars/Vars"
@@ -7,12 +8,14 @@ import NoPage from "./sections/NoPage/NoPage"
 function App () {
   return (
   <>
+    <MessageQueue id="notify">
     <Routes>
           <Route index element={<Home />} />
           <Route path="types" element={<Types/>} />
           <Route path="vars" element={<Vars/>} />
           <Route path="*" element={<NoPage />} />
     </Routes>
+    </MessageQueue>
   </>
 )}
 export default App
