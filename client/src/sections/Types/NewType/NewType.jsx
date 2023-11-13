@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react"
-import { useAddMessage } from "@react-md/alert";
+import { useAddMessage } from "@react-md/alert"
 import { ExpansionPanel } from "@react-md/expansion-panel"
 import { Grid, GridCell } from '@react-md/utils'
 import FieldsList from './FieldsList'
@@ -27,8 +27,13 @@ function NewType (props) {
     const new_type_on_connect = () => {
       axios.post('http://localhost:3001/api/getAll', {table: "NewTypeTmp", fields:["name", "type", "id"]})
         .then(response => {
-          setNewTypeFieldsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
+          setNewTypeFieldsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
           setInit((prevState) => ({ ...prevState, vars: true}))
+        })
+        .catch(error => {
+          addMessage({
+            children: error.message,
+          })
         })
     }
 
@@ -37,7 +42,7 @@ function NewType (props) {
       const error = args[0]
       console.log("Error: " + error)
       addMessage({
-        children: "Errore!",
+        children: error.message,
       })
     }
 
@@ -62,21 +67,14 @@ function NewType (props) {
         setNewTypeFieldsList([...updFields])
       }
       console.log(args)
-      //var msg = () => {return isMember ? '$2.00' : '$10.00'}
-      addMessage({
-        children: "Types table updated correctly",
-      })
     }
 
     //On component load request the lists
     if(init.newTypeFields === false){
       axios.post('http://localhost:3001/api/getAll', {table: "NewTypeTmp", fields:["name", "type", "id"]})
         .then(response => {
-          setNewTypeFieldsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
+          setNewTypeFieldsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
           setInit((prevState) => ({ ...prevState, newTypeFields: true}))
-          addMessage({
-            children: "Connesso!",
-          })
         })
     }
 

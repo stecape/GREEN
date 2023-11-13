@@ -31,7 +31,7 @@ module.exports = function (app, pool) {
       rowMode: 'array'
     })
     .then((data)=>{
-      res.status(200).json({value: data.rows})
+      res.status(200).json({result: data.rows, message: data.rowCount + " record(s) from table \"" + req.body.table + "\" returned correctly"})
     })
     .catch((error) => {
       res.sendStatus(400)
@@ -64,11 +64,11 @@ module.exports = function (app, pool) {
       text: queryString,
       rowMode: 'array'
     })
-    .then((result) => {
-      res.status(200).json({result: result.rows[0]})
+    .then((data) => {
+      res.status(200).json({result: data.rows[0], message: "Record correctly inserted in table \"" + req.body.table + "\" "})
     })
     .catch((error) => {
-      error.code == '23505' ? res.status(200).json({code: error.code, detail: error.detail}) : res.status(200).json({code: '0', detail: 'Generic error (not reachable?)'})
+      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: '0', detail: 'Generic error (not reachable?)', message: 'Generic error (not reachable?)'})
     })
   })
 
@@ -77,7 +77,7 @@ module.exports = function (app, pool) {
   /*
   Add many records for one ID
   Type:   POST
-  Route:  '/api/addOneToMany'
+  Route:  '/api/addMany'
   Body:   {
             table: 'TypeDependencies',
             fields: [ 'type', 'dependant_type' ],
@@ -99,11 +99,11 @@ module.exports = function (app, pool) {
       text: queryString,
       rowMode: 'array'
     })
-    .then((result) => {
+    .then((data) => {
       res.sendStatus(200)
     })
     .catch((error) => {
-      error.code == '23505' ? res.status(200).json({code: error.code, detail: error.detail}) : res.status(200).json({code: '0', detail: 'Generic error (not reachable?)'})
+      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: '0', detail: 'Generic error (not reachable?)', message: 'Generic error (not reachable?)'})
     })
   })
 
@@ -129,7 +129,7 @@ module.exports = function (app, pool) {
       res.sendStatus(200)
     })
     .catch((error) => {
-      res.sendStatus(400)
+      res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
     })
   })
 
@@ -160,7 +160,7 @@ module.exports = function (app, pool) {
       res.sendStatus(200)
     })
     .catch((error) => {
-      res.sendStatus(400)
+      res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
     })
   })
 
@@ -191,7 +191,7 @@ module.exports = function (app, pool) {
       res.sendStatus(200)
     })
     .catch((error) => {
-      res.sendStatus(400)
+      res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
     })
   })
 
@@ -227,11 +227,12 @@ module.exports = function (app, pool) {
       text: queryString,
       rowMode: 'array'
     })
-    .then((result) => {
+    .then((data) => {
       res.sendStatus(200)
     })
     .catch((error) => {
-      res.sendStatus(400)
+      //res.sendStatus(400)
+      res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
     })
   })
 }

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useAddMessage } from "@react-md/alert"
 import { Button } from '@react-md/button'
 import {
   Form,
@@ -11,6 +12,7 @@ import formStyles from '../../styles/Form.module.scss'
 
 
 function NewVar (props) {
+  const addMessage = useAddMessage()
   const [type, setType] = useState({})
   const [name, setName] = useState("")
   
@@ -18,6 +20,7 @@ function NewVar (props) {
   const handleSubmit = (event) => {
     event.preventDefault()
     axios.post('http://localhost:3001/api/add', {table: "Var", fields:["name", "type"], values:[name, type]})
+    .then(response => addMessage({children: response.data.message}))
   }
   const handleReset = (event) => {
     event.preventDefault()

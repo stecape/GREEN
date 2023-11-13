@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react"
+import { useAddMessage } from "@react-md/alert"
 import { Grid, GridCell } from '@react-md/utils'
 import TypesList from './TypesList/TypesList'
 import NewType from './NewType/NewType'
@@ -9,6 +10,7 @@ import {SocketContext} from "../../Helpers/socket"
 
 function Types () {
   const socket = useContext(SocketContext)
+  const addMessage = useAddMessage()
   const [fieldsList, setFieldsList] = useState([])
   const [typesList, setTypesList] = useState([])
   const [init, setInit] = useState({types: false, fields: false})
@@ -21,12 +23,12 @@ function Types () {
     const types_on_connect = () => {
       axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
         .then(response => {
-          setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
+          setTypesList(response.data.result.map((val) => ({name:val[0], id:val[1]})))
           setInit((prevState) => ({ ...prevState, types: true}))
         })
       axios.post('http://localhost:3001/api/getAll', {table: "Field", fields:["name", "type", "id"]})
         .then(response => {
-          setFieldsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
+          setFieldsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
           setInit((prevState) => ({ ...prevState, fields: true}))
         })
     }
@@ -68,14 +70,15 @@ function Types () {
     if(init.types === false){
       axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
         .then(response => {
-          setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
+          setTypesList(response.data.result.map((val) => ({name:val[0], id:val[1]})))
           setInit((prevState) => ({ ...prevState, types: true}))
+          addMessage({children: response.data.message})
         })
     }
     if(init.fields === false){
       axios.post('http://localhost:3001/api/getAll', {table: "Field", fields:["name", "parent_type", "type", "id"]})
         .then(response => {
-          setFieldsList(response.data.value.map((val) => ({name:val[0], type:val[1], parent_type:val[2], id:val[3]})))
+          setFieldsList(response.data.result.map((val) => ({name:val[0], type:val[1], parent_type:val[2], id:val[3]})))
           setInit((prevState) => ({ ...prevState, fields: true}))
         })
     }
@@ -95,7 +98,7 @@ function Types () {
       socket.off("error", types_on_error)
       socket.off("update", types_on_update)
     }
-  },[init, fieldsList, typesList, socket])
+  },[init, fieldsList, typesList, socket, addMessage])
   return (
   <>
   <Grid>

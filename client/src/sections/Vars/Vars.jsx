@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react"
+import { useAddMessage } from "@react-md/alert"
 import { ExpansionPanel } from "@react-md/expansion-panel"
 import { Grid, GridCell } from '@react-md/utils'
 import VarsList from './VarsList'
@@ -10,6 +11,7 @@ import {SocketContext} from "../../Helpers/socket"
 
 function Vars () {
   const socket = useContext(SocketContext)
+  const addMessage = useAddMessage()
   const [varsList, setVarsList] = useState([])
   const [typesList, setTypesList] = useState([])
   const [init, setInit] = useState({types: false, vars: false})
@@ -23,12 +25,12 @@ function Vars () {
     const vars_on_connect = () => {
       axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
         .then(response => {
-          setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
+          setTypesList(response.data.result.map((val) => ({name:val[0], id:val[1]})))
           setInit((prevState) => ({ ...prevState, types: true}))
         })
       axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:["name", "type", "id"]})
         .then(response => {
-          setVarsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
+          setVarsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
           setInit((prevState) => ({ ...prevState, vars: true}))
         })
     }
@@ -70,15 +72,16 @@ function Vars () {
     if(init.types === false){
       axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
         .then(response => {
-          setTypesList(response.data.value.map((val) => ({name:val[0], id:val[1]})))
+          setTypesList(response.data.result.map((val) => ({name:val[0], id:val[1]})))
           setInit((prevState) => ({ ...prevState, types: true}))
         })
     }
     if(init.vars === false){
       axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:["name", "type", "id"]})
         .then(response => {
-          setVarsList(response.data.value.map((val) => ({name:val[0], type:val[1], id:val[2]})))
+          setVarsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
           setInit((prevState) => ({ ...prevState, vars: true}))
+          addMessage({children: response.data.message})
         })
     }
 
@@ -97,7 +100,7 @@ function Vars () {
       socket.off("error", vars_on_error)
       socket.off("update", vars_on_update)
     }
-  },[init, varsList, typesList, socket])
+  },[init, varsList, typesList, socket, addMessage])
   return (
   <>
   <Grid>
