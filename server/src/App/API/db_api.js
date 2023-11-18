@@ -68,7 +68,7 @@ module.exports = function (app, pool) {
       res.status(200).json({result: data.rows[0], message: "Record correctly inserted in table \"" + req.body.table + "\" "})
     })
     .catch((error) => {
-      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: '0', detail: 'Generic error (not reachable?)', message: 'Generic error (not reachable?)'})
+      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error: ' + error.code})
     })
   })
 
@@ -103,7 +103,7 @@ module.exports = function (app, pool) {
       res.sendStatus(200)
     })
     .catch((error) => {
-      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: '0', detail: 'Generic error (not reachable?)', message: 'Generic error (not reachable?)'})
+      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error: ' + error.code})
     })
   })
 
