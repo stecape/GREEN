@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useAddMessage } from "@react-md/alert"
 import { Button } from "@react-md/button"
 import DeleteTypePopup from "./DeleteTypePopup"
 import ModifyTypePopup from "./ModifyTypePopup"
@@ -14,13 +15,13 @@ import axios from 'axios'
 import tableStyles from '../../../styles/Table.module.scss'
 
 function TypesList (props) {
-
+  const addMessage = useAddMessage()
   const [typesList, setTypesList] = useState(props.typesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, id: 0, field: 0, name: '' })
   useEffect(() => {
     setTypesList(props.typesList)
-  }, [props.typesList])
+  }, [props.typesList, addMessage])
 
   return(
     <>
@@ -68,18 +69,67 @@ function TypesList (props) {
         name={deletePopup.name}
         delType={()=>{
           axios.post('http://localhost:3001/api/removeType', {id: deletePopup.id})
-            .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
+            .then(response => {
+              addMessage({children: response.data.message})
+            })
+            .catch(error => {
+              if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                addMessage({children: "Error: " + error.response.data.message, messageId: Date.now().toString()})
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                addMessage({children: "Error: database not reachable"})
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                addMessage({children: "Error: wrong request parameters"})
+                console.log('Error', error.message);
+              }
+              console.log(error.config);
+            })
+            .finally(()=>setDeletePopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
           setDeletePopup((prevState) => ({ ...prevState, visible: false }))
         }}
       />
+
       <ModifyTypePopup 
         visible={modifyTypePopup.visible}
         name={modifyTypePopup.name}
         updType={(data)=>{
           axios.post('http://localhost:3001/api/modify', {table: "Type", id: modifyTypePopup.id, fields: data.fields, values: data.values})
-            .then(setModifyTypePopup((prevState) => ({ ...prevState, visible: false })))
+          .then(response => {
+            addMessage({children: response.data.message})
+          })
+          .catch(error => {
+            if (error.response) {
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
+              addMessage({children: "Error: " + error.response.data.message, messageId: Date.now().toString()})
+              console.log(error.response.data);
+              console.log(error.response.status);
+              console.log(error.response.headers);
+            } else if (error.request) {
+              // The request was made but no response was received
+              // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+              // http.ClientRequest in node.js
+              addMessage({children: "Error: database not reachable"})
+              console.log(error.request);
+            } else {
+              // Something happened in setting up the request that triggered an Error
+              addMessage({children: "Error: wrong request parameters"})
+              console.log('Error', error.message);
+            }
+            console.log(error.config);
+          })
+          .finally(()=>setModifyTypePopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
           setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))

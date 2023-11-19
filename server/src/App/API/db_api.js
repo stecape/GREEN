@@ -100,7 +100,7 @@ module.exports = function (app, pool) {
       rowMode: 'array'
     })
     .then((data) => {
-      res.sendStatus(200)
+      res.status(200).json({result: data.rows, message: "Record correctly inserted"})
     })
     .catch((error) => {
       error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error: ' + error.code})
@@ -126,7 +126,7 @@ module.exports = function (app, pool) {
       text: queryString
     })
     .then((data)=>{
-      res.sendStatus(200)
+      res.status(200).json({result: data.rows, message: "Records correctly removed from table \"" + req.body.table + "\" "})
     })
     .catch((error) => {
       res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
@@ -157,7 +157,7 @@ module.exports = function (app, pool) {
       rowMode: 'array'
     })
     .then((data)=>{
-      res.sendStatus(200)
+      res.status(200).json({result: data.rows, message: "Record correctly removed from table \"" + req.body.table + "\" "})
     })
     .catch((error) => {
       res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
@@ -188,7 +188,7 @@ module.exports = function (app, pool) {
       rowMode: 'array'
     })
     .then((data)=>{
-      res.sendStatus(200)
+      res.status(200).json({result: data.rows[0], message: "Record correctly removed from table \"" + req.body.table + "\" "})
     })
     .catch((error) => {
       res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
@@ -228,7 +228,7 @@ module.exports = function (app, pool) {
       rowMode: 'array'
     })
     .then((data) => {
-      res.sendStatus(200)
+      res.status(200).json({result: data.rows[0], message: "Type \"" + req.body.values[0] + "\" correctly modified"})
     })
     .catch((error) => {
       //res.sendStatus(400)

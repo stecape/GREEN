@@ -113,11 +113,13 @@ function NewType (props) {
             }}
             create={(name)=>{
               return new Promise((innerResolve, innerReject) => {
-                axios.post('http://localhost:3001/api/add', {table: "Type", fields:["name"], values:[name]}).then((res)=>{
+                axios.post('http://localhost:3001/api/add', {table: "Type", fields:["name"], values:[name]})
+                .then((res)=>{
                   axios.post('http://localhost:3001/api/addMany', {table: "TypeDependencies", fields: ["type","dependent_type"], id: res.data.result[0], values: newTypeFieldsList.map(field => {return field.type})})
-                    .then((value)=>{innerResolve(value)})
-                    .catch((error)=>{innerReject(error)})
-                }).catch((error)=>{innerReject(error)})
+                  .then((value)=>{innerResolve(value)})
+                  .catch((error)=>{innerReject(error)})
+                })
+                .catch((error)=>{innerReject(error)})
               })
             }}
           />
