@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
 import { Button } from "@react-md/button"
 import DeleteVarPopup from "./DeleteVarPopup"
-import ModifyVarPopup from "./ModifyVarPopup"
-import { DeleteSVGIcon, EditSVGIcon } from "@react-md/material-icons"
+import UpsertVarPopup from "./UpsertVarPopup"
+import { DeleteSVGIcon, EditSVGIcon, AddSVGIcon } from "@react-md/material-icons"
 import {
   Table,
   TableBody,
@@ -19,6 +19,7 @@ function VarsList (props) {
   const [typesList, setTypesList] = useState(props.typesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyVarPopup, setModifyVarPopup] = useState({ visible: false, id: 0, type: 0, name: '' })
+  const [createVarPopup, setCreateVarPopup] = useState({ visible: false })
   useEffect(() => {
     setVarsList(props.varsList)
     setTypesList(props.typesList)
@@ -62,12 +63,15 @@ function VarsList (props) {
                       <EditSVGIcon />
                     </Button>
                 </TableCell>
+                <TableCell />
                 </TableRow>
               )
             })}
         </TableBody>
       </Table>
 
+      <Button floating="bottom-right" onClick={()=> setCreateVarPopup({visible: true})}><AddSVGIcon /></Button>
+      
       <DeleteVarPopup 
         visible={deletePopup.visible}
         name={deletePopup.name}
@@ -79,17 +83,33 @@ function VarsList (props) {
           setDeletePopup((prevState) => ({ ...prevState, visible: false }))
         }}
       />
-      <ModifyVarPopup 
+      <UpsertVarPopup 
         visible={modifyVarPopup.visible}
         name={modifyVarPopup.name}
         type={modifyVarPopup.type}
+        modalType="full-page"
         typesList={typesList}
-        updVar={(data)=>{
+        upsertVar={(data)=>{
           axios.post('http://localhost:3001/api/modify', {table: "Var", id: modifyVarPopup.id, fields: data.fields, values: data.values})
             .then(setModifyVarPopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
           setModifyVarPopup((prevState) => ({ ...prevState, visible: false }))
+        }}
+      />
+      <UpsertVarPopup 
+        visible={createVarPopup.visible}
+        create
+        name=""
+        type="0"
+        modalType="full-page"
+        typesList={typesList}
+        upsertVar={(data)=>{
+          axios.post('http://localhost:3001/api/add', {table: "Var", fields: data.fields, values: data.values})
+            .then(setCreateVarPopup((prevState) => ({ ...prevState, visible: false })))
+        }}
+        cancelCommand={()=>{
+          setCreateVarPopup((prevState) => ({ ...prevState, visible: false }))
         }}
       />
     </>

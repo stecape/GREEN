@@ -1,9 +1,7 @@
 import { useState, useEffect, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
-import { ExpansionPanel } from "@react-md/expansion-panel"
 import { Grid, GridCell } from '@react-md/utils'
 import VarsList from './VarsList'
-import NewVar from './NewVar'
 import gridStyles from "../../styles/Grid.module.scss"
 import axios from 'axios'
 
@@ -15,7 +13,6 @@ function Vars () {
   const [varsList, setVarsList] = useState([])
   const [typesList, setTypesList] = useState([])
   const [init, setInit] = useState({types: false, vars: false})
-  const [expanded, setExpanded] = useState(false);
 
   //State management
   useEffect(() => {
@@ -104,16 +101,6 @@ function Vars () {
   return (
   <>
   <Grid>
-    <GridCell colSpan={12} className={gridStyles.item}>
-      <ExpansionPanel
-        id="new-var"
-        expanded={expanded}
-        onExpandClick={() => setExpanded(!expanded)}
-        header="Create new var"
-      >
-        <NewVar typesList={typesList}/>
-      </ExpansionPanel>
-    </GridCell>
     <GridCell colSpan={12} className={gridStyles.item}>
       <VarsList typesList={typesList} varsList={varsList}/>
     </GridCell>
