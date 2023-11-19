@@ -3,7 +3,7 @@ import { useAddMessage } from "@react-md/alert"
 import { Button } from "@react-md/button"
 import DeleteTypePopup from "./DeleteTypePopup"
 import ModifyTypePopup from "./ModifyTypePopup"
-import { DeleteSVGIcon, EditSVGIcon } from "@react-md/material-icons"
+import { DeleteSVGIcon, EditSVGIcon, AddSVGIcon } from "@react-md/material-icons"
 import {
   Table,
   TableBody,
@@ -19,6 +19,7 @@ function TypesList (props) {
   const [typesList, setTypesList] = useState(props.typesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, id: 0, field: 0, name: '' })
+  const [createTypePopup, setCreateTypePopup] = useState({ visible: false})
   useEffect(() => {
     setTypesList(props.typesList)
   }, [props.typesList, addMessage])
@@ -58,11 +59,14 @@ function TypesList (props) {
                       <EditSVGIcon />
                     </Button>
                 </TableCell>
+                <TableCell />
                 </TableRow>
               )
             })}
         </TableBody>
       </Table>
+
+      <Button floating="bottom-right" onClick={()=> setCreateTypePopup({visible: true})}><AddSVGIcon /></Button>
 
       <DeleteTypePopup 
         visible={deletePopup.visible}
