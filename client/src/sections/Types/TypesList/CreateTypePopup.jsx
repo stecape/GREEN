@@ -15,7 +15,7 @@ import {SocketContext} from "../../../Helpers/socket"
 
 function CreateTypePopup (props) {
 
-  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: "1", typesList: props.typesList })
+  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: "0", typesList: props.typesList })
   
   const socket = useContext(SocketContext)
   const addMessage = useAddMessage()
@@ -24,8 +24,7 @@ function CreateTypePopup (props) {
   const [fieldType, setFieldType] = useState('')
   const [init, setInit] = useState({types: false, newTypeFields: false})
 
-  const handleReset = (event) => {
-    event.preventDefault()
+  const handleReset = () => {
     setModalState((prevState) => ({ ...prevState, name: "", visible: false}))
     axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
     props.cancelCommand()
@@ -131,8 +130,10 @@ function CreateTypePopup (props) {
               <NewTypeName 
                 typesList={props.typesList}
                 reset={()=>{
+                  console.log("done, reset")
                   setFieldName('')
                   setFieldType('')
+                  handleReset()
                 }}
                 upsertType={(name)=>{
                   return new Promise((innerResolve, innerReject) => {
@@ -141,8 +142,10 @@ function CreateTypePopup (props) {
                       axios.post('http://localhost:3001/api/addMany', {table: "TypeDependencies", fields: ["type","dependent_type"], id: res.data.result[0], values: newTypeFieldsList.map(field => {return field.type})})
                       .then((value)=>{innerResolve(value)})
                       .catch((error)=>{innerReject(error)})
+                      .finally(()=>{handleReset()})
                     })
                     .catch((error)=>{innerReject(error)})
+                    .finally(()=>{handleReset()})
                   })
                 }}
               />

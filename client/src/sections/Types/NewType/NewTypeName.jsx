@@ -20,13 +20,12 @@ function NewTypeName (props) {
   const handleSubmit = (event) => {
     event.preventDefault()
     //si chiama una promise in arrivo dalle props. La funzione deve eseguire la query di creazione, sul then poi bisogna resettare il form
-    props.create(name)
+    props.upsertType(name)
       .then((response)=>{  
         console.log(response)
         addMessage({children: response.data.message})
         axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
         setName('')
-        props.reset()
       })
       .catch(error => {
         if (error.response) {
@@ -49,6 +48,7 @@ function NewTypeName (props) {
       }
       console.log(error.config);
       })
+      .finally(()=>{props.reset()})
   }
   const handleReset = (event) => {
     event.preventDefault()
