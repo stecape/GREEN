@@ -3,6 +3,7 @@ import { useAddMessage } from "@react-md/alert"
 import { Button } from "@react-md/button"
 import DeleteTypePopup from "./DeleteTypePopup"
 import ModifyTypePopup from "./ModifyTypePopup"
+import CreateTypePopup from "./CreateTypePopup"
 import { DeleteSVGIcon, EditSVGIcon, AddSVGIcon } from "@react-md/material-icons"
 import {
   Table,
@@ -17,6 +18,7 @@ import tableStyles from '../../../styles/Table.module.scss'
 function TypesList (props) {
   const addMessage = useAddMessage()
   const [typesList, setTypesList] = useState(props.typesList)
+  const [newTypeFieldsList, setNewTypeFieldsList] = useState([])
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, id: 0, field: 0, name: '' })
   const [createTypePopup, setCreateTypePopup] = useState({ visible: false})
@@ -104,39 +106,14 @@ function TypesList (props) {
         }}
       />
 
-      <ModifyTypePopup 
-        visible={modifyTypePopup.visible}
-        name={modifyTypePopup.name}
-        updType={(data)=>{
-          axios.post('http://localhost:3001/api/modify', {table: "Type", id: modifyTypePopup.id, fields: data.fields, values: data.values})
-          .then(response => {
-            addMessage({children: response.data.message})
-          })
-          .catch(error => {
-            if (error.response) {
-              // The request was made and the server responded with a status code
-              // that falls out of the range of 2xx
-              addMessage({children: "Error: " + error.response.data.message, messageId: Date.now().toString()})
-              console.log(error.response.data);
-              console.log(error.response.status);
-              console.log(error.response.headers);
-            } else if (error.request) {
-              // The request was made but no response was received
-              // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-              // http.ClientRequest in node.js
-              addMessage({children: "Error: database not reachable"})
-              console.log(error.request);
-            } else {
-              // Something happened in setting up the request that triggered an Error
-              addMessage({children: "Error: wrong request parameters"})
-              console.log('Error', error.message);
-            }
-            console.log(error.config);
-          })
-          .finally(()=>setModifyTypePopup((prevState) => ({ ...prevState, visible: false })))
-        }}
+      <CreateTypePopup
+        visible={createTypePopup.visible}
+        create
+        name=""
+        modalType="full-page"
+        typesList={typesList}
         cancelCommand={()=>{
-          setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
+          setCreateTypePopup((prevState) => ({ ...prevState, visible: false }))
         }}
       />
     </>
