@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { AppBar, AppBarTitle, AppBarNav } from '@react-md/app-bar';
+import { Grid, GridCell } from '@react-md/utils'
 import { Button } from "@react-md/button"
 import { Dialog, DialogContent } from "@react-md/dialog"
 import { ArrowBackSVGIcon } from '@react-md/material-icons';
@@ -9,6 +10,7 @@ import {
   FormThemeProvider,
   Select
 } from '@react-md/form'
+import gridStyles from '../../styles/Grid.module.scss'
 import formStyles from '../../styles/Form.module.scss'
 
 function UpsertVarPopup (props) {
@@ -48,52 +50,58 @@ function UpsertVarPopup (props) {
     </AppBar>
       <DialogContent>
         <div className={formStyles.container}>
-          <FormThemeProvider theme='outline'>
-            <Form className={formStyles.form} onSubmit={handleSubmit} onReset={handleReset}>
-              <TextField
-              id='name'
-              key='name'
-              type='string'
-              placeholder="Var Name"
-              label="Var Name"
-              className={formStyles.item}
-              value={modalState.name}
-              onChange={(e) => setModalState((prevState) => ({ ...prevState, name: e.target.value}))}
-            />
-            <Select
-              id='type'
-              key='type'
-              type='string'
-              options={modalState.typesList.map((item) => ({
-                label: item.name,
-                value: item.id
-              }))}
-              value={modalState.type.toString()}
-              placeholder="Choose..."
-              label="Var Type"
-              className={formStyles.item}
-              onChange={(value) => setModalState((prevState) => ({ ...prevState, type: value}))}
-            />
-              <div className={formStyles.btn_container}>
-                <Button
-                  type="submit"
-                  theme="primary"
-                  themeType="outline"
-                  className={formStyles.btn}
-                >
-                  {props.create ? "Create" : "Save"}
-                </Button>
-                <Button
-                  type="reset"
-                  theme="error"
-                  themeType="outline"
-                  className={formStyles.btn}
-                >
-                  Cancel
-                </Button>
+          <Grid>
+            <GridCell colSpan={12} className={gridStyles.item}>
+              <div className={formStyles.container}>
+                <FormThemeProvider theme='outline'>
+                  <Form className={formStyles.form} onSubmit={handleSubmit} onReset={handleReset}>
+                    <TextField
+                    id='name'
+                    key='name'
+                    type='string'
+                    placeholder="Var Name"
+                    label="Var Name"
+                    className={formStyles.item}
+                    value={modalState.name}
+                    onChange={(e) => setModalState((prevState) => ({ ...prevState, name: e.target.value}))}
+                  />
+                  <Select
+                    id='type'
+                    key='type'
+                    type='string'
+                    options={modalState.typesList.map((item) => ({
+                      label: item.name,
+                      value: item.id
+                    }))}
+                    value={modalState.type.toString()}
+                    placeholder="Choose..."
+                    label="Var Type"
+                    className={formStyles.item}
+                    onChange={(value) => setModalState((prevState) => ({ ...prevState, type: value}))}
+                  />
+                    <div className={formStyles.btn_container}>
+                      <Button
+                        type="submit"
+                        theme="primary"
+                        themeType="outline"
+                        className={formStyles.btn}
+                      >
+                        {props.create ? "Create" : "Save"}
+                      </Button>
+                      <Button
+                        type="reset"
+                        theme="error"
+                        themeType="outline"
+                        className={formStyles.btn}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </Form>
+                </FormThemeProvider>
               </div>
-            </Form>
-          </FormThemeProvider>
+            </GridCell>
+          </Grid>
         </div>
       </DialogContent>      
     </Dialog>
