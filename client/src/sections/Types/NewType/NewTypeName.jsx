@@ -6,7 +6,6 @@ import {
   TextField,
   FormThemeProvider
 } from '@react-md/form'
-import axios from 'axios'
 import formStyles from '../../../styles/Form.module.scss'
 
 
@@ -22,10 +21,7 @@ function NewTypeName (props) {
     //si chiama una promise in arrivo dalle props. La funzione deve eseguire la query di creazione, sul then poi bisogna resettare il form
     props.upsertType(name)
       .then((response)=>{  
-        console.log(response)
         addMessage({children: response.data.message})
-        axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
-        setName('')
       })
       .catch(error => {
         if (error.response) {
@@ -48,11 +44,9 @@ function NewTypeName (props) {
       }
       console.log(error.config);
       })
-      .finally(()=>{props.reset()})
+      .finally(handleReset)
   }
-  const handleReset = (event) => {
-    event.preventDefault()
-    axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
+  const handleReset = () => {
     setName('')
     props.reset()
   }

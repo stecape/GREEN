@@ -25,7 +25,8 @@ function CreateTypePopup (props) {
   const [init, setInit] = useState({types: false, newTypeFields: false})
 
   const handleReset = () => {
-    setModalState((prevState) => ({ ...prevState, name: "", visible: false}))
+    setFieldName('')
+    setFieldType('')
     axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
     props.cancelCommand()
   }
@@ -114,14 +115,14 @@ function CreateTypePopup (props) {
       role="alertdialog"
       type={modalState.modalType}
       visible={modalState.visible}
-      onRequestClose={props.cancelCommand}
+      onRequestClose={handleReset}
       aria-labelledby="dialog-title"
     >
     <AppBar id={`appbarT`} theme="primary" key="primary">
       <AppBarNav onClick={handleReset} aria-label="Close">
         <ArrowBackSVGIcon />
       </AppBarNav>
-      <AppBarTitle>{props.create ? "Creating Type" : "Modifying " + modalState.name}</AppBarTitle>
+      <AppBarTitle>{props.create ? "Creating Type" + modalState.name : "Modifying " + modalState.name}</AppBarTitle>
     </AppBar>
       <DialogContent>
         <div className={formStyles.container}>
@@ -129,12 +130,7 @@ function CreateTypePopup (props) {
             <GridCell colSpan={12} className={gridStyles.item}>
               <NewTypeName 
                 typesList={props.typesList}
-                reset={()=>{
-                  console.log("done, reset")
-                  setFieldName('')
-                  setFieldType('')
-                  handleReset()
-                }}
+                reset={handleReset}
                 upsertType={(name)=>{
                   return new Promise((innerResolve, innerReject) => {
                     axios.post('http://localhost:3001/api/add', {table: "Type", fields:["name"], values:[name]})
@@ -142,10 +138,8 @@ function CreateTypePopup (props) {
                       axios.post('http://localhost:3001/api/addMany', {table: "TypeDependencies", fields: ["type","dependent_type"], id: res.data.result[0], values: newTypeFieldsList.map(field => {return field.type})})
                       .then((value)=>{innerResolve(value)})
                       .catch((error)=>{innerReject(error)})
-                      .finally(()=>{handleReset()})
                     })
                     .catch((error)=>{innerReject(error)})
-                    .finally(()=>{handleReset()})
                   })
                 }}
               />

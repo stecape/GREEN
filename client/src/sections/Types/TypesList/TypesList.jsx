@@ -2,7 +2,6 @@ import { useState, useEffect } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Button } from "@react-md/button"
 import DeleteTypePopup from "./DeleteTypePopup"
-import ModifyTypePopup from "./ModifyTypePopup"
 import CreateTypePopup from "./CreateTypePopup"
 import { DeleteSVGIcon, EditSVGIcon, AddSVGIcon } from "@react-md/material-icons"
 import {
@@ -18,7 +17,7 @@ import tableStyles from '../../../styles/Table.module.scss'
 function TypesList (props) {
   const addMessage = useAddMessage()
   const [typesList, setTypesList] = useState(props.typesList)
-  const [newTypeFieldsList, setNewTypeFieldsList] = useState([])
+  const [fieldsList, setFieldsList] = useState(props.typesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, id: 0, field: 0, name: '' })
   const [createTypePopup, setCreateTypePopup] = useState({ visible: false})
@@ -103,6 +102,24 @@ function TypesList (props) {
         }}
         cancelCommand={()=>{
           setDeletePopup((prevState) => ({ ...prevState, visible: false }))
+        }}
+      />
+
+      {/*
+       * Modify Popup
+       * Devo popolare la tabella con i fields,
+       * Devo passare i Types,
+       * Devo aggiornare il nome del Type
+      */}
+      <CreateTypePopup
+        visible={modifyTypePopup.visible}
+        name={modifyTypePopup.name}
+        id={modifyTypePopup.id}
+        modalType="full-page"
+        typesList={typesList}
+        fieldsList={fieldsList}
+        cancelCommand={()=>{
+          setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
         }}
       />
 
