@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext, useRef } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { AppBar, AppBarTitle, AppBarNav } from '@react-md/app-bar'
 import { Grid, GridCell } from '@react-md/utils'
@@ -20,13 +20,9 @@ function CreateTypePopup (props) {
   const socket = useContext(SocketContext)
   const addMessage = useAddMessage()
   const [newTypeFieldsList, setNewTypeFieldsList] = useState([])
-  const [fieldName, setFieldName] = useState('')
-  const [fieldType, setFieldType] = useState('')
-  const [init, setInit] = useState({types: false, newTypeFields: false})
+  const init = useRef(false)
 
   const handleReset = () => {
-    setFieldName('')
-    setFieldType('')
     axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
     props.cancelCommand()
   }
@@ -41,11 +37,10 @@ function CreateTypePopup (props) {
       axios.post('http://localhost:3001/api/getAll', {table: "NewTypeTmp", fields:["name", "type", "id"]})
         .then(response => {
           setNewTypeFieldsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
-          setInit((prevState) => ({ ...prevState, vars: true}))
         })
         .catch(error => {
           addMessage({
-            children: error.message,
+            children: error.response.data.message,
           })
         })
     }
@@ -83,11 +78,11 @@ function CreateTypePopup (props) {
     }
 
     //On component load request the lists
-    if(init.newTypeFields === false){
+    if(!init.current){
+      init.current = true
       axios.post('http://localhost:3001/api/getAll', {table: "NewTypeTmp", fields:["name", "type", "id"]})
         .then(response => {
           setNewTypeFieldsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
-          setInit((prevState) => ({ ...prevState, newTypeFields: true}))
         })
     }
 
@@ -135,6 +130,7 @@ function CreateTypePopup (props) {
                   return new Promise((innerResolve, innerReject) => {
                     axios.post('http://localhost:3001/api/add', {table: "Type", fields:["name"], values:[name]})
                     .then((res)=>{
+                      axios.post('http://localhost:3001/api/addFields', {table: "Field", fields: ["parent_type","name","type"], id: res.data.result[0], values: newTypeFieldsList.map(field => {return [field.name, field.type]})})
                       axios.post('http://localhost:3001/api/addMany', {table: "TypeDependencies", fields: ["type","dependent_type"], id: res.data.result[0], values: newTypeFieldsList.map(field => {return field.type})})
                       .then((value)=>{innerResolve(value)})
                       .catch((error)=>{innerReject(error)})
@@ -145,13 +141,7 @@ function CreateTypePopup (props) {
               />
             </GridCell>
             <GridCell colSpan={12} className={gridStyles.item}>
-              <NewField 
-                typesList={props.typesList}
-                fieldName={fieldName}
-                setFieldName={(name)=>setFieldName(name)}
-                fieldType={fieldType}
-                setFieldType={(type)=>setFieldType(type)}
-              />
+              <NewField typesList={props.typesList} />
             </GridCell>
             <GridCell colSpan={12} className={gridStyles.item}>
               <FieldsList typesList={props.typesList} newTypeFieldsList={newTypeFieldsList}/>

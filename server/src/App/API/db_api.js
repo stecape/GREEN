@@ -34,7 +34,7 @@ module.exports = function (app, pool) {
       res.status(200).json({result: data.rows, message: data.rowCount + " record(s) from table \"" + req.body.table + "\" returned correctly"})
     })
     .catch((error) => {
-      res.sendStatus(400)
+      res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
     })
   })
 
@@ -171,7 +171,7 @@ module.exports = function (app, pool) {
   Type:   POST
   Route:  '/api/removeType'
   Body:   { id: 182 }
-  Query:  DELETE FROM "TypeDependencies"  WHERE "type" = 182; DELETE FROM "Type" WHERE "id" = 182
+  Query:  DELETE FROM "TypeDependencies" WHERE "type" = 182; DELETE FROM "Field" WHERE "type" = 182; DELETE FROM "Type" WHERE "id" = 182
   Event:  {
             operation: 'DELETE',
             table: 'Type',
@@ -181,7 +181,7 @@ module.exports = function (app, pool) {
   Err:    400
   */
   app.post('/api/removeType', (req, res) => {
-    var queryString="DELETE FROM \"TypeDependencies\"  WHERE \"type\" = " + req.body.id + "; DELETE FROM \"Type\" WHERE \"id\" = " + req.body.id
+    var queryString="DELETE FROM \"TypeDependencies\"  WHERE \"type\" = " + req.body.id + "; DELETE FROM \"Field\"  WHERE \"parent_type\" = " + req.body.id + "; DELETE FROM \"Type\" WHERE \"id\" = " + req.body.id
     console.log(queryString)
     pool.query({
       text: queryString,
@@ -231,8 +231,86 @@ module.exports = function (app, pool) {
       res.status(200).json({result: data.rows[0], message: "Type \"" + req.body.values[0] + "\" correctly modified"})
     })
     .catch((error) => {
-      //res.sendStatus(400)
       res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
+    })
+  })
+
+
+  
+  /*
+  Read fields
+  Type:   POST
+  Route:  '/api/getFields'
+  Body:   {
+            table: 'Field',
+            type: 128
+          }
+  Query:  SELECT * from "Field" where "parent_type" = 128
+  Event:  -
+  Res:    200,
+          {
+            value: [
+              [ 'Temperature 1', 1, 131 ],
+              [ 'Temperature 2', 1, 124 ],
+              [ 'Temperature 3', 3, 125 ]
+            ]
+          }
+  Err:    400
+  */
+  app.post('/api/getFields', (req, res) => {
+    var queryString="SELECT * from \"Field\" where \"parent_type\" = " + req.body.type
+    console.log(queryString)
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then((data)=>{
+      res.status(200).json({result: data.rows, message: data.rowCount + " record(s) from table \"Field\" returned correctly"})
+    })
+    .catch((error) => {
+      res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
+    })
+  })
+
+
+
+  /*
+  Add many fields for one type
+  Type:   POST
+  Route:  '/api/addFields'
+  Body:   {
+            parent_type: 396,
+            fields: [ 'name', 'type', 'parent_type' ],
+            values: [ [ 'Set', 394 ], [ 'Act', 395 ] ]
+          }
+  Query:  INSERT INTO "Field" ("id","parent_type","name","type") VALUES (DEFAULT,'396','Set',394),(DEFAULT,'396','Act',395)
+  Event:  {
+            operation: 'INSERT',
+            table: 'Field',
+            data: { id: 9, name: 'Set', type: 394, parent_type: 396 }
+          }
+          {
+            operation: 'INSERT',
+            table: 'Field',
+            data: { id: 10, name: 'Act', type: 395, parent_type: 396 }
+          }
+  Res:    200
+  Err:    400
+  */
+  app.post('/api/addFields', (req, res) => {
+    console.log(req.body.values)
+    var queryString="INSERT INTO \"Field\" (\"id\",\"" + req.body.fields.join('","') + "\") VALUES "
+    queryString += req.body.values.map((field) =>"(DEFAULT,'" + req.body.id + "','" + field[0] + "'," + field[1] +")").join(",")
+    console.log("addFields queryString: ", queryString)
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then((data) => {
+      res.status(200).json({result: data.rows, message: "Record correctly inserted"})
+    })
+    .catch((error) => {
+      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error: ' + error.code})
     })
   })
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useAddMessage } from "@react-md/alert"
 import { Button } from '@react-md/button'
 import {
   Form,
@@ -11,21 +12,49 @@ import formStyles from '../../../styles/Form.module.scss'
 
 
 function NewField (props) {
+  const addMessage = useAddMessage()
   const [typesList, setTypesList] = useState(props.typesList)
-  const [name, setName] = useState(props.fieldName)
-  const [type, setType] = useState(props.fieldType)
+  const [name, setName] = useState("")
+  const [type, setType] = useState("0")
 
   useEffect(() => { 
     setTypesList(props.typesList)
-    setName(props.fieldName)
-    setType(props.fieldType)
-  }, [props.typesList, props.fieldName, props.fieldType])
+  }, [props.typesList])
 
 
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    axios.post('http://localhost:3001/api/add', {table: "NewTypeTmp", fields:["name", "type"], values:[name, type]}).then((value)=>{}).catch((error)=>console.log(error))
+    axios.post('http://localhost:3001/api/add', {table: "NewTypeTmp", fields:["name", "type"], values:[name, type]})
+    .then(()=>{handleReset()})
+    .catch(error => {
+      if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      addMessage({children: "Error: " + error.response.data.message, messageId: Date.now().toString()})
+      console.log(error.response.data);
+      console.log(error.response.status);
+      console.log(error.response.headers);
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      addMessage({children: "Error: database not reachable"})
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      addMessage({children: "Error: wrong request parameters"})
+      console.log('Error', error.message);
+    }
+    console.log(error.config);
+    })
+  }
+
+
+  //Form Events
+  const handleReset = () => {
+    setName("")
+    setType("0")
   }
 
   return(
@@ -39,7 +68,7 @@ function NewField (props) {
           label="Field Name"
           className={formStyles.item}
           value={name}
-          onChange={(e) => props.setFieldName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
         />
         <Select
           id='type'
@@ -53,7 +82,7 @@ function NewField (props) {
           placeholder="Choose..."
           label="Field Type"
           className={formStyles.item}
-          onChange={(type) => props.setFieldType(type)}
+          onChange={(type) => setType(type)}
         />
         <div className={formStyles.btn_container}>
           <Button

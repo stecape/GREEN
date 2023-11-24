@@ -3,6 +3,7 @@ import { useAddMessage } from "@react-md/alert"
 import { Button } from "@react-md/button"
 import DeleteTypePopup from "./DeleteTypePopup"
 import CreateTypePopup from "./CreateTypePopup"
+import ModifyTypePopup from "./ModifyTypePopup"
 import { DeleteSVGIcon, EditSVGIcon, AddSVGIcon } from "@react-md/material-icons"
 import {
   Table,
@@ -17,7 +18,6 @@ import tableStyles from '../../../styles/Table.module.scss'
 function TypesList (props) {
   const addMessage = useAddMessage()
   const [typesList, setTypesList] = useState(props.typesList)
-  const [fieldsList, setFieldsList] = useState(props.typesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, id: 0, field: 0, name: '' })
   const [createTypePopup, setCreateTypePopup] = useState({ visible: false})
@@ -55,7 +55,12 @@ function TypesList (props) {
                       id="icon-button-4"
                       buttonType="icon"
                       aria-label="Edit"
-                      onClick={()=> setModifyTypePopup({visible: true, id: item.id, name: item.name})}
+                      onClick={()=> 
+                        axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
+                        .then(
+                          axios.post('http://localhost:3001/api/getFields', {type: item.id})
+                          .then((res) => console.log(res)))
+                      }
                     >
                       <EditSVGIcon />
                     </Button>
@@ -67,7 +72,14 @@ function TypesList (props) {
         </TableBody>
       </Table>
 
-      <Button floating="bottom-right" onClick={()=> setCreateTypePopup({visible: true})}><AddSVGIcon /></Button>
+      <Button 
+        floating="bottom-right" 
+        onClick={()=>
+          axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
+          .then(setCreateTypePopup({visible: true}))}
+      >
+        <AddSVGIcon />
+      </Button>
 
       <DeleteTypePopup 
         visible={deletePopup.visible}
@@ -111,13 +123,12 @@ function TypesList (props) {
        * Devo passare i Types,
        * Devo aggiornare il nome del Type
       */}
-      <CreateTypePopup
+      <ModifyTypePopup
         visible={modifyTypePopup.visible}
         name={modifyTypePopup.name}
         id={modifyTypePopup.id}
         modalType="full-page"
         typesList={typesList}
-        fieldsList={fieldsList}
         cancelCommand={()=>{
           setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
         }}
@@ -136,3 +147,21 @@ function TypesList (props) {
     </>
   )}
 export default TypesList
+
+/*
+onClick={()=> 
+  axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})//Qui devo prendere i field da l relativo type e riempire la tabella fields tmp
+  .then(
+    axios.post('http://localhost:3001/api/getFields', {type: item.id})
+    .then((res) => axios.post(
+      'http://localhost:3001/api/addMany', 
+      {
+        table: "NewTypeTmp",
+        fields: ["name", "type", "id"],
+        id: res.data.result[0],
+        type: res.data.result.map(field => {return field.type}),
+        name: res.data.result.map(field => {return field.name})
+      })
+      .then((res) => setModifyTypePopup({visible: true, id: item.id, name: item.name}))))
+}
+*/

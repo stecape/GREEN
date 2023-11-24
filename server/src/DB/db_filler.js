@@ -12,8 +12,7 @@ module.exports = function () {
       type integer NOT NULL,
       parent_type integer NOT NULL,
       logic_values text COLLATE pg_catalog."default",
-      um text COLLATE pg_catalog."default",
-      CONSTRAINT unique_field_name UNIQUE (name)
+      um text COLLATE pg_catalog."default"
     );
     
     CREATE TABLE IF NOT EXISTS public."TypeDependencies"
