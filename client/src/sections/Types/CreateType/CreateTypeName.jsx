@@ -6,10 +6,10 @@ import {
   TextField,
   FormThemeProvider
 } from '@react-md/form'
-import formStyles from '../../../../styles/Form.module.scss'
+import formStyles from '../../../styles/Form.module.scss'
 
 
-function ModifyTypeName (props) {
+function NewTypeName (props) {
   const addMessage = useAddMessage()
   const [name, setName] = useState(props.name ? props.name : "")
 
@@ -75,15 +75,14 @@ function ModifyTypeName (props) {
           </Button>
           <Button
             type="reset"
-            theme="error"
             themeType="outline"
             className={formStyles.btn}
           >
-            Reset
+            Cancel
           </Button>
         </div>
       </Form>
     </FormThemeProvider>
     </div>
   )}
-export default ModifyTypeName
+export default NewTypeName

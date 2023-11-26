@@ -7,11 +7,11 @@ import { ArrowBackSVGIcon } from '@react-md/material-icons'
 import FieldsList from './ModifyType/FieldsList'
 import NewField from './ModifyType/NewField'
 import ModifyTypeName from './ModifyType/ModifyTypeName'
-import gridStyles from '../../../styles/Grid.module.scss'
-import formStyles from '../../../styles/Form.module.scss'
+import gridStyles from '../../styles/Grid.module.scss'
+import formStyles from '../../styles/Form.module.scss'
 import axios from 'axios'
 
-import {SocketContext} from "../../../Helpers/socket"
+import {SocketContext} from "../../Helpers/socket"
 
 function ModifyTypePopup (props) {
 

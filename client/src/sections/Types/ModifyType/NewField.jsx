@@ -8,7 +8,7 @@ import {
   Select
 } from '@react-md/form'
 import axios from 'axios'
-import formStyles from '../../../../styles/Form.module.scss'
+import formStyles from '../../../styles/Form.module.scss'
 
 
 function NewField (props) {

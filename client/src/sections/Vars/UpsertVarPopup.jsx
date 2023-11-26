@@ -89,7 +89,6 @@ function UpsertVarPopup (props) {
                       </Button>
                       <Button
                         type="reset"
-                        theme="error"
                         themeType="outline"
                         className={formStyles.btn}
                       >

@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@react-md/table'
 import axios from 'axios'
-import tableStyles from '../../../styles/Table.module.scss'
+import tableStyles from '../../styles/Table.module.scss'
 
 function TypesList (props) {
   const addMessage = useAddMessage()

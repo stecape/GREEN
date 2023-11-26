@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Grid, GridCell } from '@react-md/utils'
-import TypesList from './TypesList/TypesList'
+import TypesList from './TypesList'
 import gridStyles from "../../styles/Grid.module.scss"
 import axios from 'axios'
 

@@ -7,11 +7,11 @@ import { ArrowBackSVGIcon } from '@react-md/material-icons'
 import FieldsList from './CreateType/FieldsList'
 import NewField from './CreateType/NewField'
 import CreateTypeName from './CreateType/CreateTypeName'
-import gridStyles from '../../../styles/Grid.module.scss'
-import formStyles from '../../../styles/Form.module.scss'
+import gridStyles from '../../styles/Grid.module.scss'
+import formStyles from '../../styles/Form.module.scss'
 import axios from 'axios'
 
-import {SocketContext} from "../../../Helpers/socket"
+import {SocketContext} from "../../Helpers/socket"
 
 function CreateTypePopup (props) {
 
