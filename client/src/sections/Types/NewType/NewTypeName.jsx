@@ -11,7 +11,7 @@ import formStyles from '../../../styles/Form.module.scss'
 
 function NewTypeName (props) {
   const addMessage = useAddMessage()
-  const [name, setName] = useState('')
+  const [name, setName] = useState(props.name ? props.name : "")
 
 
 

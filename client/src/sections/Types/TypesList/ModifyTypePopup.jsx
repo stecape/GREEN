@@ -15,7 +15,7 @@ import {SocketContext} from "../../../Helpers/socket"
 
 function ModifyTypePopup (props) {
 
-  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: "0", typesList: props.typesList })
+  const [modalState, setModalState] = useState({ visible: false, name: props.name, modalType: props.modalType, type: props.type, typesList: props.typesList })
   
   const socket = useContext(SocketContext)
   const addMessage = useAddMessage()
@@ -74,7 +74,6 @@ function ModifyTypePopup (props) {
         updFields[index] = value.data
         setNewTypeFieldsList([...updFields])
       }
-      console.log(args)
     }
 
     //On component load request the lists
@@ -106,7 +105,7 @@ function ModifyTypePopup (props) {
   
   return (
     <Dialog
-      id="draft-dialog"
+      id="modify-type-dialog"
       role="alertdialog"
       type={modalState.modalType}
       visible={modalState.visible}
@@ -117,13 +116,14 @@ function ModifyTypePopup (props) {
       <AppBarNav onClick={handleReset} aria-label="Close">
         <ArrowBackSVGIcon />
       </AppBarNav>
-      <AppBarTitle>{props.create ? "Creating Type" + modalState.name : "Modifying " + modalState.name}</AppBarTitle>
+      <AppBarTitle>{"Modifying " + modalState.name}</AppBarTitle>
     </AppBar>
       <DialogContent>
         <div className={formStyles.container}>
           <Grid>
             <GridCell colSpan={12} className={gridStyles.item}>
               <NewTypeName 
+                name={modalState.name}
                 typesList={props.typesList}
                 reset={handleReset}
                 upsertType={(name)=>{

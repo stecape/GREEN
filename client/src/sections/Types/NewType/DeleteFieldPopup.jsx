@@ -13,7 +13,7 @@ function DeleteFieldPopup (props) {
   
   return (
     <Dialog
-      id="draft-dialog"
+      id="delete-field-dialog"
       role="alertdialog"
       modal={modalState.modal}
       visible={modalState.visible}

@@ -13,7 +13,7 @@ function DeleteTypePopup (props) {
   
   return (
     <Dialog
-      id="draft-dialog"
+      id="delete-type-dialog"
       role="alertdialog"
       modal={modalState.modal}
       visible={modalState.visible}

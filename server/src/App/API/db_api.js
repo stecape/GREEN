@@ -258,17 +258,40 @@ module.exports = function (app, pool) {
   Err:    400
   */
   app.post('/api/getFields', (req, res) => {
-    var queryString="SELECT * from \"Field\" where \"parent_type\" = " + req.body.type
-    console.log(queryString)
+    var response = {
+      name: "",
+      type: req.body.type,
+      fields: []
+    }
+    var queryString="SELECT \"name\" from \"Type\" where \"id\" = " + req.body.type
+    console.log(response)
     pool.query({
       text: queryString,
       rowMode: 'array'
-    })
-    .then((data)=>{
-      res.status(200).json({result: data.rows, message: data.rowCount + " record(s) from table \"Field\" returned correctly"})
-    })
-    .catch((error) => {
-      res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
+    }).then((name) => { 
+      response.name = name.rows[0][0]
+      var queryString="SELECT * from \"Field\" where \"parent_type\" = " + req.body.type
+      console.log(response)
+      pool.query({
+        text: queryString,
+        rowMode: 'array'
+      })
+      .then((data)=>{
+        response.fields = data.rows
+        console.log(response)
+        var queryString="INSERT INTO \"NewTypeTmp\" (\"id\",\"name\",\"type\") VALUES " + data.rows.map(i => "(" + i[0] + ",'" + i[1] + "'," + i[2] + ")").join(",")
+        console.log(queryString)
+        pool.query({
+          text: queryString,
+          rowMode: 'array'
+        })
+        .then(()=>{
+          res.status(200).json({result: response, message: "Record(s) from table \"Field\" returned correctly"})
+        })
+      })
+      .catch((error) => {
+        res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
+      })
     })
   })
 

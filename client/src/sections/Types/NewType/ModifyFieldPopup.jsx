@@ -29,7 +29,7 @@ function ModifyFieldPopup (props) {
   
   return (
     <Dialog
-      id="draft-dialog"
+      id="modify-field-dialog"
       role="alertdialog"
       modal={modalState.modal}
       visible={modalState.visible}

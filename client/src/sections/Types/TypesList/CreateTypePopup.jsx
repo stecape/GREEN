@@ -74,7 +74,6 @@ function CreateTypePopup (props) {
         updFields[index] = value.data
         setNewTypeFieldsList([...updFields])
       }
-      console.log(args)
     }
 
     //On component load request the lists
@@ -106,7 +105,7 @@ function CreateTypePopup (props) {
   
   return (
     <Dialog
-      id="draft-dialog"
+      id="create-type-dialog"
       role="alertdialog"
       type={modalState.modalType}
       visible={modalState.visible}
@@ -117,7 +116,7 @@ function CreateTypePopup (props) {
       <AppBarNav onClick={handleReset} aria-label="Close">
         <ArrowBackSVGIcon />
       </AppBarNav>
-      <AppBarTitle>{props.create ? "Creating Type" + modalState.name : "Modifying " + modalState.name}</AppBarTitle>
+      <AppBarTitle>{"Creating Type"}</AppBarTitle>
     </AppBar>
       <DialogContent>
         <div className={formStyles.container}>

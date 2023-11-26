@@ -19,7 +19,7 @@ function TypesList (props) {
   const addMessage = useAddMessage()
   const [typesList, setTypesList] = useState(props.typesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
-  const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, id: 0, field: 0, name: '' })
+  const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, type: 0, name: '' })
   const [createTypePopup, setCreateTypePopup] = useState({ visible: false})
   useEffect(() => {
     setTypesList(props.typesList)
@@ -59,7 +59,10 @@ function TypesList (props) {
                         axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
                         .then(
                           axios.post('http://localhost:3001/api/getFields', {type: item.id})
-                          .then((res) => console.log(res)))
+                          .then((res) => {
+                            console.log(res)
+                            setModifyTypePopup((prevState) => ({ ...prevState, visible: true, name: res.data.result.name, type: res.data.result.type }))
+                          }))
                       }
                     >
                       <EditSVGIcon />
@@ -126,7 +129,7 @@ function TypesList (props) {
       <ModifyTypePopup
         visible={modifyTypePopup.visible}
         name={modifyTypePopup.name}
-        id={modifyTypePopup.id}
+        id={modifyTypePopup.type}
         modalType="full-page"
         typesList={typesList}
         cancelCommand={()=>{
@@ -136,7 +139,6 @@ function TypesList (props) {
 
       <CreateTypePopup
         visible={createTypePopup.visible}
-        create
         name=""
         modalType="full-page"
         typesList={typesList}

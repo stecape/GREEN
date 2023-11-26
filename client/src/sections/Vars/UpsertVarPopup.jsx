@@ -35,7 +35,7 @@ function UpsertVarPopup (props) {
   
   return (
     <Dialog
-      id="draft-dialog"
+      id="upsert-var-dialog"
       role="alertdialog"
       type={modalState.modalType}
       visible={modalState.visible}

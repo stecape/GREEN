@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom"
 import { MessageQueue } from "@react-md/alert"
+import { NestedDialogContextProvider } from "@react-md/dialog"
 import Home from "./sections/Home/Home"
 import Types from "./sections/Types/Types"
 import Vars from "./sections/Vars/Vars"
@@ -8,6 +9,7 @@ import NoPage from "./sections/NoPage/NoPage"
 function App () {
   return (
   <>
+    <NestedDialogContextProvider>
     <MessageQueue id="notify"  duplicates="allow">
     <Routes>
           <Route index element={<Home />} />
@@ -16,6 +18,7 @@ function App () {
           <Route path="*" element={<NoPage />} />
     </Routes>
     </MessageQueue>
+    </NestedDialogContextProvider>
   </>
 )}
 export default App

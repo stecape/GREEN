@@ -13,7 +13,7 @@ function DeleteVarPopup (props) {
   
   return (
     <Dialog
-      id="draft-dialog"
+      id="delete-var-dialog"
       role="alertdialog"
       modal={modalState.modal}
       visible={modalState.visible}
