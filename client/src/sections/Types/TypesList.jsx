@@ -128,7 +128,7 @@ function TypesList (props) {
       <ModifyTypePopup
         visible={modifyTypePopup.visible}
         name={modifyTypePopup.name}
-        id={modifyTypePopup.type}
+        type={modifyTypePopup.type}
         modalType="full-page"
         typesList={typesList}
         cancelCommand={()=>{

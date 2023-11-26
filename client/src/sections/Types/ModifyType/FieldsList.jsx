@@ -15,14 +15,15 @@ import tableStyles from '../../../styles/Table.module.scss'
 
 function FieldsList (props) {
 
-  const [newTypeFieldsList, setNewTypeFieldsList] = useState(props.newTypeFieldsList)
+  const [typeFieldsList, setTypeFieldsList] = useState(props.typeFieldsList)
   const [typesList, setTypesList] = useState([])
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyFieldPopup, setModifyFieldPopup] = useState({ visible: false, id: 0, type: 0, name: '' })
   useEffect(() => {          
-    setNewTypeFieldsList(props.newTypeFieldsList)
+    console.log()
+    setTypeFieldsList(props.typeFieldsList)
     setTypesList(props.typesList)
-  }, [props.newTypeFieldsList, props.typesList])
+  }, [props.typeFieldsList, props.typesList])
 
   return(
     <>
@@ -35,7 +36,7 @@ function FieldsList (props) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {newTypeFieldsList.map((item) => {
+          {typeFieldsList.map((item) => {
               var typeItem = typesList.find(i => i.id === item.type)
               return (
                 <TableRow

@@ -62,7 +62,13 @@ function ModifyTypeName (props) {
           label="Type Name"
           className={formStyles.item}
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value)
+          }}
+          onBlur={(e) => {
+            props.changeName(e.target.value)
+          }}
+          
         />
         <div className={formStyles.btn_container}>
           <Button
