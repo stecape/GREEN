@@ -59,7 +59,6 @@ function UpsertVarPopup (props) {
                     id='name'
                     key='name'
                     type='string'
-                    placeholder="Var Name"
                     label="Var Name"
                     className={formStyles.item}
                     value={modalState.name}

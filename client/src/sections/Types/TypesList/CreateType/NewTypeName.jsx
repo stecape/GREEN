@@ -6,7 +6,7 @@ import {
   TextField,
   FormThemeProvider
 } from '@react-md/form'
-import formStyles from '../../../styles/Form.module.scss'
+import formStyles from '../../../../styles/Form.module.scss'
 
 
 function NewTypeName (props) {

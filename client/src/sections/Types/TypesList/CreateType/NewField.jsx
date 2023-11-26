@@ -8,7 +8,7 @@ import {
   Select
 } from '@react-md/form'
 import axios from 'axios'
-import formStyles from '../../../styles/Form.module.scss'
+import formStyles from '../../../../styles/Form.module.scss'
 
 
 function NewField (props) {
@@ -62,8 +62,8 @@ function NewField (props) {
     <FormThemeProvider theme='outline'>
       <Form className={formStyles.form} onSubmit={handleSubmit}>
         <TextField
-          id='name'
-          key='name'
+          id='field-name'
+          key='field-name'
           type='string'
           label="Field Name"
           className={formStyles.item}
@@ -71,8 +71,8 @@ function NewField (props) {
           onChange={(e) => setName(e.target.value)}
         />
         <Select
-          id='type'
-          key='type'
+          id='field-type'
+          key='field-type'
           type='string'
           options={typesList.map((item) => ({
             label: item.name,

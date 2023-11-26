@@ -94,7 +94,6 @@ module.exports = function (app, pool) {
   */
   app.post('/api/addMany', (req, res) => {
     var queryString="INSERT INTO \"" + req.body.table + "\" (\"id\",\"" + req.body.fields.join('","') + "\") VALUES (DEFAULT,'" + req.body.id + "', unnest(array[" + req.body.values.join(',') + "]))"
-    console.log("addMany queryString: ", queryString)
     pool.query({
       text: queryString,
       rowMode: 'array'
@@ -151,7 +150,6 @@ module.exports = function (app, pool) {
   */
   app.post('/api/removeOne', (req, res) => {
     var queryString="DELETE FROM \"" + req.body.table + "\" WHERE \"id\" = " + req.body.id
-    console.log(queryString)
     pool.query({
       text: queryString,
       rowMode: 'array'
@@ -182,7 +180,6 @@ module.exports = function (app, pool) {
   */
   app.post('/api/removeType', (req, res) => {
     var queryString="DELETE FROM \"TypeDependencies\"  WHERE \"type\" = " + req.body.id + "; DELETE FROM \"Field\"  WHERE \"parent_type\" = " + req.body.id + "; DELETE FROM \"Type\" WHERE \"id\" = " + req.body.id
-    console.log(queryString)
     pool.query({
       text: queryString,
       rowMode: 'array'
@@ -220,9 +217,7 @@ module.exports = function (app, pool) {
     var sets = req.body.fields.map((i, index) => {
        return "\"" + i + "\" = '" + req.body.values[index] + "'"
     })
-    console.log(req.body)
     var queryString="UPDATE \"" + req.body.table + "\" SET " + sets + " WHERE id = " + req.body.id
-    console.log(queryString)
     pool.query({
       text: queryString,
       rowMode: 'array'
@@ -264,23 +259,19 @@ module.exports = function (app, pool) {
       fields: []
     }
     var queryString="SELECT \"name\" from \"Type\" where \"id\" = " + req.body.type
-    console.log(response)
     pool.query({
       text: queryString,
       rowMode: 'array'
     }).then((name) => { 
       response.name = name.rows[0][0]
       var queryString="SELECT * from \"Field\" where \"parent_type\" = " + req.body.type
-      console.log(response)
       pool.query({
         text: queryString,
         rowMode: 'array'
       })
       .then((data)=>{
         response.fields = data.rows
-        console.log(response)
         var queryString="INSERT INTO \"NewTypeTmp\" (\"id\",\"name\",\"type\") VALUES " + data.rows.map(i => "(" + i[0] + ",'" + i[1] + "'," + i[2] + ")").join(",")
-        console.log(queryString)
         pool.query({
           text: queryString,
           rowMode: 'array'
@@ -324,7 +315,6 @@ module.exports = function (app, pool) {
     console.log(req.body.values)
     var queryString="INSERT INTO \"Field\" (\"id\",\"" + req.body.fields.join('","') + "\") VALUES "
     queryString += req.body.values.map((field) =>"(DEFAULT,'" + req.body.id + "','" + field[0] + "'," + field[1] +")").join(",")
-    console.log("addFields queryString: ", queryString)
     pool.query({
       text: queryString,
       rowMode: 'array'

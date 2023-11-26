@@ -60,7 +60,6 @@ function TypesList (props) {
                         .then(
                           axios.post('http://localhost:3001/api/getFields', {type: item.id})
                           .then((res) => {
-                            console.log(res)
                             setModifyTypePopup((prevState) => ({ ...prevState, visible: true, name: res.data.result.name, type: res.data.result.type }))
                           }))
                       }

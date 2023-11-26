@@ -51,8 +51,7 @@ function ModifyFieldPopup (props) {
               id='name'
               key='name'
               type='string'
-              placeholder="Var Name"
-              label="Var Name"
+              label="Field Name"
               value={modalState.name}
               onChange={(e) => setModalState((prevState) => ({ ...prevState, name: e.target.value}))}
             />
