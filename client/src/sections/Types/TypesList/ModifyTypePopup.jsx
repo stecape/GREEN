@@ -6,7 +6,7 @@ import { Dialog, DialogContent } from "@react-md/dialog"
 import { ArrowBackSVGIcon } from '@react-md/material-icons'
 import FieldsList from './ModifyType/FieldsList'
 import NewField from './ModifyType/NewField'
-import NewTypeName from './ModifyType/NewTypeName'
+import ModifyTypeName from './ModifyType/ModifyTypeName'
 import gridStyles from '../../../styles/Grid.module.scss'
 import formStyles from '../../../styles/Form.module.scss'
 import axios from 'axios'
@@ -122,7 +122,7 @@ function ModifyTypePopup (props) {
         <div className={formStyles.container}>
           <Grid>
             <GridCell colSpan={12} className={gridStyles.item}>
-              <NewTypeName 
+              <ModifyTypeName 
                 name={modalState.name}
                 typesList={props.typesList}
                 reset={handleReset}

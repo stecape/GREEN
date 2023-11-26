@@ -9,7 +9,7 @@ import {
 import formStyles from '../../../../styles/Form.module.scss'
 
 
-function NewTypeName (props) {
+function ModifyTypeName (props) {
   const addMessage = useAddMessage()
   const [name, setName] = useState(props.name ? props.name : "")
 
@@ -86,4 +86,4 @@ function NewTypeName (props) {
     </FormThemeProvider>
     </div>
   )}
-export default NewTypeName
+export default ModifyTypeName

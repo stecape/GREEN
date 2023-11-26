@@ -6,7 +6,7 @@ import { Dialog, DialogContent } from "@react-md/dialog"
 import { ArrowBackSVGIcon } from '@react-md/material-icons'
 import FieldsList from './CreateType/FieldsList'
 import NewField from './CreateType/NewField'
-import NewTypeName from './CreateType/NewTypeName'
+import CreateTypeName from './CreateType/CreateTypeName'
 import gridStyles from '../../../styles/Grid.module.scss'
 import formStyles from '../../../styles/Form.module.scss'
 import axios from 'axios'
@@ -122,7 +122,7 @@ function CreateTypePopup (props) {
         <div className={formStyles.container}>
           <Grid>
             <GridCell colSpan={12} className={gridStyles.item}>
-              <NewTypeName 
+              <CreateTypeName 
                 typesList={props.typesList}
                 reset={handleReset}
                 upsertType={(name)=>{
