@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Button } from '@react-md/button'
 import {
@@ -7,11 +7,13 @@ import {
   FormThemeProvider
 } from '@react-md/form'
 import formStyles from '../../../styles/Form.module.scss'
-
+import { ModifyTypeContext } from '../ModifyTypePopup'
 
 function ModifyTypeName (props) {
   const addMessage = useAddMessage()
-  const [name, setName] = useState(props.name ? props.name : "")
+  const {query, setQuery} = useContext(ModifyTypeContext)
+  const [name, setName] = useState(props.name)
+  const [prevName, setPrevName] = useState(props.name)
 
 
 
@@ -46,6 +48,7 @@ function ModifyTypeName (props) {
       })
       .finally(handleReset)
   }
+
   const handleReset = () => {
     setName('')
     props.reset()
@@ -66,7 +69,12 @@ function ModifyTypeName (props) {
             setName(e.target.value)
           }}
           onBlur={(e) => {
-            props.changeName(e.target.value)
+            if (prevName !== name) {
+              var tmpQueryArray = query
+              tmpQueryArray.push(`UPDATE "Type" SET name = '${name}' WHERE id = ${props.type}`)
+              setQuery(tmpQueryArray)
+              setPrevName(name)
+            }
           }}
           
         />
