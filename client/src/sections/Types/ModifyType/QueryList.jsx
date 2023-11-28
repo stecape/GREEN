@@ -4,7 +4,7 @@ import { List, ListItem } from "@react-md/list"
 import { ModifyTypeContext } from '../ModifyTypePopup'
 
 function QueryList () {
-  const {query, setQuery} = useContext(ModifyTypeContext)
+  const {query} = useContext(ModifyTypeContext)
 
   return (
     <List>

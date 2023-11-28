@@ -70,9 +70,7 @@ function ModifyTypeName (props) {
           }}
           onBlur={(e) => {
             if (prevName !== name) {
-              var tmpQueryArray = query
-              tmpQueryArray.push(`UPDATE "Type" SET name = '${name}' WHERE id = ${props.type}`)
-              setQuery(tmpQueryArray)
+              setQuery([...query, `UPDATE "Type" SET name = '${name}' WHERE id = ${props.type}`])
               setPrevName(name)
             }
           }}
