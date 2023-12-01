@@ -45,7 +45,6 @@ function ModifyTypePopup (props) {
 
   useEffect(() => {
     setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, visible: props.visible, typesList: props.typesList}))
-
     //clear query on exit
     if (props.type !== modalState.type){
       setQuery([])

@@ -28,8 +28,6 @@ function NewField (props) {
   const handleSubmit = (event) => {
     event.preventDefault()
     setQuery([...query, `INSERT into "Field" ("id","name","type") VALUES  (DEFAULT, '${name}', ${type})`])
-    axios.post('http://localhost:3001/api/getTypeGraph', {id: 394})
-    .then((res) => console.log(res.data.result))
     axios.post('http://localhost:3001/api/add', {table: "NewTypeTmp", fields:["name", "type"], values:[name, type]})
     .then(()=>{handleReset()})
     .catch(error => {

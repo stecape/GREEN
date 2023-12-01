@@ -19,7 +19,7 @@ function TypesList (props) {
   const addMessage = useAddMessage()
   const [typesList, setTypesList] = useState(props.typesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
-  const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, type: 0, name: '' })
+  const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, type: 0, name: '', deps: [] })
   const [createTypePopup, setCreateTypePopup] = useState({ visible: false})
   useEffect(() => {
     setTypesList(props.typesList)
@@ -60,7 +60,7 @@ function TypesList (props) {
                         .then(
                           axios.post('http://localhost:3001/api/getFields', {type: item.id})
                           .then((res) => {
-                            setModifyTypePopup((prevState) => ({ ...prevState, visible: true, name: res.data.result.name, type: res.data.result.type }))
+                            setModifyTypePopup((prevState) => ({ ...prevState, visible: true, name: res.data.result.name, type: res.data.result.type, deps: res.data.result.deps }))
                           }))
                       }
                     >
@@ -130,7 +130,7 @@ function TypesList (props) {
         name={modifyTypePopup.name}
         type={modifyTypePopup.type}
         modalType="full-page"
-        typesList={typesList}
+        typesList={typesList.filter(i => !modifyTypePopup.deps.includes(i.id) )}
         cancelCommand={()=>{
           setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
         }}

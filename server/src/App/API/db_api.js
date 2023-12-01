@@ -252,17 +252,40 @@ module.exports = function (app, pool) {
           }
   Err:    400
   */
+ 
+
+  const DFS = (graph, typeId, visited = undefined, depthCounter = undefined) => {
+    if (visited == undefined) {
+      visited = new Set()
+    }
+    if (depthCounter == undefined) {
+      depthCounter = 0
+    }
+    visited.add(typeId)
+    depthCounter++
+    graph[typeId]
+      .filter((item) => !visited.has(item))
+      .forEach((parent) => DFS(graph, parent, visited, depthCounter))
+    depthCounter--
+    if (depthCounter == 0) {
+      return visited
+    }
+  }
+
+
   app.post('/api/getFields', (req, res) => {
     var response = {
       name: "",
       type: req.body.type,
-      fields: []
+      fields: [],
+      deps: []
     }
     var queryString="SELECT \"name\" from \"Type\" where \"id\" = " + req.body.type
     pool.query({
       text: queryString,
       rowMode: 'array'
-    }).then((name) => { 
+    })
+    .then((name) => { 
       response.name = name.rows[0][0]
       var queryString="SELECT * from \"Field\" where \"parent_type\" = " + req.body.type
       pool.query({
@@ -276,13 +299,50 @@ module.exports = function (app, pool) {
           text: queryString,
           rowMode: 'array'
         })
-        .then(()=>{
-          res.status(200).json({result: response, message: "Record(s) from table \"Field\" returned correctly"})
+        .then(() => {
+          var result = []
+          var queryString=`
+          SELECT
+          distinct "Type".id, "Field".parent_type
+          FROM "Type"
+          INNER JOIN "Field" ON "Field".type="Type".id
+          ORDER by id
+          `
+          pool.query({
+            text: queryString,
+            rowMode: 'array'
+          })
+          .then((data) => {
+            result = data.rows
+            var queryString=`
+              SELECT
+              distinct "Field".parent_type
+              FROM "Field"
+              LEFT JOIN (
+                SELECT
+                distinct "Type".id
+                FROM "Type"
+                INNER JOIN "Field" ON "Field".type="Type".id
+              ) a ON a.id = "Field".parent_type
+              WHERE a.id IS NULL
+            `
+            pool.query({
+              text: queryString,
+              rowMode: 'array'
+            })
+            .then((data) => {
+              var graph = {}
+              result.map(k => graph[k[0]] = result.filter(i => i[0] == k[0]).map(j => j[1]))
+              data.rows.map(k => graph[k[0]] = [])
+              response.deps = [...DFS(graph, req.body.type)]       //Spread operator, DSF returns a Set, I want an array
+              res.status(200).json({result: response, message: "Record(s) from table \"Field\" returned correctly"})
+            })
+          })
         })
       })
-      .catch((error) => {
-        res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
-      })
+    })
+    .catch((error) => {
+      res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
     })
   })
 
@@ -344,19 +404,9 @@ module.exports = function (app, pool) {
   Err:    400
   */
 
-  const DFS = (graph, typeId, visited = undefined) => {
-    console.log(typeId, visited)
-    if (visited == undefined) {
-      visited = new Set()
-    }
-    visited.add(typeId)
-    graph[typeId]
-      .filter((item) => !visited.has(item))
-      .forEach((parent) => DFS(graph, parent, visited))
-    return visited
-  }
 
-  app.post('/api/getTypeGraph', (req, res) => {
+  app.post('/api/getTypeDeps', (req, res) => {
+    var result = []
     var queryString=`
     SELECT
     distinct "Type".id, "Field".parent_type
@@ -364,21 +414,35 @@ module.exports = function (app, pool) {
     INNER JOIN "Field" ON "Field".type="Type".id
     ORDER by id
     `
-
-    
     pool.query({
       text: queryString,
       rowMode: 'array'
     })
     .then((data) => {
-      console.log(data.rows)
-      var graph = {}
-      data.rows.map(k => graph[k[0]] = data.rows.filter(i => i[0] == k[0]).map(j => j[1]))
-      console.log(graph)
-      console.log("id: ", req.body.id)
-      var parents = DFS(graph, req.body.id)
-      console.log("parents: ", parents)
-      res.status(200).json({result: parents, message: "Record correctly returned"})
+      result = data.rows
+      var queryString=`
+        SELECT
+        distinct "Field".parent_type
+        FROM "Field"
+        LEFT JOIN (
+          SELECT
+          distinct "Type".id
+          FROM "Type"
+          INNER JOIN "Field" ON "Field".type="Type".id
+        ) a ON a.id = "Field".parent_type
+        WHERE a.id IS NULL
+      `
+      pool.query({
+        text: queryString,
+        rowMode: 'array'
+      })
+      .then((data) => {
+        var graph = {}
+        result.map(k => graph[k[0]] = result.filter(i => i[0] == k[0]).map(j => j[1]))
+        data.rows.map(k => graph[k[0]] = [])
+        var parents = [...DFS(graph, req.body.id)]       //Spread operator, DSF returns a Set, I want an array  
+        res.status(200).json({result: parents, message: "Record correctly returned"})          
+      })
     })
     .catch((error) => {
       error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error: ' + error.code})
