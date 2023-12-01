@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { Button } from "@react-md/button"
 import DeleteFieldPopup from "./DeleteFieldPopup"
 import ModifyFieldPopup from "./ModifyFieldPopup"
@@ -12,9 +12,11 @@ import {
 } from '@react-md/table'
 import axios from 'axios'
 import tableStyles from '../../../styles/Table.module.scss'
+import { ModifyTypeContext } from '../ModifyTypePopup'
+
 
 function FieldsList (props) {
-
+  const {query, setQuery} = useContext(ModifyTypeContext)
   const [typeFieldsList, setTypeFieldsList] = useState(props.typeFieldsList)
   const [typesList, setTypesList] = useState([])
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
@@ -73,6 +75,13 @@ function FieldsList (props) {
         visible={deletePopup.visible}
         name={deletePopup.name}
         delField={()=>{
+          var fieldData = typeFieldsList.find(i => i.id === deletePopup.id)
+          console.log(props.type, typeFieldsList, fieldData)
+          setQuery([
+            ...query,
+            `DELETE from "Field" WHERE "name" = '${fieldData.name}' AND "parent_type" = ${props.type}`,
+            `DELETE from "TypeDependencies" WHERE "id" = '${fieldData.name}' AND "parent_type" = ${props.type}`
+          ])
           axios.post('http://localhost:3001/api/removeOne', {table: "NewTypeTmp", id: deletePopup.id})
             .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
         }}

@@ -326,4 +326,62 @@ module.exports = function (app, pool) {
       error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error: ' + error.code})
     })
   })
+
+
+
+  /*
+  Get Type dependency graph
+  Type:   POST
+  Route:  '/api/getTypeGraph'
+  Body:   -
+  Query:  INSERT INTO "Field" ("id","parent_type","name","type") VALUES (DEFAULT,'396','Set',394),(DEFAULT,'396','Act',395)
+  Event:  {
+            operation: 'INSERT',
+            table: 'Field',
+            data: { id: 9, name: 'Set', type: 394, parent_type: 396 }
+          }
+  Res:    200
+  Err:    400
+  */
+
+  const DFS = (graph, typeId, visited = undefined) => {
+    console.log(typeId, visited)
+    if (visited == undefined) {
+      visited = new Set()
+    }
+    visited.add(typeId)
+    graph[typeId]
+      .filter((item) => !visited.has(item))
+      .forEach((parent) => DFS(graph, parent, visited))
+    return visited
+  }
+
+  app.post('/api/getTypeGraph', (req, res) => {
+    var queryString=`
+    SELECT
+    distinct "Type".id, "Field".parent_type
+    FROM "Type"
+    INNER JOIN "Field" ON "Field".type="Type".id
+    ORDER by id
+    `
+
+    
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then((data) => {
+      console.log(data.rows)
+      var graph = {}
+      data.rows.map(k => graph[k[0]] = data.rows.filter(i => i[0] == k[0]).map(j => j[1]))
+      console.log(graph)
+      console.log("id: ", req.body.id)
+      var parents = DFS(graph, req.body.id)
+      console.log("parents: ", parents)
+      res.status(200).json({result: parents, message: "Record correctly returned"})
+    })
+    .catch((error) => {
+      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error: ' + error.code})
+    })
+  })
 }

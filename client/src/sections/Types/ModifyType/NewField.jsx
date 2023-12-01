@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Button } from '@react-md/button'
 import {
@@ -9,10 +9,12 @@ import {
 } from '@react-md/form'
 import axios from 'axios'
 import formStyles from '../../../styles/Form.module.scss'
+import { ModifyTypeContext } from '../ModifyTypePopup'
 
 
 function NewField (props) {
   const addMessage = useAddMessage()
+  const {query, setQuery} = useContext(ModifyTypeContext)
   const [typesList, setTypesList] = useState(props.typesList)
   const [name, setName] = useState("")
   const [type, setType] = useState("0")
@@ -25,6 +27,9 @@ function NewField (props) {
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
+    setQuery([...query, `INSERT into "Field" ("id","name","type") VALUES  (DEFAULT, '${name}', ${type})`])
+    axios.post('http://localhost:3001/api/getTypeGraph', {id: 394})
+    .then((res) => console.log(res.data.result))
     axios.post('http://localhost:3001/api/add', {table: "NewTypeTmp", fields:["name", "type"], values:[name, type]})
     .then(()=>{handleReset()})
     .catch(error => {

@@ -147,6 +147,7 @@ function ModifyTypePopup (props) {
               <GridCell colSpan={12} className={gridStyles.item}>
                 <ModifyTypeName
                   name={modalState.name}
+                  type={modalState.type}
                   typesList={props.typesList}
                   reset={handleReset}
                   upsertType={(name)=> upsertType(name)}
@@ -156,7 +157,7 @@ function ModifyTypePopup (props) {
                 <NewField typesList={props.typesList} />
               </GridCell>
               <GridCell colSpan={12} className={gridStyles.item}>
-                <FieldsList typesList={props.typesList} typeFieldsList={typeFieldsList}/>
+                <FieldsList type={props.type} typesList={props.typesList} typeFieldsList={typeFieldsList}/>
               </GridCell>
               <GridCell colSpan={12} className={gridStyles.item}>
                 <QueryList />
