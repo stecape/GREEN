@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, createContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Button } from "@react-md/button"
 import DeleteTypePopup from "./DeleteTypePopup"
@@ -15,8 +15,11 @@ import {
 import axios from 'axios'
 import tableStyles from '../../styles/Table.module.scss'
 
+export const ModifyTypeContext = createContext()
+
 function TypesList (props) {
   const addMessage = useAddMessage()
+  const [editType, setEditType] = useState({query:[]})
   const [typesList, setTypesList] = useState(props.typesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, type: 0, name: '', deps: [] })
@@ -60,7 +63,15 @@ function TypesList (props) {
                         .then(
                           axios.post('http://localhost:3001/api/getFields', {type: item.id})
                           .then((res) => {
-                            setModifyTypePopup((prevState) => ({ ...prevState, visible: true, name: res.data.result.name, type: res.data.result.type, deps: res.data.result.deps }))
+                            //////////////////////////////////////////////////////////////////////////////////////////77QUI SETTO IL CONTEXT E POI CONFIGURO IL POPUP
+                            setEditType(() => ({
+                              query: [],
+                              name: res.data.result.name,
+                              type: res.data.result.type,
+                              fields: res.data.result.fields,
+                              deps: res.data.result.deps
+                            }))
+                            setModifyTypePopup((prevState) => ({ ...prevState, visible: true }))
                           }))
                       }
                     >
@@ -125,17 +136,25 @@ function TypesList (props) {
        * Devo passare i Types,
        * Devo aggiornare il nome del Type
       */}
-      <ModifyTypePopup
-        visible={modifyTypePopup.visible}
-        name={modifyTypePopup.name}
-        type={modifyTypePopup.type}
-        modalType="full-page"
-        typesList={typesList.filter(i => !modifyTypePopup.deps.includes(i.id) )}
-        cancelCommand={()=>{
-          setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
-        }}
-      />
-
+      
+      <ModifyTypeContext.Provider value={{ editType, setEditType }}>
+        <ModifyTypePopup
+          visible={modifyTypePopup.visible}
+          name={modifyTypePopup.name}
+          type={modifyTypePopup.type}
+          modalType="full-page"
+          typesList={typesList.filter(i => !modifyTypePopup.deps.includes(i.id) )}
+          cancelCommand={()=>{
+            setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
+            setEditType(() => ({
+              query: [],
+              name: "",
+              type: "0",
+              fields: []
+            }))
+          }}
+        />
+      </ModifyTypeContext.Provider>
       <CreateTypePopup
         visible={createTypePopup.visible}
         name=""

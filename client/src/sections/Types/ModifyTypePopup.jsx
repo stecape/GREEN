@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useContext, createContext } from "react"
+import { useState, useEffect, useRef, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { AppBar, AppBarTitle, AppBarNav } from '@react-md/app-bar'
 import { Grid, GridCell } from '@react-md/utils'
@@ -13,8 +13,7 @@ import formStyles from '../../styles/Form.module.scss'
 import axios from 'axios'
 
 import {SocketContext} from "../../Helpers/socket"
-
-export const ModifyTypeContext = createContext()
+import { ModifyTypeContext } from './TypesList'
 
 function ModifyTypePopup (props) {
 
@@ -23,7 +22,7 @@ function ModifyTypePopup (props) {
   
   const [modalState, setModalState] = useState({ visible: false, name: props.name, modalType: props.modalType, type: props.type, typesList: props.typesList })
   const [typeFieldsList, setTypeFieldsList] = useState([])
-  const [query, setQuery] = useState([])
+  const {editType, setEditType} = useContext(ModifyTypeContext)
   const init = useRef(false)
   const upsertType = (name)=>{
     return new Promise((innerResolve, innerReject) => {
@@ -47,7 +46,6 @@ function ModifyTypePopup (props) {
     setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, visible: props.visible, typesList: props.typesList}))
     //clear query on exit
     if (props.type !== modalState.type){
-      setQuery([])
     }
 
     //Socket listeners callbacks definition
@@ -99,7 +97,7 @@ function ModifyTypePopup (props) {
     //On component load request the lists
     if(!init.current){
       init.current = true
-      setQuery([])
+      setEditType({query:[]})
       axios.post('http://localhost:3001/api/getAll', {table: "NewTypeTmp", fields:["name", "type", "id"]})
         .then(response => {
           setTypeFieldsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
@@ -122,50 +120,48 @@ function ModifyTypePopup (props) {
       socket.off("update", modify_type_on_update)
     }
     
-  },[props.name, props.visible, props.type, props.typesList, init, typeFieldsList, socket, addMessage, modalState.type])
+  },[props.name, props.visible, props.type, props.typesList, init, typeFieldsList, socket, addMessage, modalState.type, setEditType])
   
   return (
-    <ModifyTypeContext.Provider value={{query, setQuery}}>
-      <Dialog
-        id="modify-type-dialog"
-        role="alertdialog"
-        type={modalState.modalType}
-        visible={modalState.visible}
-        onRequestClose={handleReset}
-        aria-labelledby="dialog-title"
-      >
-        <AppBar id={`appbarT`} theme="primary" key="primary">
-          <AppBarNav onClick={handleReset} aria-label="Close">
-            <ArrowBackSVGIcon />
-          </AppBarNav>
-          <AppBarTitle>{"Modifying " + modalState.name}</AppBarTitle>
-        </AppBar>
-        <DialogContent>
-          <div className={formStyles.container}>
-            <Grid>
-              <GridCell colSpan={12} className={gridStyles.item}>
-                <ModifyTypeName
-                  name={modalState.name}
-                  type={modalState.type}
-                  typesList={props.typesList}
-                  reset={handleReset}
-                  upsertType={(name)=> upsertType(name)}
-                />
-              </GridCell>
-              <GridCell colSpan={12} className={gridStyles.item}>
-                <NewField typesList={props.typesList} />
-              </GridCell>
-              <GridCell colSpan={12} className={gridStyles.item}>
-                <FieldsList type={props.type} typesList={props.typesList} typeFieldsList={typeFieldsList}/>
-              </GridCell>
-              <GridCell colSpan={12} className={gridStyles.item}>
-                <QueryList />
-              </GridCell>
-            </Grid>
-          </div>
-        </DialogContent>      
-      </Dialog>
-    </ModifyTypeContext.Provider>
+    <Dialog
+      id="modify-type-dialog"
+      role="alertdialog"
+      type={modalState.modalType}
+      visible={modalState.visible}
+      onRequestClose={handleReset}
+      aria-labelledby="dialog-title"
+    >
+      <AppBar id={`appbarT`} theme="primary" key="primary">
+        <AppBarNav onClick={handleReset} aria-label="Close">
+          <ArrowBackSVGIcon />
+        </AppBarNav>
+        <AppBarTitle>{"Modifying " + modalState.name}</AppBarTitle>
+      </AppBar>
+      <DialogContent>
+        <div className={formStyles.container}>
+          <Grid>
+            <GridCell colSpan={12} className={gridStyles.item}>
+              <ModifyTypeName
+                name={modalState.name}
+                type={modalState.type}
+                typesList={props.typesList}
+                reset={handleReset}
+                upsertType={(name)=> upsertType(name)}
+              />
+            </GridCell>
+            <GridCell colSpan={12} className={gridStyles.item}>
+              <NewField typesList={props.typesList} />
+            </GridCell>
+            <GridCell colSpan={12} className={gridStyles.item}>
+              <FieldsList type={props.type} typesList={props.typesList} typeFieldsList={typeFieldsList}/>
+            </GridCell>
+            <GridCell colSpan={12} className={gridStyles.item}>
+              <QueryList />
+            </GridCell>
+          </Grid>
+        </div>
+      </DialogContent>      
+    </Dialog>
   )
 }
 export default ModifyTypePopup

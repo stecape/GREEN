@@ -1,14 +1,14 @@
 import { useContext } from "react"
 import { List, ListItem } from "@react-md/list"
 
-import { ModifyTypeContext } from '../ModifyTypePopup'
+import { ModifyTypeContext } from '../TypesList'
 
 function QueryList () {
-  const {query} = useContext(ModifyTypeContext)
+  const {editType} = useContext(ModifyTypeContext)
 
   return (
     <List>
-        {query.map((q, i) => (
+        {editType.query.map((q, i) => (
         <ListItem key={`query_${i}`} id={`query_${i}`}>
             {q}
         </ListItem>

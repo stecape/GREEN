@@ -9,12 +9,12 @@ import {
 } from '@react-md/form'
 import axios from 'axios'
 import formStyles from '../../../styles/Form.module.scss'
-import { ModifyTypeContext } from '../ModifyTypePopup'
+import { ModifyTypeContext } from '../TypesList'
 
 
 function NewField (props) {
   const addMessage = useAddMessage()
-  const {query, setQuery} = useContext(ModifyTypeContext)
+  const {editType, setEditType} = useContext(ModifyTypeContext)
   const [typesList, setTypesList] = useState(props.typesList)
   const [name, setName] = useState("")
   const [type, setType] = useState("0")
@@ -27,7 +27,7 @@ function NewField (props) {
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    setQuery([...query, `INSERT into "Field" ("id","name","type") VALUES  (DEFAULT, '${name}', ${type})`])
+    setEditType((prevState) => ({...prevState, query: [...editType.query, `INSERT into "Field" ("id","name","type") VALUES  (DEFAULT, '${name}', ${type})`]}))
     axios.post('http://localhost:3001/api/add', {table: "NewTypeTmp", fields:["name", "type"], values:[name, type]})
     .then(()=>{handleReset()})
     .catch(error => {

@@ -7,11 +7,11 @@ import {
   FormThemeProvider
 } from '@react-md/form'
 import formStyles from '../../../styles/Form.module.scss'
-import { ModifyTypeContext } from '../ModifyTypePopup'
+import { ModifyTypeContext } from '../TypesList'
 
 function ModifyTypeName (props) {
   const addMessage = useAddMessage()
-  const {query, setQuery} = useContext(ModifyTypeContext)
+  const {editType, setEditType} = useContext(ModifyTypeContext)
   const [name, setName] = useState(props.name)
   const [prevName, setPrevName] = useState(props.name)
 
@@ -70,7 +70,7 @@ function ModifyTypeName (props) {
           }}
           onBlur={(e) => {
             if (prevName !== name) {
-              setQuery([...query, `UPDATE "Type" SET name = '${name}' WHERE id = ${props.type}`])
+              setEditType((prevState) => ({...prevState, query: [...editType.query, `UPDATE "Type" SET name = '${name}' WHERE id = ${props.type}`]}))
               setPrevName(name)
             }
           }}
