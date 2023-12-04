@@ -69,7 +69,7 @@ function TypesList (props) {
                               name: res.data.result.name,
                               type: res.data.result.type,
                               fields: res.data.result.fields,
-                              deps: res.data.result.deps
+                              typesList: typesList.filter(i => !res.data.result.deps.includes(i.id) )
                             }))
                             setModifyTypePopup((prevState) => ({ ...prevState, visible: true }))
                           }))
@@ -140,8 +140,6 @@ function TypesList (props) {
       <ModifyTypeContext.Provider value={{ editType, setEditType }}>
         <ModifyTypePopup
           visible={modifyTypePopup.visible}
-          name={modifyTypePopup.name}
-          type={modifyTypePopup.type}
           modalType="full-page"
           typesList={typesList.filter(i => !modifyTypePopup.deps.includes(i.id) )}
           cancelCommand={()=>{
@@ -151,6 +149,7 @@ function TypesList (props) {
               name: "",
               type: "0",
               fields: []
+              //////////////////finire di pulire
             }))
           }}
         />
