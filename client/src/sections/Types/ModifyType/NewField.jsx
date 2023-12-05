@@ -1,5 +1,4 @@
 import { useState, useContext } from "react"
-import { useAddMessage } from "@react-md/alert"
 import { Button } from '@react-md/button'
 import {
   Form,
@@ -7,13 +6,11 @@ import {
   FormThemeProvider,
   Select
 } from '@react-md/form'
-import axios from 'axios'
 import formStyles from '../../../styles/Form.module.scss'
 import { ModifyTypeContext } from '../TypesList'
 
 
 function NewField () {
-  const addMessage = useAddMessage()
   const {editType, setEditType} = useContext(ModifyTypeContext)
   const [name, setName] = useState("")
   const [type, setType] = useState("0")
@@ -21,30 +18,14 @@ function NewField () {
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    setEditType((prevState) => ({...prevState, query: [...editType.query, `INSERT into "Field" ("id","name","type") VALUES  (DEFAULT, '${name}', ${type})`]}))
-    axios.post('http://localhost:3001/api/add', {table: "NewTypeTmp", fields:["name", "type"], values:[name, type]})
-    .then(()=>{handleReset()})
-    .catch(error => {
-      if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      addMessage({children: "Error: " + error.response.data.message, messageId: Date.now().toString()})
-      console.log(error.response.data);
-      console.log(error.response.status);
-      console.log(error.response.headers);
-    } else if (error.request) {
-      // The request was made but no response was received
-      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-      // http.ClientRequest in node.js
-      addMessage({children: "Error: database not reachable"})
-      console.log(error.request);
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      addMessage({children: "Error: wrong request parameters"})
-      console.log('Error', error.message);
-    }
-    console.log(error.config);
-    })
+    console.log(editType.typesList, type)
+    var typeItem = editType.typesList.find(i => i.id === type)
+    console.log(typeItem)
+    setEditType((prevState) => ({
+      ...prevState,
+      fields: [...editType.fields, { id: Math.floor(Date.now() / 1000), type: typeItem.name, name: name }],
+      query: [...editType.query, `INSERT into "Field" ("id","name","type") VALUES  (DEFAULT, '${name}', ${type})`]}), handleReset()
+    )    
   }
 
 

@@ -32,36 +32,37 @@ function FieldsList (props) {
         </TableHeader>
         <TableBody>
           {editType.fields.map((item) => {
-            console.log(editType.fields)
-              var typeItem = editType.typesList.find(i => i.id === item.type)
-              return (
-                <TableRow
-                  key={item.id}
-                >
-                  <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
-                  <TableCell className={tableStyles.cell}>
-                    <Button
-                      id="icon-button-4"
-                      buttonType="icon"
-                      theme="error"
-                      aria-label="Permanently Delete"
-                      onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
-                    >
-                      <DeleteSVGIcon />
-                    </Button>
-                    <Button
-                      id="icon-button-4"
-                      buttonType="icon"
-                      aria-label="Edit"
-                      onClick={()=> setModifyFieldPopup({visible: true, id: item.id, type: item.type, name: item.name})}
-                    >
-                      <EditSVGIcon />
-                    </Button>
-                </TableCell>
-                </TableRow>
-              )
-            })}
+            console.log("item: ", item)
+            var typeItem = editType.typesList.find(i => i.id === item.type)
+            console.log("typeItem: ", typeItem)
+            return (
+              <TableRow
+                key={item.id}
+              >
+                <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
+                <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
+                <TableCell className={tableStyles.cell}>
+                  <Button
+                    id="icon-button-4"
+                    buttonType="icon"
+                    theme="error"
+                    aria-label="Permanently Delete"
+                    onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
+                  >
+                    <DeleteSVGIcon />
+                  </Button>
+                  <Button
+                    id="icon-button-4"
+                    buttonType="icon"
+                    aria-label="Edit"
+                    onClick={()=> setModifyFieldPopup({visible: true, id: item.id, type: item.type, name: item.name})}
+                  >
+                    <EditSVGIcon />
+                  </Button>
+              </TableCell>
+              </TableRow>
+            )
+          })}
         </TableBody>
       </Table>
 

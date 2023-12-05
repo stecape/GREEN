@@ -35,7 +35,6 @@ function ModifyTypePopup (props) {
   }
 
   const handleReset = () => {
-    //axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
     props.cancelCommand()
     setEditType((prevState) => ({...prevState, name: '', fields: []}))
   }

@@ -59,19 +59,17 @@ function TypesList (props) {
                       buttonType="icon"
                       aria-label="Edit"
                       onClick={()=> 
-                        axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
-                        .then(
-                          axios.post('http://localhost:3001/api/getFields', {type: item.id})
-                          .then((res) => {
-                            //////////////////////////////////////////////////////////////////////////////////////////77QUI SETTO IL CONTEXT E POI CONFIGURO IL POPUP
-                            setEditType(() => ({
-                              query: [],
-                              name: res.data.result.name,
-                              type: res.data.result.type,
-                              fields: res.data.result.fields,
-                              typesList: typesList.filter(i => !res.data.result.deps.includes(i.id) )
-                            }), setModifyTypePopup((prevState) => ({ ...prevState, visible: true })))  //////////////////////////////////////visualizzo il popup come callback                          
-                          }))
+                        axios.post('http://localhost:3001/api/getFields', {type: item.id})
+                        .then((res) => {
+                          //////////////////////////////////////////////////////////////////////////////////////////77QUI SETTO IL CONTEXT E POI CONFIGURO IL POPUP
+                          setEditType(() => ({
+                            query: [],
+                            name: res.data.result.name,
+                            type: res.data.result.type,
+                            fields: res.data.result.fields,
+                            typesList: typesList.filter(i => !res.data.result.deps.includes(i.id) )
+                          }), setModifyTypePopup((prevState) => ({ ...prevState, visible: true })))  //////////////////////////////////////visualizzo il popup come callback                          
+                        })
                       }
                     >
                       <EditSVGIcon />
@@ -140,7 +138,6 @@ function TypesList (props) {
         <ModifyTypePopup
           visible={modifyTypePopup.visible}
           modalType="full-page"
-          typesList={editType.typesList}
           cancelCommand={()=>{
             setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
             setEditType(() => ({
@@ -149,7 +146,6 @@ function TypesList (props) {
               type: "0",
               fields: [],
               typesList: []
-              //////////////////finire di pulire
             }))
           }}
         />
