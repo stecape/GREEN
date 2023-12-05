@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Button } from '@react-md/button'
 import {
@@ -12,17 +12,11 @@ import formStyles from '../../../styles/Form.module.scss'
 import { ModifyTypeContext } from '../TypesList'
 
 
-function NewField (props) {
+function NewField () {
   const addMessage = useAddMessage()
   const {editType, setEditType} = useContext(ModifyTypeContext)
-  const [typesList, setTypesList] = useState(props.typesList)
   const [name, setName] = useState("")
   const [type, setType] = useState("0")
-
-  useEffect(() => { 
-    setTypesList(props.typesList)
-  }, [props.typesList])
-
 
   //Form Events
   const handleSubmit = (event) => {
@@ -77,7 +71,7 @@ function NewField (props) {
           id='field-type'
           key='field-type'
           type='string'
-          options={typesList.map((item) => ({
+          options={editType.typesList.map((item) => ({
             label: item.name,
             value: item.id
           }))}

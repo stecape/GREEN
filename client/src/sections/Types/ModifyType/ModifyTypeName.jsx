@@ -12,7 +12,6 @@ import { ModifyTypeContext } from '../TypesList'
 function ModifyTypeName (props) {
   const addMessage = useAddMessage()
   const {editType, setEditType} = useContext(ModifyTypeContext)
-  const [name, setName] = useState(props.name)
   const [prevName, setPrevName] = useState(props.name)
 
 
@@ -21,7 +20,7 @@ function ModifyTypeName (props) {
   const handleSubmit = (event) => {
     event.preventDefault()
     //si chiama una promise in arrivo dalle props. La funzione deve eseguire la query di creazione, sul then poi bisogna resettare il form
-    props.upsertType(name)
+    props.upsertType(editType.name)
       .then((response)=>{  
         addMessage({children: response.data.message})
       })
@@ -50,7 +49,6 @@ function ModifyTypeName (props) {
   }
 
   const handleReset = () => {
-    setName('')
     props.reset()
   }
 
@@ -64,14 +62,14 @@ function ModifyTypeName (props) {
           type='string'
           label="Type Name"
           className={formStyles.item}
-          value={name}
+          value={editType.name}
           onChange={(e) => {
-            setName(e.target.value)
+            setEditType((prevState) => ({...prevState, name: e.target.value}))
           }}
           onBlur={(e) => {
-            if (prevName !== name) {
-              setEditType((prevState) => ({...prevState, query: [...editType.query, `UPDATE "Type" SET name = '${name}' WHERE id = ${props.type}`]}))
-              setPrevName(name)
+            if (prevName !== editType.name) {
+              setEditType((prevState) => ({...prevState, query: [...editType.query, `UPDATE "Type" SET name = '${editType.name}' WHERE id = ${editType.type}`]}))
+              setPrevName(editType.name)
             }
           }}
           

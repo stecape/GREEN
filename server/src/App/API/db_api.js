@@ -293,50 +293,43 @@ module.exports = function (app, pool) {
         rowMode: 'array'
       })
       .then((data)=>{
-        response.fields = data.rows
-        var queryString="INSERT INTO \"NewTypeTmp\" (\"id\",\"name\",\"type\") VALUES " + data.rows.map(i => "(" + i[0] + ",'" + i[1] + "'," + i[2] + ")").join(",")
+        response.fields = data.rows.map((field) => ({id: field[0], name: field[1], type: field[2]}))
+        var result = []
+        var queryString=`
+        SELECT
+        distinct "Type".id, "Field".parent_type
+        FROM "Type"
+        INNER JOIN "Field" ON "Field".type="Type".id
+        ORDER by id
+        `
         pool.query({
           text: queryString,
           rowMode: 'array'
         })
-        .then(() => {
-          var result = []
+        .then((data) => {
+          result = data.rows
           var queryString=`
-          SELECT
-          distinct "Type".id, "Field".parent_type
-          FROM "Type"
-          INNER JOIN "Field" ON "Field".type="Type".id
-          ORDER by id
+            SELECT
+            distinct "Field".parent_type
+            FROM "Field"
+            LEFT JOIN (
+              SELECT
+              distinct "Type".id
+              FROM "Type"
+              INNER JOIN "Field" ON "Field".type="Type".id
+            ) a ON a.id = "Field".parent_type
+            WHERE a.id IS NULL
           `
           pool.query({
             text: queryString,
             rowMode: 'array'
           })
           .then((data) => {
-            result = data.rows
-            var queryString=`
-              SELECT
-              distinct "Field".parent_type
-              FROM "Field"
-              LEFT JOIN (
-                SELECT
-                distinct "Type".id
-                FROM "Type"
-                INNER JOIN "Field" ON "Field".type="Type".id
-              ) a ON a.id = "Field".parent_type
-              WHERE a.id IS NULL
-            `
-            pool.query({
-              text: queryString,
-              rowMode: 'array'
-            })
-            .then((data) => {
-              var graph = {}
-              result.map(k => graph[k[0]] = result.filter(i => i[0] == k[0]).map(j => j[1]))
-              data.rows.map(k => graph[k[0]] = [])
-              response.deps = [...DFS(graph, req.body.type)]       //Spread operator, DSF returns a Set, I want an array
-              res.status(200).json({result: response, message: "Record(s) from table \"Field\" returned correctly"})
-            })
+            var graph = {}
+            result.map(k => graph[k[0]] = result.filter(i => i[0] == k[0]).map(j => j[1]))
+            data.rows.map(k => graph[k[0]] = [])
+            response.deps = [...DFS(graph, req.body.type)]       //Spread operator, DSF returns a Set, I want an array
+            res.status(200).json({result: response, message: "Record(s) from table \"Field\" returned correctly"})
           })
         })
       })
@@ -440,7 +433,7 @@ module.exports = function (app, pool) {
         var graph = {}
         result.map(k => graph[k[0]] = result.filter(i => i[0] == k[0]).map(j => j[1]))
         data.rows.map(k => graph[k[0]] = [])
-        var parents = [...DFS(graph, req.body.id)]       //Spread operator, DSF returns a Set, I want an array  
+        var parents = [...DFS(graph, req.body.id)]       //Spread operator, DFS returns a Set, I want an array  
         res.status(200).json({result: parents, message: "Record correctly returned"})          
       })
     })

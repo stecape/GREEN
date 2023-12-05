@@ -22,8 +22,8 @@ function TypesList (props) {
   const [editType, setEditType] = useState({query:[]})
   const [typesList, setTypesList] = useState(props.typesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
-  const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false, type: 0, name: '', deps: [] })
-  const [createTypePopup, setCreateTypePopup] = useState({ visible: false})
+  const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false })
+  const [createTypePopup, setCreateTypePopup] = useState({ visible: false })
   useEffect(() => {
     setTypesList(props.typesList)
   }, [props.typesList, addMessage])
@@ -70,8 +70,7 @@ function TypesList (props) {
                               type: res.data.result.type,
                               fields: res.data.result.fields,
                               typesList: typesList.filter(i => !res.data.result.deps.includes(i.id) )
-                            }))
-                            setModifyTypePopup((prevState) => ({ ...prevState, visible: true }))
+                            }), setModifyTypePopup((prevState) => ({ ...prevState, visible: true })))  //////////////////////////////////////visualizzo il popup come callback                          
                           }))
                       }
                     >
@@ -141,14 +140,15 @@ function TypesList (props) {
         <ModifyTypePopup
           visible={modifyTypePopup.visible}
           modalType="full-page"
-          typesList={typesList.filter(i => !modifyTypePopup.deps.includes(i.id) )}
+          typesList={editType.typesList}
           cancelCommand={()=>{
             setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
             setEditType(() => ({
               query: [],
               name: "",
               type: "0",
-              fields: []
+              fields: [],
+              typesList: []
               //////////////////finire di pulire
             }))
           }}
@@ -166,21 +166,3 @@ function TypesList (props) {
     </>
   )}
 export default TypesList
-
-/*
-onClick={()=> 
-  axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})//Qui devo prendere i field da l relativo type e riempire la tabella fields tmp
-  .then(
-    axios.post('http://localhost:3001/api/getFields', {type: item.id})
-    .then((res) => axios.post(
-      'http://localhost:3001/api/addMany', 
-      {
-        table: "NewTypeTmp",
-        fields: ["name", "type", "id"],
-        id: res.data.result[0],
-        type: res.data.result.map(field => {return field.type}),
-        name: res.data.result.map(field => {return field.name})
-      })
-      .then((res) => setModifyTypePopup({visible: true, id: item.id, name: item.name}))))
-}
-*/

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useContext } from "react"
+import { useState, useEffect, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { AppBar, AppBarTitle, AppBarNav } from '@react-md/app-bar'
 import { Grid, GridCell } from '@react-md/utils'
@@ -20,15 +20,13 @@ function ModifyTypePopup (props) {
   const socket = useContext(SocketContext)
   const addMessage = useAddMessage()
   
-  const [modalState, setModalState] = useState({ visible: false, name: props.name, modalType: props.modalType, type: props.type, typesList: props.typesList })
-  const [typeFieldsList, setTypeFieldsList] = useState([])
   const {editType, setEditType} = useContext(ModifyTypeContext)
-  const init = useRef(false)
+  const [modalState, setModalState] = useState({ visible: false, modalType: props.modalType })
   const upsertType = (name)=>{
     return new Promise((innerResolve, innerReject) => {
       axios.post('http://localhost:3001/api/add', {table: "Type", fields:["name"], values:[name]})
       .then((res)=>{
-        axios.post('http://localhost:3001/api/addMany', {table: "TypeDependencies", fields: ["type","dependent_type"], id: res.data.result[0], values: typeFieldsList.map(field => {return field.type})})
+        axios.post('http://localhost:3001/api/addMany', {table: "TypeDependencies", fields: ["type","dependent_type"], id: res.data.result[0], values: editType.fields.map(field => {return field.type})})
         .then((value)=>{innerResolve(value)})
         .catch((error)=>{innerReject(error)})
       })
@@ -37,24 +35,21 @@ function ModifyTypePopup (props) {
   }
 
   const handleReset = () => {
-    axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
+    //axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
     props.cancelCommand()
-    setModalState((prevState) => ({ ...prevState, type: "0"}))
+    setEditType((prevState) => ({...prevState, name: '', fields: []}))
   }
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, visible: props.visible, typesList: props.typesList}))
-    //clear query on exit
-    if (props.type !== modalState.type){
-    }
+    setModalState((prevState) => ({ ...prevState, visible: props.visible}))
 
     //Socket listeners callbacks definition
     //on connect
-
+    //////////////////////////////////////////////////////////////////////////////////////////////////Ha senso sta cosa????????? Bisognerebbe aggiornare tutto....
     const modify_type_on_connect = () => {
       axios.post('http://localhost:3001/api/getAll', {table: "NewTypeTmp", fields:["name", "type", "id"]})
         .then(response => {
-          setTypeFieldsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
+          setEditType((prevState) => ({...prevState, fields: response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]}))}))
         })
         .catch(error => {
           addMessage({
@@ -74,34 +69,25 @@ function ModifyTypePopup (props) {
 
     //on update
     const modify_type_on_update = (...args) => {
+      var fields
       const value = args[0]
       if (value.table === "NewTypeTmp" && value.operation === 'INSERT') {
-        var fields = typeFieldsList
+        fields = editType.fields
         fields.push(value.data)
-        setTypeFieldsList([...fields])
+        setEditType((prevState) => ({...prevState, fields: fields}))
       }
       else if (value.table === "NewTypeTmp" && value.operation === 'DELETE') {
-        setTypeFieldsList([...typeFieldsList.filter(i => i.id !== value.data.id)])
+        setEditType((prevState) => ({...prevState, fields: editType.fields.filter(i => i.id !== value.data.id)}))
       }
       else if (value.table === "NewTypeTmp" && value.operation === 'TRUNCATE') {
-        setTypeFieldsList([...[]])
+        setEditType((prevState) => ({...prevState, fields: []}))
       }
       else if (value.table === "NewTypeTmp" && value.operation === 'UPDATE') {
-        var updFields = typeFieldsList
-        var index = updFields.findIndex(i => i.id === value.data.id)
-        updFields[index] = value.data
-        setTypeFieldsList([...updFields])
+        fields = editType.fields
+        var index = fields.findIndex(i => i.id === value.data.id)
+        fields[index] = value.data
+        setEditType((prevState) => ({...prevState, fields: fields}))
       }
-    }
-
-    //On component load request the lists
-    if(!init.current){
-      init.current = true
-      setEditType({query:[]})
-      axios.post('http://localhost:3001/api/getAll', {table: "NewTypeTmp", fields:["name", "type", "id"]})
-        .then(response => {
-          setTypeFieldsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
-        })
     }
 
     //On (re)connection request the lists
@@ -120,7 +106,7 @@ function ModifyTypePopup (props) {
       socket.off("update", modify_type_on_update)
     }
     
-  },[props.name, props.visible, props.type, props.typesList, init, typeFieldsList, socket, addMessage, modalState.type, setEditType])
+  },[props.name, props.visible, props.type, props.typesList, socket, addMessage, setEditType, editType.fields])
   
   return (
     <Dialog
@@ -135,25 +121,22 @@ function ModifyTypePopup (props) {
         <AppBarNav onClick={handleReset} aria-label="Close">
           <ArrowBackSVGIcon />
         </AppBarNav>
-        <AppBarTitle>{"Modifying " + modalState.name}</AppBarTitle>
+        <AppBarTitle>{"Modifying " + editType.name}</AppBarTitle>
       </AppBar>
       <DialogContent>
         <div className={formStyles.container}>
           <Grid>
             <GridCell colSpan={12} className={gridStyles.item}>
               <ModifyTypeName
-                name={modalState.name}
-                type={modalState.type}
-                typesList={props.typesList}
                 reset={handleReset}
                 upsertType={(name)=> upsertType(name)}
               />
             </GridCell>
             <GridCell colSpan={12} className={gridStyles.item}>
-              <NewField typesList={props.typesList} />
+              <NewField />
             </GridCell>
             <GridCell colSpan={12} className={gridStyles.item}>
-              <FieldsList type={props.type} typesList={props.typesList} typeFieldsList={typeFieldsList}/>
+              <FieldsList />
             </GridCell>
             <GridCell colSpan={12} className={gridStyles.item}>
               <QueryList />

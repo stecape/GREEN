@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useContext } from "react"
 import { Button } from "@react-md/button"
 import DeleteFieldPopup from "./DeleteFieldPopup"
 import ModifyFieldPopup from "./ModifyFieldPopup"
@@ -17,15 +17,8 @@ import { ModifyTypeContext } from '../TypesList'
 
 function FieldsList (props) {
   const {editType, setEditType} = useContext(ModifyTypeContext)
-  const [typeFieldsList, setTypeFieldsList] = useState(props.typeFieldsList)
-  const [typesList, setTypesList] = useState([])
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyFieldPopup, setModifyFieldPopup] = useState({ visible: false, id: 0, type: 0, name: '' })
-  useEffect(() => {          
-    console.log()
-    setTypeFieldsList(props.typeFieldsList)
-    setTypesList(props.typesList)
-  }, [props.typeFieldsList, props.typesList])
 
   return(
     <>
@@ -38,8 +31,9 @@ function FieldsList (props) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {typeFieldsList.map((item) => {
-              var typeItem = typesList.find(i => i.id === item.type)
+          {editType.fields.map((item) => {
+            console.log(editType.fields)
+              var typeItem = editType.typesList.find(i => i.id === item.type)
               return (
                 <TableRow
                   key={item.id}
@@ -75,8 +69,8 @@ function FieldsList (props) {
         visible={deletePopup.visible}
         name={deletePopup.name}
         delField={()=>{
-          var fieldData = typeFieldsList.find(i => i.id === deletePopup.id)
-          console.log(props.type, typeFieldsList, fieldData)
+          var fieldData = editType.fields.find(i => i.id === deletePopup.id)
+          console.log(props.type, editType.fields, fieldData)
           setEditType((prevState) => ({...prevState, query: [
             ...editType.query,
             `DELETE from "Field" WHERE "name" = '${fieldData.name}' AND "parent_type" = ${props.type}`,
@@ -93,7 +87,7 @@ function FieldsList (props) {
         visible={modifyFieldPopup.visible}
         name={modifyFieldPopup.name}
         type={modifyFieldPopup.type}
-        typesList={typesList}
+        typesList={editType.typesList}
         updField={(data)=>{
           axios.post('http://localhost:3001/api/modify', {table: "NewTypeTmp", id: modifyFieldPopup.id, fields: data.fields, values: data.values})
             .then(setModifyFieldPopup((prevState) => ({ ...prevState, visible: false })))
