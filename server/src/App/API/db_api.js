@@ -5,6 +5,38 @@ module.exports = function (app, pool) {
 
 
   /*
+  Execute a query
+  Type:   POST
+  Route:  '/api/exec'
+  Body:   {
+            query: 'INSERT INTO "Var" ("id","name","type") VALUES (DEFAULT,'Temperature 2','1')'
+          }
+  Query:  INSERT INTO "Var" ("id","name","type") VALUES (DEFAULT,'Temperature 2','1')
+  Event:  {
+            operation: 'INSERT',
+            table: 'Var',
+            data: { id: 133, type: 1, name: 'Temperature 2' }
+          }
+  Res:    200
+  Err:    400
+  */
+  app.post('/api/exec', (req, res) => {
+    var queryString=req.body.query
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then((data) => {
+      res.status(200).json({result: data.rows[0], message: "Query executed"})
+    })
+    .catch((error) => {
+      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error: ' + error.code})
+    })
+  })
+
+
+
+  /*
   Get all records
   Type:   POST
   Route:  '/api/getAll'
