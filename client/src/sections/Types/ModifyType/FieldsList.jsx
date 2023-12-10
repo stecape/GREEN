@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from '@react-md/table'
-import axios from 'axios'
 import tableStyles from '../../../styles/Table.module.scss'
 import { ModifyTypeContext } from '../TypesList'
 
@@ -32,9 +31,7 @@ function FieldsList (props) {
         </TableHeader>
         <TableBody>
           {editType.fields.map((item) => {
-            console.log("item: ", item)
             var typeItem = editType.typesList.find(i => i.id === item.type)
-            console.log("typeItem: ", typeItem)
             return (
               <TableRow
                 key={item.id}
@@ -47,7 +44,7 @@ function FieldsList (props) {
                     buttonType="icon"
                     theme="error"
                     aria-label="Permanently Delete"
-                    onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
+                    onClick={() => setDeletePopup({visible: true, id: item.id, name: item.name})}
                   >
                     <DeleteSVGIcon />
                   </Button>
@@ -71,14 +68,13 @@ function FieldsList (props) {
         name={deletePopup.name}
         delField={()=>{
           var fieldData = editType.fields.find(i => i.id === deletePopup.id)
-          console.log(props.type, editType.fields, fieldData)
-          setEditType((prevState) => ({...prevState, query: [
-            ...editType.query,
-            `DELETE from "Field" WHERE "name" = '${fieldData.name}' AND "parent_type" = ${props.type}`,
-            `DELETE from "TypeDependencies" WHERE "id" = '${fieldData.name}' AND "parent_type" = ${props.type}`
-          ]}))
-          axios.post('http://localhost:3001/api/removeOne', {table: "NewTypeTmp", id: deletePopup.id})
-            .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
+          console.log(editType.type, editType.fields, fieldData)
+          setEditType((prevState) => ({
+              ...prevState,
+              fields: editType.fields.filter(i => i.id !== deletePopup.id)
+            }
+          ))
+          setDeletePopup((prevState) => ({ ...prevState, visible: false }))
         }}
         cancelCommand={()=>{
           setDeletePopup((prevState) => ({ ...prevState, visible: false }))
@@ -88,10 +84,23 @@ function FieldsList (props) {
         visible={modifyFieldPopup.visible}
         name={modifyFieldPopup.name}
         type={modifyFieldPopup.type}
+        id={modifyFieldPopup.id}
         typesList={editType.typesList}
         updField={(data)=>{
-          axios.post('http://localhost:3001/api/modify', {table: "NewTypeTmp", id: modifyFieldPopup.id, fields: data.fields, values: data.values})
-            .then(setModifyFieldPopup((prevState) => ({ ...prevState, visible: false })))
+          var fieldToUpdateIndex = editType.fields.findIndex(i => i.id === data.id)
+          var fieldToUpdate = editType.fields[fieldToUpdateIndex]
+          fieldToUpdate.name = data.name
+          fieldToUpdate.type = data.type
+          var fields = editType.fields
+          fields[fieldToUpdateIndex] = fieldToUpdate
+          setEditType((prevState) => ({
+            ...prevState,
+            query: [
+              ...editType.query,
+              `UPDATE "Field" SET name='${fieldToUpdate.name}', type=${fieldToUpdate.type} WHERE id = ${fieldToUpdate.id}`
+            ],
+            fields: fields
+          }), setModifyFieldPopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
           setModifyFieldPopup((prevState) => ({ ...prevState, visible: false }))

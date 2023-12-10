@@ -15,7 +15,7 @@ import formStyles from '../../styles/Form.module.scss'
 
 function UpsertVarPopup (props) {
 
-  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: "1", typesList: props.typesList })
+  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: 0, typesList: props.typesList })
   
   //Form Events
   const handleSubmit = (event) => {
@@ -67,7 +67,6 @@ function UpsertVarPopup (props) {
                   <Select
                     id='type'
                     key='type'
-                    type='string'
                     options={modalState.typesList.map((item) => ({
                       label: item.name,
                       value: item.id
@@ -76,7 +75,7 @@ function UpsertVarPopup (props) {
                     placeholder="Choose..."
                     label="Var Type"
                     className={formStyles.item}
-                    onChange={(value) => setModalState((prevState) => ({ ...prevState, type: value}))}
+                    onChange={(value) => setModalState((prevState) => ({ ...prevState, type: Number(value)}))}
                   />
                     <div className={formStyles.btn_container}>
                       <Button

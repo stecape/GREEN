@@ -15,7 +15,7 @@ function NewField (props) {
   const addMessage = useAddMessage()
   const [typesList, setTypesList] = useState(props.typesList)
   const [name, setName] = useState("")
-  const [type, setType] = useState("0")
+  const [type, setType] = useState(0)
 
   useEffect(() => { 
     setTypesList(props.typesList)
@@ -54,7 +54,7 @@ function NewField (props) {
   //Form Events
   const handleReset = () => {
     setName("")
-    setType("0")
+    setType(0)
   }
 
   return(
@@ -73,7 +73,6 @@ function NewField (props) {
         <Select
           id='field-type'
           key='field-type'
-          type='string'
           options={typesList.map((item) => ({
             label: item.name,
             value: item.id
@@ -82,7 +81,7 @@ function NewField (props) {
           placeholder="Choose..."
           label="Field Type"
           className={formStyles.item}
-          onChange={(type) => setType(type)}
+          onChange={(type) => setType(Number(type))}
         />
         <div className={formStyles.btn_container}>
           <Button

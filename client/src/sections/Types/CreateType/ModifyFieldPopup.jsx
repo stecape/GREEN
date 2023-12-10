@@ -11,7 +11,7 @@ import {
 
 function ModifyFieldPopup (props) {
 
-  const [modalState, setModalState] = useState({ visible: false, name: '', type: "1", typesList: props.typesList })
+  const [modalState, setModalState] = useState({ visible: false, name: '', type: 0, typesList: props.typesList })
   
   //Form Events
   const handleSubmit = (event) => {
@@ -58,14 +58,13 @@ function ModifyFieldPopup (props) {
             <Select
               id='type'
               key='type'
-              type='string'
               options={modalState.typesList.map((item) => ({
                 label: item.name,
                 value: item.id
               }))}
               value={modalState.type.toString()}
               label="Type"
-              onChange={(value) => setModalState((prevState) => ({ ...prevState, type: value}))}
+              onChange={(value) => setModalState((prevState) => ({ ...prevState, type: Number(value)}))}
             />
           </DialogContent>
           <DialogFooter>

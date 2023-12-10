@@ -13,14 +13,12 @@ import { ModifyTypeContext } from '../TypesList'
 function NewField () {
   const {editType, setEditType} = useContext(ModifyTypeContext)
   const [name, setName] = useState("")
-  const [type, setType] = useState("0")
+  const [type, setType] = useState(0)
 
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    console.log(editType.typesList, type)
-    var typeItem = editType.typesList.find(i => i.id === type)
-    console.log(typeItem)
+    var typeItem = editType.typesList.find(i => i.id === Number(type))
     setEditType((prevState) => ({
       ...prevState,
       fields: [...editType.fields, { id: Math.floor(Date.now() / 1000), type: typeItem.name, name: name }],
@@ -32,7 +30,7 @@ function NewField () {
   //Form Events
   const handleReset = () => {
     setName("")
-    setType("0")
+    setType(0)
   }
 
   return(
@@ -51,7 +49,6 @@ function NewField () {
         <Select
           id='field-type'
           key='field-type'
-          type='string'
           options={editType.typesList.map((item) => ({
             label: item.name,
             value: item.id
@@ -60,7 +57,7 @@ function NewField () {
           placeholder="Choose..."
           label="Field Type"
           className={formStyles.item}
-          onChange={(type) => setType(type)}
+          onChange={(type) => setType(Number(type))}
         />
         <div className={formStyles.btn_container}>
           <Button
