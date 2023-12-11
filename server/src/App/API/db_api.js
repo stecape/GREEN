@@ -27,7 +27,7 @@ module.exports = function (app, pool) {
       rowMode: 'array'
     })
     .then((data) => {
-      res.status(200).json({result: data.rows[0], message: "Query executed"})
+      res.status(200).json({result: data, message: "Query executed"})
     })
     .catch((error) => {
       error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error: ' + error.code})

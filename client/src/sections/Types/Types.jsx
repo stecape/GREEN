@@ -102,7 +102,7 @@ function Types () {
   <>
   <Grid>
     <GridCell colSpan={12} className={gridStyles.item}>
-      <TypesList typesList={typesList} fieldsList={fieldsList}/>
+      <TypesList typesList={typesList} />
     </GridCell>
   </Grid>
   </>

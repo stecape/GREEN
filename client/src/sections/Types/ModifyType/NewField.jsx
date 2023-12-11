@@ -22,7 +22,7 @@ function NewField () {
     setEditType((prevState) => ({
       ...prevState,
       fields: [...editType.fields, { id: Math.floor(Date.now() / 1000), type: typeItem.name, name: name }],
-      query: [...editType.query, `INSERT into "Field" ("id","name","type","parent_type") VALUES  (DEFAULT, '${name}', ${type}), ${parent_vsvsvsv_//////////////type})`]}), handleReset()
+      query: [...editType.query, `INSERT into "Field" ("id","name","type","parent_type") VALUES  (DEFAULT, '${name}', ${type}, ${editType.type})`]}), handleReset()
     )    
   }
 

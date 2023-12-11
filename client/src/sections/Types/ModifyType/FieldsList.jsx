@@ -67,14 +67,15 @@ function FieldsList (props) {
         visible={deletePopup.visible}
         name={deletePopup.name}
         delField={()=>{
-          var fieldData = editType.fields.find(i => i.id === deletePopup.id)
-          console.log(editType.type, editType.fields, fieldData)
           setEditType((prevState) => ({
               ...prevState,
+              query:[
+                ...prevState.query,
+                `DELETE FROM "Field" WHERE "id" = ${deletePopup.id}`
+              ],
               fields: editType.fields.filter(i => i.id !== deletePopup.id)
             }
-          ))
-          setDeletePopup((prevState) => ({ ...prevState, visible: false }))
+          ), setDeletePopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
           setDeletePopup((prevState) => ({ ...prevState, visible: false }))
