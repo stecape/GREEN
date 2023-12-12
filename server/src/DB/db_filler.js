@@ -69,11 +69,13 @@ module.exports = function () {
     (
       id SERIAL PRIMARY KEY,
       type integer NOT NULL,
+      parent_type integer NOT NULL,
       name text COLLATE pg_catalog."default" NOT NULL,
       CONSTRAINT unique_new_field_name UNIQUE (name)
     );
     
     ALTER TABLE IF EXISTS public."Field"
+      ADD CONSTRAINT name_and_parent_id UNIQUE (name, parent_type),
       DROP CONSTRAINT IF EXISTS type_id,
       ADD CONSTRAINT type_id FOREIGN KEY (type)
       REFERENCES public."Type" (id) MATCH SIMPLE
@@ -176,6 +178,7 @@ module.exports = function () {
   
     ALTER TABLE IF EXISTS public."NewTypeTmp"
       DROP CONSTRAINT IF EXISTS type_id,
+      ADD CONSTRAINT name_and_parent_id_tmp UNIQUE (name, parent_type),
       ADD CONSTRAINT type_id FOREIGN KEY (type)
       REFERENCES public."Type" (id) MATCH SIMPLE
       ON UPDATE NO ACTION
