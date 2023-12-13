@@ -75,6 +75,7 @@ module.exports = function () {
     );
     
     ALTER TABLE IF EXISTS public."Field"
+      DROP CONSTRAINT IF EXISTS name_and_parent_id,
       ADD CONSTRAINT name_and_parent_id UNIQUE (name, parent_type),
       DROP CONSTRAINT IF EXISTS type_id,
       ADD CONSTRAINT type_id FOREIGN KEY (type)
@@ -177,8 +178,9 @@ module.exports = function () {
   
   
     ALTER TABLE IF EXISTS public."NewTypeTmp"
-      DROP CONSTRAINT IF EXISTS type_id,
+      DROP CONSTRAINT IF EXISTS name_and_parent_id_tmp,
       ADD CONSTRAINT name_and_parent_id_tmp UNIQUE (name, parent_type),
+      DROP CONSTRAINT IF EXISTS type_id,
       ADD CONSTRAINT type_id FOREIGN KEY (type)
       REFERENCES public."Type" (id) MATCH SIMPLE
       ON UPDATE NO ACTION

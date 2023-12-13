@@ -19,18 +19,33 @@ function NewField () {
   const InlineValidation = (value) => {
     setName(value)
     let pattern = /[^A-Za-z0-9\-_<> ]/g
-    setEditType((prevState) => ({...prevState, fieldNameNotValid: pattern.test(value)  || editType.fields.find(i => i.name === value)}))
+    setEditType((prevState) => ({
+      ...prevState, 
+      fieldNameNotValid: pattern.test(value) || editType.fields.find(i => i.name === value)
+    }))
   }
 
   //Form Events
   const handleSubmit = (event) => {
+    console.log(name, type, typeof(type))
     event.preventDefault()
     var typeItem = editType.typesList.find(i => i.id === Number(type))
-    setEditType((prevState) => ({
-      ...prevState,
-      fields: [...editType.fields, { id: Math.floor(Date.now() / 1000), type: typeItem.name, name: name }],
-      query: [...editType.query, `INSERT into "Field" ("id","name","type","parent_type") VALUES  (DEFAULT, '${name}', ${type}, ${editType.type})`]}), handleReset()
-    )    
+    let pattern = /[^A-Za-z0-9\-_<> ]/g
+    var fieldNameNotValid = pattern.test(name) || editType.fields.find(i => i.name === name) || name === ""
+    var fieldTypeNotValid = type === "0"
+/*     setEditType((prevState) => ({
+      ...prevState, 
+      fieldNameNotValid: fieldNameNotValid,
+      fieldTypeNotValid: fieldTypeNotValid
+    }))
+
+    if (!fieldNameNotValid && !fieldTypeNotValid){
+      setEditType((prevState) => ({
+        ...prevState, 
+        fields: [...editType.fields, { id: Math.floor(Date.now() / 1000), type: typeItem.name, name: name }],
+        query: [...editType.query, `INSERT into "Field" ("id","name","type","parent_type") VALUES  (DEFAULT, '${name}', ${type}, ${editType.type})`]}), handleReset()
+      )
+    } */
   }
 
   //Form Events
@@ -65,6 +80,7 @@ function NewField () {
           label="Field Type"
           className={formStyles.item}
           onChange={(type) => setType(Number(type))}
+          error={editType.fieldNameNotValid}
         />
         <div className={formStyles.btn_container}>
           <Button
@@ -72,7 +88,7 @@ function NewField () {
             theme="primary"
             themeType="outline"
             className={formStyles.btn}
-            disabled={editType.fieldNameNotValid}
+            disabled={editType.fieldNameNotValid || editType.fieldTypeNotValid}
           >
             Add
           </Button>

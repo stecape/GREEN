@@ -18,7 +18,7 @@ function ModifyTypeName (props) {
   //Input Validation
   const InlineValidation = (value) => {
     let pattern = /[^A-Za-z0-9\-_<> ]/g
-    setEditType((prevState) => ({...prevState, name: value, typeNameNotValid: pattern.test(value) || editType.allTypes.find(i => i.name === value && i.id !== editType.type)}))
+    setEditType((prevState) => ({...prevState, name: value, typeNameNotValid: pattern.test(value) || editType.allTypes.find(i => i.name === value && i.id !== editType.type) || value === ""}))
   }
 
 

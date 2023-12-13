@@ -28,7 +28,7 @@ function NewField (props) {
   const InlineValidation = (value) => {
     setName(value)
     let pattern = /[^A-Za-z0-9\-_<> ]/g
-    setValid(!pattern.test(value))
+    setValid(!pattern.test(value) & value !== "")
   }
 
   //Form Events
