@@ -16,7 +16,7 @@ function NewField () {
   const [type, setType] = useState(0)
 
   //Input Validation
-  const InlineValidation = (value) => {
+  const InlineNameValidation = (value) => {
     setName(value)
     let pattern = /[^A-Za-z0-9\-_<> ]/g
     setEditType((prevState) => ({
@@ -24,28 +24,35 @@ function NewField () {
       fieldNameNotValid: pattern.test(value) || editType.fields.find(i => i.name === value)
     }))
   }
+  const InlineTypeValidation = (value) => {
+    setType(Number(value))
+    setEditType((prevState) => ({
+      ...prevState, 
+      fieldTypeNotValid: value === 0
+    }))
+  }
 
   //Form Events
   const handleSubmit = (event) => {
-    console.log(name, type, typeof(type))
     event.preventDefault()
+    //it begins validating the input and then, if both type and name are valid, it proceed with the insert of the field and of the query
     var typeItem = editType.typesList.find(i => i.id === Number(type))
     let pattern = /[^A-Za-z0-9\-_<> ]/g
     var fieldNameNotValid = pattern.test(name) || editType.fields.find(i => i.name === name) || name === ""
-    var fieldTypeNotValid = type === "0"
-/*     setEditType((prevState) => ({
+    var fieldTypeNotValid = type === 0
+    console.log(name, type, typeof(type), typeItem)
+    setEditType((prevState) => ({
       ...prevState, 
       fieldNameNotValid: fieldNameNotValid,
       fieldTypeNotValid: fieldTypeNotValid
     }))
-
     if (!fieldNameNotValid && !fieldTypeNotValid){
       setEditType((prevState) => ({
         ...prevState, 
         fields: [...editType.fields, { id: Math.floor(Date.now() / 1000), type: typeItem.name, name: name }],
         query: [...editType.query, `INSERT into "Field" ("id","name","type","parent_type") VALUES  (DEFAULT, '${name}', ${type}, ${editType.type})`]}), handleReset()
       )
-    } */
+    }
   }
 
   //Form Events
@@ -65,7 +72,7 @@ function NewField () {
           label="Field Name"
           className={formStyles.item}
           value={name}
-          onChange={(e) => InlineValidation(e.target.value)}
+          onChange={(e) => InlineNameValidation(e.target.value)}
           error={editType.fieldNameNotValid}
         />
         <Select
@@ -79,8 +86,8 @@ function NewField () {
           placeholder="Choose..."
           label="Field Type"
           className={formStyles.item}
-          onChange={(type) => setType(Number(type))}
-          error={editType.fieldNameNotValid}
+          onChange={(value) => InlineTypeValidation(value)}
+          error={editType.fieldTypeNotValid}
         />
         <div className={formStyles.btn_container}>
           <Button
