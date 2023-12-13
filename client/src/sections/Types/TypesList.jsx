@@ -67,6 +67,7 @@ function TypesList (props) {
                             name: res.data.result.name,
                             type: res.data.result.type,
                             fields: res.data.result.fields,
+                            allTypes: typesList,
                             typesList: typesList.filter(i => !res.data.result.deps.includes(i.id) )
                           }), setModifyTypePopup((prevState) => ({ ...prevState, visible: true })))  //////////////////////////////////////visualizzo il popup come callback                          
                         })

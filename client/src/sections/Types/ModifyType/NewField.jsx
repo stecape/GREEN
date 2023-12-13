@@ -15,6 +15,13 @@ function NewField () {
   const [name, setName] = useState("")
   const [type, setType] = useState(0)
 
+  //Input Validation
+  const InlineValidation = (value) => {
+    setName(value)
+    let pattern = /[^A-Za-z0-9\-_<> ]/g
+    setEditType((prevState) => ({...prevState, fieldNameNotValid: pattern.test(value)  || editType.fields.find(i => i.name === value)}))
+  }
+
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -25,7 +32,6 @@ function NewField () {
       query: [...editType.query, `INSERT into "Field" ("id","name","type","parent_type") VALUES  (DEFAULT, '${name}', ${type}, ${editType.type})`]}), handleReset()
     )    
   }
-
 
   //Form Events
   const handleReset = () => {
@@ -44,7 +50,8 @@ function NewField () {
           label="Field Name"
           className={formStyles.item}
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => InlineValidation(e.target.value)}
+          error={editType.fieldNameNotValid}
         />
         <Select
           id='field-type'
@@ -65,6 +72,7 @@ function NewField () {
             theme="primary"
             themeType="outline"
             className={formStyles.btn}
+            disabled={editType.fieldNameNotValid}
           >
             Add
           </Button>

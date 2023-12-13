@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Button } from '@react-md/button'
 import {
+  FormMessage,
   Form,
   TextField,
   FormThemeProvider,
@@ -16,16 +17,24 @@ function NewField (props) {
   const [typesList, setTypesList] = useState(props.typesList)
   const [name, setName] = useState("")
   const [type, setType] = useState(0)
+  const [valid, setValid] = useState(true)
 
   useEffect(() => { 
     setTypesList(props.typesList)
   }, [props.typesList])
 
 
+  //Input Validation
+  const InlineValidation = (value) => {
+    setName(value)
+    let pattern = /[^A-Za-z0-9\-_<> ]/g
+    setValid(!pattern.test(value))
+  }
+
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    axios.post('http://localhost:3001/api/add', {table: "NewTypeTmp", fields:["name", "type"], values:[name, type]})
+    axios.post('http://localhost:3001/api/add', {table: "NewTypeTmp", fields:["name", "type", "parent_type"], values:[name, type, 0]})
     .then(()=>{handleReset()})
     .catch(error => {
       if (error.response) {
@@ -62,14 +71,19 @@ function NewField (props) {
     <FormThemeProvider theme='outline'>
       <Form className={formStyles.form} onSubmit={handleSubmit}>
         <TextField
-          id='field-name'
+          id='simple-help-and-error-messages-field-name'
+          aria-describedby={'simple-help-and-error-messages-field-name-message'}
           key='field-name'
           type='string'
           label="Field Name"
           className={formStyles.item}
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => InlineValidation(e.target.value)}
+          error={!valid}
         />
+        <FormMessage id={'simple-help-and-error-messages-field-name-message'} error={!valid}>
+          Wrong characters
+        </FormMessage>
         <Select
           id='field-type'
           key='field-type'

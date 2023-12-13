@@ -15,6 +15,12 @@ function ModifyTypeName (props) {
   const [prevName, setPrevName] = useState(props.name)
 
 
+  //Input Validation
+  const InlineValidation = (value) => {
+    let pattern = /[^A-Za-z0-9\-_<> ]/g
+    setEditType((prevState) => ({...prevState, name: value, typeNameNotValid: pattern.test(value) || editType.allTypes.find(i => i.name === value && i.id !== editType.type)}))
+  }
+
 
   //Form Events
   const handleSubmit = (event) => {
@@ -28,7 +34,7 @@ function ModifyTypeName (props) {
         if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
-        addMessage({children: "Error: " + error.response.data.message, messageId: Date.now().toString()})
+        addMessage({children: "Error: " + error.response.data.message.toString(), messageId: Date.now().toString()})
         console.log(error.response.data);
         console.log(error.response.status);
         console.log(error.response.headers);
@@ -63,16 +69,14 @@ function ModifyTypeName (props) {
           label="Type Name"
           className={formStyles.item}
           value={editType.name}
-          onChange={(e) => {
-            setEditType((prevState) => ({...prevState, name: e.target.value}))
-          }}
+          onChange={(e) => InlineValidation(e.target.value)}
           onBlur={(e) => {
-            if (prevName !== editType.name) {
+            if (prevName !== editType.name && !editType.typeNameNotValid) {
               setEditType((prevState) => ({...prevState, query: [...editType.query, `UPDATE "Type" SET name = '${editType.name}' WHERE id = ${editType.type}`]}))
               setPrevName(editType.name)
             }
           }}
-          
+          error={editType.typeNameNotValid}
         />
         <div className={formStyles.btn_container}>
           <Button
@@ -80,6 +84,7 @@ function ModifyTypeName (props) {
             theme="primary"
             themeType="outline"
             className={formStyles.btn}
+            disabled={editType.typeNameNotValid}
           >
             Save Type
           </Button>

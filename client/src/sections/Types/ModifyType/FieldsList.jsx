@@ -87,6 +87,7 @@ function FieldsList (props) {
         type={modifyFieldPopup.type}
         id={modifyFieldPopup.id}
         typesList={editType.typesList}
+        fields={editType.fields}
         updField={(data)=>{
           var fieldToUpdateIndex = editType.fields.findIndex(i => i.id === data.id)
           var fieldToUpdate = editType.fields[fieldToUpdateIndex]
