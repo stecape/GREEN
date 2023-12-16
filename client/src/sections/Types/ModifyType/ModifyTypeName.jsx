@@ -7,7 +7,7 @@ import {
   FormThemeProvider
 } from '@react-md/form'
 import formStyles from '../../../styles/Form.module.scss'
-import { ModifyTypeContext } from '../TypesList'
+import { ModifyTypeContext } from './ModifyTypeContext'
 
 function ModifyTypeName (props) {
   const addMessage = useAddMessage()

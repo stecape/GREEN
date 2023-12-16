@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext } from "react"
+import { useState, useEffect, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Button } from "@react-md/button"
 import DeleteTypePopup from "./DeleteTypePopup"
@@ -14,16 +14,16 @@ import {
 } from '@react-md/table'
 import axios from 'axios'
 import tableStyles from '../../styles/Table.module.scss'
-
-export const ModifyTypeContext = createContext()
+import { ModifyTypeContext } from "./ModifyType/ModifyTypeContext";
 
 function TypesList (props) {
   const addMessage = useAddMessage()
-  const [editType, setEditType] = useState({query:[]})
   const [typesList, setTypesList] = useState(props.typesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false })
   const [createTypePopup, setCreateTypePopup] = useState({ visible: false })
+  const {setEditType} = useContext(ModifyTypeContext)
+
   useEffect(() => {
     setTypesList(props.typesList)
   }, [props.typesList, addMessage])
@@ -135,7 +135,6 @@ function TypesList (props) {
        * Devo aggiornare il nome del Type
       */}
       
-      <ModifyTypeContext.Provider value={{ editType, setEditType }}>
         <ModifyTypePopup
           visible={modifyTypePopup.visible}
           modalType="full-page"
@@ -150,7 +149,6 @@ function TypesList (props) {
             }))
           }}
         />
-      </ModifyTypeContext.Provider>
       <CreateTypePopup
         visible={createTypePopup.visible}
         name=""

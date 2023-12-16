@@ -10,7 +10,7 @@ import QueryList from './ModifyType/QueryList'
 import gridStyles from '../../styles/Grid.module.scss'
 import formStyles from '../../styles/Form.module.scss'
 import axios from 'axios'
-import { ModifyTypeContext } from './TypesList'
+import { ModifyTypeContext } from './ModifyType/ModifyTypeContext'
 
 function ModifyTypePopup (props) {
   

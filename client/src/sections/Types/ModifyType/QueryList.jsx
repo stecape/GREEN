@@ -1,7 +1,7 @@
 import { useContext } from "react"
 import { List, ListItem } from "@react-md/list"
 
-import { ModifyTypeContext } from '../TypesList'
+import { ModifyTypeContext } from './ModifyTypeContext'
 
 function QueryList () {
   const {editType} = useContext(ModifyTypeContext)

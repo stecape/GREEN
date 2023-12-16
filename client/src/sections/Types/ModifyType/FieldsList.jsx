@@ -11,7 +11,7 @@ import {
   TableRow,
 } from '@react-md/table'
 import tableStyles from '../../../styles/Table.module.scss'
-import { ModifyTypeContext } from '../TypesList'
+import { ModifyTypeContext } from './ModifyTypeContext'
 
 
 function FieldsList (props) {

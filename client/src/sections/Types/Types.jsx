@@ -5,6 +5,7 @@ import TypesList from './TypesList'
 import gridStyles from "../../styles/Grid.module.scss"
 import axios from 'axios'
 
+import { ModifyTypeContextProvider } from "./ModifyType/ModifyTypeContext"
 import {SocketContext} from "../../Helpers/socket"
 
 function Types () {
@@ -102,7 +103,9 @@ function Types () {
   <>
   <Grid>
     <GridCell colSpan={12} className={gridStyles.item}>
-      <TypesList typesList={typesList} />
+      <ModifyTypeContextProvider>
+        <TypesList typesList={typesList} />
+      </ModifyTypeContextProvider>
     </GridCell>
   </Grid>
   </>

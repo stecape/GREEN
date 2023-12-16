@@ -7,7 +7,7 @@ import {
   Select
 } from '@react-md/form'
 import formStyles from '../../../styles/Form.module.scss'
-import { ModifyTypeContext } from '../TypesList'
+import { ModifyTypeContext } from './ModifyTypeContext'
 
 
 function NewField () {
@@ -40,7 +40,6 @@ function NewField () {
     let pattern = /[^A-Za-z0-9\-_<> ]/g
     var fieldNameNotValid = pattern.test(name) || editType.fields.find(i => i.name === name) || name === ""
     var fieldTypeNotValid = type === 0
-    console.log(name, type, typeof(type), typeItem)
     setEditType((prevState) => ({
       ...prevState, 
       fieldNameNotValid: fieldNameNotValid,
