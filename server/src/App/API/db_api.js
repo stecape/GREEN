@@ -211,7 +211,7 @@ module.exports = function (app, pool) {
   Err:    400
   */
   app.post('/api/removeType', (req, res) => {
-    var queryString="DELETE FROM \"TypeDependencies\"  WHERE \"type\" = " + req.body.id + "; DELETE FROM \"Field\"  WHERE \"parent_type\" = " + req.body.id + "; DELETE FROM \"Type\" WHERE \"id\" = " + req.body.id
+    var queryString="DELETE FROM \"Field\"  WHERE \"parent_type\" = " + req.body.id + "; DELETE FROM \"Type\" WHERE \"id\" = " + req.body.id
     pool.query({
       text: queryString,
       rowMode: 'array'
