@@ -12,7 +12,7 @@ import { ModifyTypeContext } from './ModifyTypeContext'
 function ModifyTypeName (props) {
   const addMessage = useAddMessage()
   const {editType, setEditType} = useContext(ModifyTypeContext)
-  const [prevName, setPrevName] = useState(props.name)
+  const [prevName, setPrevName] = useState(editType.name)
 
 
   //Input Validation

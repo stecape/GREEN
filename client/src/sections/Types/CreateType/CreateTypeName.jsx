@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Button } from '@react-md/button'
 import {
@@ -7,19 +7,26 @@ import {
   FormThemeProvider
 } from '@react-md/form'
 import formStyles from '../../../styles/Form.module.scss'
+import { CreateTypeContext } from './CreateTypeContext'
 
-
-function NewTypeName (props) {
+function CreateTypeName (props) {
   const addMessage = useAddMessage()
-  const [name, setName] = useState(props.name ? props.name : "")
+  const {createType, setCreateType} = useContext(CreateTypeContext)
+  const [prevName, setPrevName] = useState(createType.name)
 
+
+  //Input Validation
+  const InlineValidation = (value) => {
+    let pattern = /[^A-Za-z0-9\-_<> ]/g
+    setCreateType((prevState) => ({...prevState, name: value, typeNameNotValid: pattern.test(value) || createType.allTypes.find(i => i.name === value && i.id !== createType.type) || value === ""}))
+  }
 
 
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
     //si chiama una promise in arrivo dalle props. La funzione deve eseguire la query di creazione, sul then poi bisogna resettare il form
-    props.upsertType(name)
+    props.upsertType(createType.name)
       .then((response)=>{  
         addMessage({children: response.data.message})
       })
@@ -46,8 +53,8 @@ function NewTypeName (props) {
       })
       .finally(handleReset)
   }
+
   const handleReset = () => {
-    setName('')
     props.reset()
   }
 
@@ -61,8 +68,15 @@ function NewTypeName (props) {
           type='string'
           label="Type Name"
           className={formStyles.item}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={createType.name}
+          onChange={(e) => InlineValidation(e.target.value)}
+          onBlur={(e) => {
+            if (prevName !== createType.name && !createType.typeNameNotValid) {
+              setCreateType((prevState) => ({...prevState, query: [...createType.query, `UPDATE "Type" SET name = '${createType.name}' WHERE id = ${createType.type}`]}))
+              setPrevName(createType.name)
+            }
+          }}
+          error={createType.typeNameNotValid}
         />
         <div className={formStyles.btn_container}>
           <Button
@@ -70,13 +84,14 @@ function NewTypeName (props) {
             theme="primary"
             themeType="outline"
             className={formStyles.btn}
+            disabled={createType.typeNameNotValid}
           >
-            Create Type
+            Save Type
           </Button>
           <Button
             type="reset"
             themeType="outline"
-            className={formStyles.btn}
+            cl
           >
             Cancel
           </Button>
@@ -85,4 +100,4 @@ function NewTypeName (props) {
     </FormThemeProvider>
     </div>
   )}
-export default NewTypeName
+export default CreateTypeName
