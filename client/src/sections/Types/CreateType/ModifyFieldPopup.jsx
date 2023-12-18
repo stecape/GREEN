@@ -10,13 +10,18 @@ import {
 } from '@react-md/form'
 
 function ModifyFieldPopup (props) {
+  const [modalState, setModalState] = useState({ visible: false, id: props.id, name: '', type: 0, typesList: props.typesList })
 
-  const [modalState, setModalState] = useState({ visible: false, name: '', type: 0, typesList: props.typesList })
+  //Input Validation
+  const InlineValidation = (value) => {
+    let pattern = /[^A-Za-z0-9\-_<> ]/g
+    setModalState((prevState) => ({ ...prevState, name: value, fieldNameNotValid: pattern.test(value) || props.fields.find(i => i.name === value && i.id !== props.id) || value === ""}))
+  }
   
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.updField({fields: ["name", "type"], values: [modalState.name, modalState.type]})
+    props.updField({id: props.id, name: modalState.name, type: modalState.type})
   }
   const handleReset = (event) => {
     event.preventDefault()
@@ -24,7 +29,7 @@ function ModifyFieldPopup (props) {
   }
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, visible: props.visible, typesList: props.typesList}))
+    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, visible: props.visible}))
   },[props.name, props.visible, props.type, props.typesList])
   
   return (
@@ -53,7 +58,8 @@ function ModifyFieldPopup (props) {
               type='string'
               label="Field Name"
               value={modalState.name}
-              onChange={(e) => setModalState((prevState) => ({ ...prevState, name: e.target.value}))}
+              onChange={(e) => InlineValidation(e.target.value)}
+              error={modalState.fieldNameNotValid}
             />
             <Select
               id='type'
@@ -78,6 +84,7 @@ function ModifyFieldPopup (props) {
               type="submit"
               id="dialog-modify"
               theme="primary"
+              disabled={modalState.fieldNameNotValid}
             >
               Save
             </Button>

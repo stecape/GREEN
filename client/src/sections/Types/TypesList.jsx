@@ -151,13 +151,6 @@ function TypesList (props) {
           modalType="full-page"
           cancelCommand={()=>{
             setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
-            setEditType(() => ({
-              query: [],
-              name: "",
-              type: "0",
-              fields: [],
-              typesList: []
-            }))
           }}
         />
       <CreateTypePopup

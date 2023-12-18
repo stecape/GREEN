@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useContext } from "react"
 import { Button } from "@react-md/button"
 import DeleteFieldPopup from "./DeleteFieldPopup"
 import ModifyFieldPopup from "./ModifyFieldPopup"
@@ -10,19 +10,13 @@ import {
   TableHeader,
   TableRow,
 } from '@react-md/table'
-import axios from 'axios'
 import tableStyles from '../../../styles/Table.module.scss'
+import { CreateTypeContext } from './CreateTypeContext'
 
 function FieldsList (props) {
-
-  const [newTypeFieldsList, setNewTypeFieldsList] = useState(props.newTypeFieldsList)
-  const [typesList, setTypesList] = useState([])
+  const {createType, setCreateType} = useContext(CreateTypeContext)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyFieldPopup, setModifyFieldPopup] = useState({ visible: false, id: 0, type: 0, name: '' })
-  useEffect(() => {          
-    setNewTypeFieldsList(props.newTypeFieldsList)
-    setTypesList(props.typesList)
-  }, [props.newTypeFieldsList, props.typesList])
 
   return(
     <>
@@ -35,8 +29,8 @@ function FieldsList (props) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {newTypeFieldsList.map((item) => {
-              var typeItem = typesList.find(i => i.id === item.type)
+          {createType.fields.map((item) => {
+            var typeItem = createType.typesList.find(i => i.id === item.type)
               return (
                 <TableRow
                   key={item.id}
@@ -72,8 +66,15 @@ function FieldsList (props) {
         visible={deletePopup.visible}
         name={deletePopup.name}
         delField={()=>{
-          axios.post('http://localhost:3001/api/removeOne', {table: "NewTypeTmp", id: deletePopup.id})
-            .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
+          setCreateType((prevState) => ({
+              ...prevState,
+              query:[
+                ...prevState.query,
+                `DELETE FROM "Field" WHERE "id" = ${deletePopup.id}`
+              ],
+              fields: createType.fields.filter(i => i.id !== deletePopup.id)
+            }
+          ), setDeletePopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
           setDeletePopup((prevState) => ({ ...prevState, visible: false }))
@@ -83,10 +84,23 @@ function FieldsList (props) {
         visible={modifyFieldPopup.visible}
         name={modifyFieldPopup.name}
         type={modifyFieldPopup.type}
-        typesList={typesList}
+        id={modifyFieldPopup.id}
+        typesList={createType.typesList}
         updField={(data)=>{
-          axios.post('http://localhost:3001/api/modify', {table: "NewTypeTmp", id: modifyFieldPopup.id, fields: data.fields, values: data.values})
-            .then(setModifyFieldPopup((prevState) => ({ ...prevState, visible: false })))
+          var fieldToUpdateIndex = createType.fields.findIndex(i => i.id === data.id)
+          var fieldToUpdate = createType.fields[fieldToUpdateIndex]
+          fieldToUpdate.name = data.name
+          fieldToUpdate.type = data.type
+          var fields = createType.fields
+          fields[fieldToUpdateIndex] = fieldToUpdate
+          setCreateType((prevState) => ({
+            ...prevState,
+            query: [
+              ...createType.query,
+              `UPDATE "Field" SET name='${fieldToUpdate.name}', type=${fieldToUpdate.type} WHERE id = ${fieldToUpdate.id}`
+            ],
+            fields: fields
+          }), setModifyFieldPopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
           setModifyFieldPopup((prevState) => ({ ...prevState, visible: false }))
