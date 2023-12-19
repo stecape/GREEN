@@ -72,7 +72,7 @@ function CreateTypeName (props) {
           onChange={(e) => InlineValidation(e.target.value)}
           onBlur={(e) => {
             if (prevName !== createType.name && !createType.typeNameNotValid) {
-              setCreateType((prevState) => ({...prevState, query: [...createType.query, `UPDATE "Type" SET name = '${createType.name}' WHERE id = ${createType.type}`]}))
+              setCreateType((prevState) => ({...prevState, typeNameQuery: `INSERT INTO "Type" (name) VALUES ('${createType.name}') RETURNING id INTO typeId;`}))
               setPrevName(createType.name)
             }
           }}
@@ -91,7 +91,7 @@ function CreateTypeName (props) {
           <Button
             type="reset"
             themeType="outline"
-            cl
+            className={formStyles.btn}
           >
             Cancel
           </Button>

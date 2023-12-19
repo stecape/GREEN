@@ -6,7 +6,7 @@ import { ArrowBackSVGIcon } from '@react-md/material-icons'
 import FieldsList from './CreateType/FieldsList'
 import NewField from './CreateType/NewField'
 import CreateTypeName from './CreateType/CreateTypeName'
-import QueryList from './ModifyType/QueryList'
+import QueryList from './CreateType/QueryList'
 import gridStyles from '../../styles/Grid.module.scss'
 import formStyles from '../../styles/Form.module.scss'
 import axios from 'axios'
@@ -18,7 +18,21 @@ function CreateTypePopup (props) {
   const [modalState, setModalState] = useState({ visible: false, modalType: props.modalType })
   const upsertType = ()=> {
     return new Promise((innerResolve, innerReject) => {
-      axios.post('http://localhost:3001/api/exec', {query: createType.query.join('; ')})
+      var query = `DO $$ 
+      DECLARE
+          typeId "Type".id%TYPE;
+      BEGIN
+      `
+      +
+      createType.typeNameQuery
+      +
+      createType.query.join(`;
+      `)
+      +
+      `;
+      END $$`
+      console.log(query)
+      axios.post('http://localhost:3001/api/exec', {query: query})
       .then((value)=>{innerResolve(value)})
       .catch((error)=>{innerReject(error)})
     })
@@ -58,7 +72,7 @@ function CreateTypePopup (props) {
               />
             </GridCell>
             <GridCell colSpan={12} className={gridStyles.item}>
-              <NewField typesList={props.typesList} />
+              <NewField />
             </GridCell>
             <GridCell colSpan={12} className={gridStyles.item}>
               <FieldsList />

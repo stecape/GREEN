@@ -43,7 +43,7 @@ function FieldsList (props) {
                       buttonType="icon"
                       theme="error"
                       aria-label="Permanently Delete"
-                      onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
+                      onClick={()=> setDeletePopup({visible: true, name: item.name})}
                     >
                       <DeleteSVGIcon />
                     </Button>
@@ -51,7 +51,7 @@ function FieldsList (props) {
                       id="icon-button-4"
                       buttonType="icon"
                       aria-label="Edit"
-                      onClick={()=> setModifyFieldPopup({visible: true, id: item.id, type: item.type, name: item.name})}
+                      onClick={()=> setModifyFieldPopup({visible: true, type: item.type, name: item.name})}
                     >
                       <EditSVGIcon />
                     </Button>
@@ -70,7 +70,7 @@ function FieldsList (props) {
               ...prevState,
               query:[
                 ...prevState.query,
-                `DELETE FROM "Field" WHERE "id" = ${deletePopup.id}`
+                `DELETE FROM "Field" WHERE "name" = ${deletePopup.name} AND "parent_type" = typeId`
               ],
               fields: createType.fields.filter(i => i.id !== deletePopup.id)
             }
@@ -97,7 +97,7 @@ function FieldsList (props) {
             ...prevState,
             query: [
               ...createType.query,
-              `UPDATE "Field" SET name='${fieldToUpdate.name}', type=${fieldToUpdate.type} WHERE id = ${fieldToUpdate.id}`
+              `UPDATE "Field" SET name='${fieldToUpdate.name}', type=${fieldToUpdate.type} WHERE "name" = ${modifyFieldPopup.name} AND "parent_type" = typeId`
             ],
             fields: fields
           }), setModifyFieldPopup((prevState) => ({ ...prevState, visible: false })))

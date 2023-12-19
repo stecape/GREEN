@@ -49,11 +49,11 @@ function NewField (props) {
       setCreateType((prevState) => ({
         ...prevState, 
         fields: [...createType.fields, { id: Math.floor(Date.now() / 1000), type: typeItem.name, name: name }],
-        query: [...createType.query, `INSERT into "Field" ("id","name","type","parent_type") VALUES  (DEFAULT, '${name}', ${type}, ${createType.type})`]}), handleReset()
+        query: [...createType.query, `INSERT into "Field" ("id","name","type","parent_type") VALUES (DEFAULT, '${name}', ${type}, typeId)`]}), handleReset()
       )
     }
   }
-
+  
   //Form Events
   const handleReset = () => {
     setName("")

@@ -15,6 +15,7 @@ import {
 import axios from 'axios'
 import tableStyles from '../../styles/Table.module.scss'
 import { ModifyTypeContext } from "./ModifyType/ModifyTypeContext";
+import { CreateTypeContext } from "./CreateType/CreateTypeContext";
 
 function TypesList (props) {
   const addMessage = useAddMessage()
@@ -23,6 +24,7 @@ function TypesList (props) {
   const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false })
   const [createTypePopup, setCreateTypePopup] = useState({ visible: false })
   const {setEditType} = useContext(ModifyTypeContext)
+  const {setCreateType} = useContext(CreateTypeContext)
 
   useEffect(() => {
     setTypesList(props.typesList)
@@ -97,8 +99,15 @@ function TypesList (props) {
       <Button 
         floating="bottom-right" 
         onClick={()=>
-          axios.post('http://localhost:3001/api/removeAll', {table: "NewTypeTmp"})
-          .then(setCreateTypePopup({visible: true}))}
+          setCreateType(() => ({
+            query: [],
+            name: '',
+            type: '',
+            fields: [],
+            allTypes: typesList,
+            typesList: typesList
+          }), setCreateTypePopup((prevState) => ({ ...prevState, visible: true })))  //as callback, it shows the popup                         
+        }
       >
         <AddSVGIcon />
       </Button>
@@ -138,21 +147,13 @@ function TypesList (props) {
           setDeletePopup((prevState) => ({ ...prevState, visible: false }))
         }}
       />
-
-      {/*
-       * Modify Popup
-       * Devo popolare la tabella con i fields,
-       * Devo passare i Types,
-       * Devo aggiornare il nome del Type
-      */}
-      
-        <ModifyTypePopup
-          visible={modifyTypePopup.visible}
-          modalType="full-page"
-          cancelCommand={()=>{
-            setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
-          }}
-        />
+      <ModifyTypePopup
+        visible={modifyTypePopup.visible}
+        modalType="full-page"
+        cancelCommand={()=>{
+          setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
+        }}
+      />
       <CreateTypePopup
         visible={createTypePopup.visible}
         name=""
