@@ -325,7 +325,7 @@ module.exports = function (app, pool) {
         rowMode: 'array'
       })
       .then((data)=>{
-        response.fields = data.rows.map((field) => ({id: field[0], name: field[1], type: field[2]}))
+        response.fields = data.rows.map((field, i) => ({id: field[0], name: field[1], type: field[2], QRef: i}))
         var result = []
         var queryString=`
         SELECT
@@ -357,8 +357,10 @@ module.exports = function (app, pool) {
             rowMode: 'array'
           })
           .then((data) => {
+            //creating the Graph of the dependencies of the types
             var graph = {}
-            result.map(k => graph[k[0]] = result.filter(i => i[0] == k[0]).map(j => j[1]))
+            //for each row of the previous query, non ricordo cosa ritorna la query... fuck! Questa va commentata
+            result.forEach(k => graph[k[0]] = result.filter(i => i[0] == k[0]).map(j => j[1]))
             data.rows.map(k => graph[k[0]] = [])
             response.deps = [...DFS(graph, req.body.type)]       //Spread operator, DSF returns a Set, I want an array
             res.status(200).json({result: response, message: "Record(s) from table \"Field\" returned correctly"})

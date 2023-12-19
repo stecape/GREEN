@@ -16,7 +16,7 @@ import { CreateTypeContext } from './CreateTypeContext'
 function FieldsList (props) {
   const {createType, setCreateType} = useContext(CreateTypeContext)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
-  const [modifyFieldPopup, setModifyFieldPopup] = useState({ visible: false, id: 0, type: 0, name: '' })
+  const [modifyFieldPopup, setModifyFieldPopup] = useState({ visible: false, type: 0, name: '', QRef: undefined })
 
   return(
     <>
@@ -43,7 +43,7 @@ function FieldsList (props) {
                       buttonType="icon"
                       theme="error"
                       aria-label="Permanently Delete"
-                      onClick={()=> setDeletePopup({visible: true, name: item.name})}
+                      onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name,  QRef: item.QRef})}
                     >
                       <DeleteSVGIcon />
                     </Button>
@@ -51,7 +51,7 @@ function FieldsList (props) {
                       id="icon-button-4"
                       buttonType="icon"
                       aria-label="Edit"
-                      onClick={()=> setModifyFieldPopup({visible: true, type: item.type, name: item.name})}
+                      onClick={()=> setModifyFieldPopup({visible: true, type: item.type, name: item.name, QRef: item.QRef})}
                     >
                       <EditSVGIcon />
                     </Button>
@@ -84,23 +84,58 @@ function FieldsList (props) {
         visible={modifyFieldPopup.visible}
         name={modifyFieldPopup.name}
         type={modifyFieldPopup.type}
-        id={modifyFieldPopup.id}
+        QRef={modifyFieldPopup.QRef}
         typesList={createType.typesList}
+        fields={createType.fields}
         updField={(data)=>{
-          var fieldToUpdateIndex = createType.fields.findIndex(i => i.id === data.id)
+          //we retreive the field to update object from the array of the fileds and his index,
+          //we create a mirror object so that we can update it with the new information and then we recreate the full fields 
+          //array with the new information
+          var fieldToUpdateIndex = createType.fields.findIndex(i => i.QRef === modifyFieldPopup.QRef)
           var fieldToUpdate = createType.fields[fieldToUpdateIndex]
           fieldToUpdate.name = data.name
           fieldToUpdate.type = data.type
           var fields = createType.fields
           fields[fieldToUpdateIndex] = fieldToUpdate
-          setCreateType((prevState) => ({
-            ...prevState,
-            query: [
-              ...createType.query,
-              `UPDATE "Field" SET name='${fieldToUpdate.name}', type=${fieldToUpdate.type} WHERE "name" = ${modifyFieldPopup.name} AND "parent_type" = typeId`
-            ],
-            fields: fields
-          }), setModifyFieldPopup((prevState) => ({ ...prevState, visible: false })))
+
+          //and then we pass to work on the queries:
+          //check if the field has been already modified in this round, to update the query 
+          var actualQuery = createType.updateQuery.find(i => i.QRef === modifyFieldPopup.QRef)
+          var newQuery
+          if (actualQuery === undefined) {
+            //Not present in the update list: the field could be in the insert list (new field) or already in DB (pre existing field)
+            //Check if is in the insert list
+            actualQuery = createType.insertQuery.find(i => i.QRef === modifyFieldPopup.QRef)
+            if (actualQuery === undefined) {
+              //Not present in the insert list: the field was already in DB. We can insert an entry in the update list
+              setCreateType((prevState) => ({
+                ...prevState,
+                updateQuery: [
+                  ...createType.updateQuery, 
+                  {query: `UPDATE "Field" SET name='${data.name}', type=${data.type} WHERE "name" = ${modifyFieldPopup.name} AND "parent_type" = typeId`, QRef: fieldToUpdate.QRef}
+                ],
+                fields: fields
+              }), setModifyFieldPopup((prevState) => ({ ...prevState, visible: false })))
+            } else {
+              //the field is in the insert list. The field has been inserted this round, so it is possible to update the insert query
+              newQuery = createType.insertQuery
+              newQuery[newQuery.findIndex(i => i.QRef===fieldToUpdate.QRef)] = {query: `INSERT INTO "Field" (id, name, type, parent_type) VALUES (DEFAULT, '${fieldToUpdate.name}', type=${fieldToUpdate.type}, typeId)`, QRef: fieldToUpdate.QRef} 
+              setCreateType((prevState) => ({
+                ...prevState,
+                insertQuery: newQuery,
+                fields: fields
+              }), setModifyFieldPopup((prevState) => ({ ...prevState, visible: false }))) 
+          }} else {
+            //the field is already in the update list. It is a preexisting field (not in the insert list) that has been already modified this round.
+            //It is possible to update the update query
+            newQuery = createType.updateQuery
+            newQuery[newQuery.findIndex(i => i.QRef===fieldToUpdate.QRef)] = {query: `UPDATE "Field" SET name='${fieldToUpdate.name}', type=${fieldToUpdate.type} WHERE "name" = ${modifyFieldPopup.name} AND "parent_type" = typeId`, QRef: fieldToUpdate.QRef}
+            setCreateType((prevState) => ({
+              ...prevState,
+              updateQuery: newQuery,
+              fields: fields
+            }), setModifyFieldPopup((prevState) => ({ ...prevState, visible: false }))) 
+          }
         }}
         cancelCommand={()=>{
           setModifyFieldPopup((prevState) => ({ ...prevState, visible: false }))

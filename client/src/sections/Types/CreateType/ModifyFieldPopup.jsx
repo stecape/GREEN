@@ -10,18 +10,18 @@ import {
 } from '@react-md/form'
 
 function ModifyFieldPopup (props) {
-  const [modalState, setModalState] = useState({ visible: false, id: props.id, name: '', type: 0, typesList: props.typesList })
+  const [modalState, setModalState] = useState({ visible: false, name: '', type: 0, fieldNameNotValid: false })
 
   //Input Validation
   const InlineValidation = (value) => {
     let pattern = /[^A-Za-z0-9\-_<> ]/g
-    setModalState((prevState) => ({ ...prevState, name: value, fieldNameNotValid: pattern.test(value) || props.fields.find(i => i.name === value && i.id !== props.id) || value === ""}))
+    setModalState((prevState) => ({ ...prevState, name: value, fieldNameNotValid: pattern.test(value) || props.fields.find(i => i.name === value && i.QRef !== props.QRef) || value === ""}))
   }
   
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.updField({id: props.id, name: modalState.name, type: modalState.type})
+    props.updField({name: modalState.name, type: modalState.type})
   }
   const handleReset = (event) => {
     event.preventDefault()
@@ -30,7 +30,7 @@ function ModifyFieldPopup (props) {
 
   useEffect(() => {
     setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, visible: props.visible}))
-  },[props.name, props.visible, props.type, props.typesList])
+  },[props.name, props.visible, props.type])
   
   return (
     <Dialog
@@ -64,7 +64,7 @@ function ModifyFieldPopup (props) {
             <Select
               id='type'
               key='type'
-              options={modalState.typesList.map((item) => ({
+              options={props.typesList.map((item) => ({
                 label: item.name,
                 value: item.id
               }))}

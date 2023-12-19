@@ -36,7 +36,6 @@ function NewField (props) {
   const handleSubmit = (event) => {
     event.preventDefault()
     //it begins validating the input and then, if both type and name are valid, it proceed with the insert of the field and of the query
-    var typeItem = createType.typesList.find(i => i.id === Number(type))
     let pattern = /[^A-Za-z0-9\-_<> ]/g
     var fieldNameNotValid = pattern.test(name) || createType.fields.find(i => i.name === name) || name === ""
     var fieldTypeNotValid = type === 0
@@ -46,10 +45,11 @@ function NewField (props) {
       fieldTypeNotValid: fieldTypeNotValid
     }))
     if (!fieldNameNotValid && !fieldTypeNotValid){
+      var QRef = Date.now()
       setCreateType((prevState) => ({
         ...prevState, 
-        fields: [...createType.fields, { id: Math.floor(Date.now() / 1000), type: typeItem.name, name: name }],
-        query: [...createType.query, `INSERT into "Field" ("id","name","type","parent_type") VALUES (DEFAULT, '${name}', ${type}, typeId)`]}), handleReset()
+        fields: [...createType.fields, { type: type, name: name, QRef: QRef }],
+        insertQuery: [...createType.insertQuery, {query: `INSERT into "Field" ("id","name","type","parent_type") VALUES (DEFAULT, '${name}', ${type}, typeId)`, QRef: QRef}]}), handleReset()
       )
     }
   }

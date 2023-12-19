@@ -12,7 +12,6 @@ import {SocketContext} from "../../Helpers/socket"
 function Types () {
   const socket = useContext(SocketContext)
   const addMessage = useAddMessage()
-  const [fieldsList, setFieldsList] = useState([])
   const [typesList, setTypesList] = useState([])
   const [init, setInit] = useState({types: false, fields: false})
 
@@ -26,11 +25,6 @@ function Types () {
         .then(response => {
           setTypesList(response.data.result.map((val) => ({name:val[0], id:val[1]})))
           setInit((prevState) => ({ ...prevState, types: true}))
-        })
-      axios.post('http://localhost:3001/api/getAll', {table: "Field", fields:["name", "type", "id"]})
-        .then(response => {
-          setFieldsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
-          setInit((prevState) => ({ ...prevState, fields: true}))
         })
     }
 
@@ -47,11 +41,6 @@ function Types () {
         var types = typesList
         types.push(value.data)
         setTypesList([...types])
-      }
-      else if (value.table === "Field" && value.operation === 'INSERT') {
-        var fields = fieldsList
-        fields.push(value.data)
-        setFieldsList([...fields])
       }
       else if (value.table === "Type" && value.operation === 'DELETE') {
         setTypesList([...typesList.filter(i => i.id !== value.data.id)])
@@ -76,13 +65,6 @@ function Types () {
           addMessage({children: response.data.message})
         })
     }
-    if(init.fields === false){
-      axios.post('http://localhost:3001/api/getAll', {table: "Field", fields:["name", "parent_type", "type", "id"]})
-        .then(response => {
-          setFieldsList(response.data.result.map((val) => ({name:val[0], type:val[1], parent_type:val[2], id:val[3]})))
-          setInit((prevState) => ({ ...prevState, fields: true}))
-        })
-    }
 
     //On (re)connection request the lists
     socket.on("connect", types_on_connect)
@@ -99,7 +81,7 @@ function Types () {
       socket.off("error", types_on_error)
       socket.off("update", types_on_update)
     }
-  },[init, fieldsList, typesList, socket, addMessage])
+  },[init, typesList, socket, addMessage])
   return (
   <>
   <Grid>

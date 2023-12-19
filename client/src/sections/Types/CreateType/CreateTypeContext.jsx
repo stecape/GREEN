@@ -1,10 +1,13 @@
-import React, { createContext, useState, useMemo } from "react";
+import React, { createContext, useState, useMemo, useCallback } from "react";
 
 const CreateTypeContext = createContext()
 
 const CreateTypeContextProvider = ({children}) => {
     const [createType, setCreateType] = useState({
-        query:[],
+        typeNameQuery: '',
+        insertQuery:[],
+        updateQuery:[],
+        deleteQuery:[],
         name: '',
         type: 0,
         fields: [],
@@ -15,9 +18,26 @@ const CreateTypeContextProvider = ({children}) => {
         fieldNameNotValid: false
     })
 
+    const initCreateTypeContext = useCallback((typesList, filteredTypesList) => {
+      setCreateType({
+        typeNameQuery: '',
+        insertQuery:[],
+        updateQuery:[],
+        deleteQuery:[],
+        name: '',
+        type: 0,
+        fields: [],
+        allTypes: typesList,
+        typesList: filteredTypesList,
+        typeNameNotValid: false,
+        fieldTypeNotValid: false,
+        fieldNameNotValid: false
+      })
+    },[])
+
     const value = useMemo(
-        () => ({ createType, setCreateType }),
-        [createType, setCreateType]
+        () => ({ createType, setCreateType, initCreateTypeContext }),
+        [createType, setCreateType, initCreateTypeContext]
       );
 
     return (

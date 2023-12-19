@@ -8,10 +8,21 @@ function QueryList () {
 
   return (
     <List>
-        <ListItem>{createType.typeNameQuery}</ListItem>
-        {createType.query.map((q, i) => (
-        <ListItem key={`query_${i}`} id={`query_${i}`}>
-            {q}
+        <ListItem key={`typeNameQuery`} id={`typeNameQuery`}>{createType.typeNameQuery}</ListItem>
+        {console.log(createType)}
+        {createType.insertQuery.map((q, i) => (
+        <ListItem key={`insertQuery_${i}`} id={`insertQuery_${i}`}>
+            {q.query}
+        </ListItem>
+        ))}
+        {createType.updateQuery.map((q, i) => (
+        <ListItem key={`updateQuery_${i}`} id={`updateQuery_${i}`}>
+            {q.query}
+        </ListItem>
+        ))}
+        {createType.deleteQuery.map((q, i) => (
+        <ListItem key={`updateQuery_${i}`} id={`updateQuery_${i}`}>
+            {q.query}
         </ListItem>
         ))}
     </List>

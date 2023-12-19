@@ -24,7 +24,7 @@ function TypesList (props) {
   const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false })
   const [createTypePopup, setCreateTypePopup] = useState({ visible: false })
   const {setEditType} = useContext(ModifyTypeContext)
-  const {setCreateType} = useContext(CreateTypeContext)
+  const {initCreateTypeContext} = useContext(CreateTypeContext)
 
   useEffect(() => {
     setTypesList(props.typesList)
@@ -76,7 +76,10 @@ function TypesList (props) {
                         axios.post('http://localhost:3001/api/getFields', {type: item.id})
                         .then((res) => {
                           setEditType(() => ({
-                            query: [],
+                            typeNameQuery: '',
+                            insertQuery:[],
+                            updateQuery:[],
+                            deleteQuery:[],
                             name: res.data.result.name,
                             type: res.data.result.type,
                             fields: res.data.result.fields,
@@ -98,16 +101,10 @@ function TypesList (props) {
 
       <Button 
         floating="bottom-right" 
-        onClick={()=>
-          setCreateType(() => ({
-            query: [],
-            name: '',
-            type: '',
-            fields: [],
-            allTypes: typesList,
-            typesList: typesList
-          }), setCreateTypePopup((prevState) => ({ ...prevState, visible: true })))  //as callback, it shows the popup                         
-        }
+        onClick={() => {
+          initCreateTypeContext(typesList, typesList)
+          setCreateTypePopup((prevState) => ({ ...prevState, visible: true }))  //it shows the popup                         
+        }}
       >
         <AddSVGIcon />
       </Button>
