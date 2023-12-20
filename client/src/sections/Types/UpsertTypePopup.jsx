@@ -5,7 +5,7 @@ import { Dialog, DialogContent } from "@react-md/dialog"
 import { ArrowBackSVGIcon } from '@react-md/material-icons'
 import FieldsList from './UpsertType/FieldsList'
 import NewField from './UpsertType/NewField'
-import UpsertTypeName from './UpsertType/UpsertTypeName'
+import TypeName from './UpsertType/TypeName'
 import QueryList from './UpsertType/QueryList'
 import gridStyles from '../../styles/Grid.module.scss'
 import formStyles from '../../styles/Form.module.scss'
@@ -72,7 +72,7 @@ function UpsertTypePopup (props) {
         <div className={formStyles.container}>
           <Grid>
             <GridCell colSpan={12} className={gridStyles.item}>
-              <UpsertTypeName
+              <TypeName
                 reset={handleReset}
                 upsertType={(name)=> upserttType(name)}
               />

@@ -13,7 +13,15 @@ import {
 import tableStyles from '../../../styles/Table.module.scss'
 import { UpsertTypeContext } from './UpsertTypeContext'
 
-function FieldsList (props) {
+//If a field is already in the DB it has an Id.
+//If a field is created in this round, it doesn't have an Id
+//So I've introduced a new code, the QRef, which is the reference for the operations
+//during an active round:
+//the fields are returned from the backend with a QRef number that varies from 0 to the total number of fields (is the index of the map that returns the fields).
+//the new fields are created with a QRef that is the Date.now(). This should avoid overlapping.
+//The QRef is valid only during the active round, the next round it could change.
+
+function FieldsList () {
   const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyFieldPopup, setModifyFieldPopup] = useState({ visible: false, type: 0, name: '', QRef: undefined })

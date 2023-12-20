@@ -9,7 +9,7 @@ import {
 import formStyles from '../../../styles/Form.module.scss'
 import { UpsertTypeContext } from './UpsertTypeContext'
 
-function UpsertTypeName (props) {
+function TypeName (props) {
   const addMessage = useAddMessage()
   const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [prevName, setPrevName] = useState(upsertType.name)
@@ -102,4 +102,4 @@ function UpsertTypeName (props) {
     </FormThemeProvider>
     </div>
   )}
-export default UpsertTypeName
+export default TypeName

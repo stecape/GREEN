@@ -24,7 +24,6 @@ function UpsertVarPopup (props) {
     setModalState((prevState) => ({ ...prevState, name: "", type: 0}))
   }
   const handleReset = (event) => {
-    event.preventDefault()
     setModalState((prevState) => ({ ...prevState, name: "", type: 0}))
     props.cancelCommand()
   }

@@ -14,13 +14,6 @@ module.exports = function () {
       logic_values text COLLATE pg_catalog."default",
       um text COLLATE pg_catalog."default"
     );
-    
-    CREATE TABLE IF NOT EXISTS public."TypeDependencies"
-    (
-      id SERIAL PRIMARY KEY,
-      type integer NOT NULL,
-      dependent_type integer NOT NULL
-    );
   
     CREATE TABLE IF NOT EXISTS public."FieldPath"
     (
@@ -65,15 +58,6 @@ module.exports = function () {
       CONSTRAINT unique_var_name UNIQUE (name)
     );
     
-    CREATE TABLE IF NOT EXISTS public."NewTypeTmp"
-    (
-      id SERIAL PRIMARY KEY,
-      type integer NOT NULL,
-      parent_type integer NOT NULL,
-      name text COLLATE pg_catalog."default" NOT NULL,
-      CONSTRAINT unique_new_field_name UNIQUE (name)
-    );
-    
     ALTER TABLE IF EXISTS public."Field"
       DROP CONSTRAINT IF EXISTS name_and_parent_id,
       ADD CONSTRAINT name_and_parent_id UNIQUE (name, parent_type),
@@ -85,21 +69,6 @@ module.exports = function () {
       NOT VALID,
       DROP CONSTRAINT IF EXISTS parent_type_id,
       ADD CONSTRAINT parent_type_id FOREIGN KEY (parent_type)
-      REFERENCES public."Type" (id) MATCH SIMPLE
-      ON UPDATE NO ACTION
-      ON DELETE NO ACTION
-      NOT VALID;
-    
-
-    ALTER TABLE IF EXISTS public."TypeDependencies"
-      DROP CONSTRAINT IF EXISTS type_id,
-      ADD CONSTRAINT type_id FOREIGN KEY (type)
-      REFERENCES public."Type" (id) MATCH SIMPLE
-      ON UPDATE NO ACTION
-      ON DELETE NO ACTION
-      NOT VALID,
-      DROP CONSTRAINT IF EXISTS dependent_type_id,
-      ADD CONSTRAINT dependent_type_id FOREIGN KEY (dependent_type)
       REFERENCES public."Type" (id) MATCH SIMPLE
       ON UPDATE NO ACTION
       ON DELETE NO ACTION
@@ -175,19 +144,6 @@ module.exports = function () {
       NOT VALID;
     CREATE INDEX IF NOT EXISTS fki_type_id
       ON public."Var"(type);
-  
-  
-    ALTER TABLE IF EXISTS public."NewTypeTmp"
-      DROP CONSTRAINT IF EXISTS name_and_parent_id_tmp,
-      ADD CONSTRAINT name_and_parent_id_tmp UNIQUE (name, parent_type),
-      DROP CONSTRAINT IF EXISTS type_id,
-      ADD CONSTRAINT type_id FOREIGN KEY (type)
-      REFERENCES public."Type" (id) MATCH SIMPLE
-      ON UPDATE NO ACTION
-      ON DELETE NO ACTION
-      NOT VALID;
-    CREATE INDEX IF NOT EXISTS fki_type_id
-      ON public."NewTypeTmp"(type);
 
       
     INSERT INTO "Type"(id,name) VALUES (DEFAULT, 'Real') ON CONFLICT (name) DO NOTHING;
