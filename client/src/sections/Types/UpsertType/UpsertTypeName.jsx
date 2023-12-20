@@ -7,18 +7,18 @@ import {
   FormThemeProvider
 } from '@react-md/form'
 import formStyles from '../../../styles/Form.module.scss'
-import { CreateTypeContext } from './CreateTypeContext'
+import { UpsertTypeContext } from './UpsertTypeContext'
 
-function CreateTypeName (props) {
+function UpsertTypeName (props) {
   const addMessage = useAddMessage()
-  const {createType, setCreateType} = useContext(CreateTypeContext)
-  const [prevName, setPrevName] = useState(createType.name)
+  const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
+  const [prevName, setPrevName] = useState(upsertType.name)
 
 
   //Input Validation
   const InlineValidation = (value) => {
     let pattern = /[^A-Za-z0-9\-_<> ]/g
-    setCreateType((prevState) => ({...prevState, name: value, typeNameNotValid: pattern.test(value) || createType.allTypes.find(i => i.name === value && i.id !== createType.type) || value === ""}))
+    setUpsertType((prevState) => ({...prevState, name: value, typeNameNotValid: pattern.test(value) || upsertType.allTypes.find(i => i.name === value && i.id !== upsertType.type) || value === ""}))
   }
 
 
@@ -26,7 +26,7 @@ function CreateTypeName (props) {
   const handleSubmit = (event) => {
     event.preventDefault()
     //si chiama una promise in arrivo dalle props. La funzione deve eseguire la query di creazione, sul then poi bisogna resettare il form
-    props.upsertType(createType.name)
+    props.upsertType(upsertType.name)
       .then((response)=>{  
         addMessage({children: response.data.message})
       })
@@ -34,7 +34,7 @@ function CreateTypeName (props) {
         if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
-        addMessage({children: "Error: " + error.response.data.message, messageId: Date.now().toString()})
+        addMessage({children: "Error: " + error.response.data.message})
         console.log(error.response.data);
         console.log(error.response.status);
         console.log(error.response.headers);
@@ -68,15 +68,17 @@ function CreateTypeName (props) {
           type='string'
           label="Type Name"
           className={formStyles.item}
-          value={createType.name}
+          value={upsertType.name}
           onChange={(e) => InlineValidation(e.target.value)}
           onBlur={(e) => {
-            if (prevName !== createType.name && !createType.typeNameNotValid) {
-              setCreateType((prevState) => ({...prevState, typeNameQuery: `INSERT INTO "Type" (name) VALUES ('${createType.name}') RETURNING id INTO typeId;`}))
-              setPrevName(createType.name)
+            if (prevName !== upsertType.name && !upsertType.typeNameNotValid) {
+              upsertType.create ? 
+              setUpsertType((prevState) => ({...prevState, typeNameQuery: `INSERT INTO "Type" (name) VALUES ('${upsertType.name}') RETURNING id INTO typeId;`})) :
+              setUpsertType((prevState) => ({...prevState, typeNameQuery: `UPDATE "Type" SET name='${upsertType.name}' WHERE id = ${upsertType.type} RETURNING id INTO typeId;`}))
+              setPrevName(upsertType.name)
             }
           }}
-          error={createType.typeNameNotValid}
+          error={upsertType.typeNameNotValid}
         />
         <div className={formStyles.btn_container}>
           <Button
@@ -84,7 +86,7 @@ function CreateTypeName (props) {
             theme="primary"
             themeType="outline"
             className={formStyles.btn}
-            disabled={createType.typeNameNotValid}
+            disabled={upsertType.typeNameNotValid}
           >
             Save Type
           </Button>
@@ -100,4 +102,4 @@ function CreateTypeName (props) {
     </FormThemeProvider>
     </div>
   )}
-export default CreateTypeName
+export default UpsertTypeName

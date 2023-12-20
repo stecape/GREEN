@@ -1,9 +1,10 @@
 import React, { createContext, useState, useMemo, useCallback } from "react";
 
-const CreateTypeContext = createContext()
+const UpsertTypeContext = createContext()
 
-const CreateTypeContextProvider = ({children}) => {
-    const [createType, setCreateType] = useState({
+const UpsertTypeContextProvider = ({children}) => {
+    const [upsertType, setUpsertType] = useState({
+        create: true,
         typeNameQuery: '',
         insertQuery:[],
         updateQuery:[],
@@ -18,8 +19,9 @@ const CreateTypeContextProvider = ({children}) => {
         fieldNameNotValid: false
     })
 
-    const initCreateTypeContext = useCallback((typesList, filteredTypesList) => {
-      setCreateType({
+    const initUpsertTypeContext = useCallback((typesList, filteredTypesList) => {
+      setUpsertType({
+        create: true,
         typeNameQuery: '',
         insertQuery:[],
         updateQuery:[],
@@ -36,16 +38,16 @@ const CreateTypeContextProvider = ({children}) => {
     },[])
 
     const value = useMemo(
-        () => ({ createType, setCreateType, initCreateTypeContext }),
-        [createType, setCreateType, initCreateTypeContext]
+        () => ({ upsertType, setUpsertType, initUpsertTypeContext }),
+        [upsertType, setUpsertType, initUpsertTypeContext]
       );
 
     return (
       // the Provider gives access to the context to its children
-      <CreateTypeContext.Provider value = {value}>
+      <UpsertTypeContext.Provider value = {value}>
         {children}
-      </CreateTypeContext.Provider>
+      </UpsertTypeContext.Provider>
     );
 }
 
-export { CreateTypeContext, CreateTypeContextProvider };
+export { UpsertTypeContext, UpsertTypeContextProvider };

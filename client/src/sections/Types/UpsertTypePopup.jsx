@@ -3,20 +3,20 @@ import { AppBar, AppBarTitle, AppBarNav } from '@react-md/app-bar'
 import { Grid, GridCell } from '@react-md/utils'
 import { Dialog, DialogContent } from "@react-md/dialog"
 import { ArrowBackSVGIcon } from '@react-md/material-icons'
-import FieldsList from './CreateType/FieldsList'
-import NewField from './CreateType/NewField'
-import CreateTypeName from './CreateType/CreateTypeName'
-import QueryList from './CreateType/QueryList'
+import FieldsList from './UpsertType/FieldsList'
+import NewField from './UpsertType/NewField'
+import UpsertTypeName from './UpsertType/UpsertTypeName'
+import QueryList from './UpsertType/QueryList'
 import gridStyles from '../../styles/Grid.module.scss'
 import formStyles from '../../styles/Form.module.scss'
 import axios from 'axios'
-import { CreateTypeContext } from './CreateType/CreateTypeContext'
+import { UpsertTypeContext } from './UpsertType/UpsertTypeContext'
 
-function CreateTypePopup (props) {
+function UpsertTypePopup (props) {
   
-  const {createType, setCreateType} = useContext(CreateTypeContext)
+  const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [modalState, setModalState] = useState({ visible: false, modalType: props.modalType })
-  const upsertType = ()=> {
+  const upserttType = ()=> {
     return new Promise((innerResolve, innerReject) => {
       var query = `DO $$ 
       DECLARE
@@ -24,12 +24,18 @@ function CreateTypePopup (props) {
       BEGIN
       `
       +
-      createType.typeNameQuery
+      upsertType.typeNameQuery
       +
-      createType.query.join(`;
+      upsertType.insertQuery.map(q => q.query).join(`
       `)
       +
-      `;
+      upsertType.updateQuery.map(q => q.query).join(`
+      `)
+      +
+      upsertType.deleteQuery.map(q => q.query).join(`
+      `)
+      +
+      `
       END $$`
       console.log(query)
       axios.post('http://localhost:3001/api/exec', {query: query})
@@ -40,7 +46,7 @@ function CreateTypePopup (props) {
 
   const handleReset = () => {
     props.cancelCommand()
-    setCreateType((prevState) => ({...prevState, name: '', fields: []}))
+    setUpsertType((prevState) => ({...prevState, name: '', fields: []}))
   }
 
   useEffect(() => {
@@ -66,9 +72,9 @@ function CreateTypePopup (props) {
         <div className={formStyles.container}>
           <Grid>
             <GridCell colSpan={12} className={gridStyles.item}>
-              <CreateTypeName
+              <UpsertTypeName
                 reset={handleReset}
-                upsertType={(name)=> upsertType(name)}
+                upsertType={(name)=> upserttType(name)}
               />
             </GridCell>
             <GridCell colSpan={12} className={gridStyles.item}>
@@ -86,4 +92,4 @@ function CreateTypePopup (props) {
     </Dialog>
   )
 }
-export default CreateTypePopup
+export default UpsertTypePopup

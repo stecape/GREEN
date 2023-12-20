@@ -2,8 +2,7 @@ import { useState, useEffect, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Button } from "@react-md/button"
 import DeleteTypePopup from "./DeleteTypePopup"
-import CreateTypePopup from "./CreateTypePopup"
-import ModifyTypePopup from "./ModifyTypePopup"
+import UpsertTypePopup from "./UpsertTypePopup"
 import { DeleteSVGIcon, EditSVGIcon, AddSVGIcon } from "@react-md/material-icons"
 import {
   Table,
@@ -14,17 +13,14 @@ import {
 } from '@react-md/table'
 import axios from 'axios'
 import tableStyles from '../../styles/Table.module.scss'
-import { ModifyTypeContext } from "./ModifyType/ModifyTypeContext";
-import { CreateTypeContext } from "./CreateType/CreateTypeContext";
+import { UpsertTypeContext } from "./UpsertType/UpsertTypeContext";
 
 function TypesList (props) {
   const addMessage = useAddMessage()
   const [typesList, setTypesList] = useState(props.typesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
-  const [modifyTypePopup, setModifyTypePopup] = useState({ visible: false })
-  const [createTypePopup, setCreateTypePopup] = useState({ visible: false })
-  const {setEditType} = useContext(ModifyTypeContext)
-  const {initCreateTypeContext} = useContext(CreateTypeContext)
+  const [upsertTypePopup, setUpsertTypePopup] = useState({ visible: false })
+  const {setUpsertType, initUpsertTypeContext} = useContext(UpsertTypeContext)
 
   useEffect(() => {
     setTypesList(props.typesList)
@@ -75,8 +71,9 @@ function TypesList (props) {
                         //to avoid circular references
                         axios.post('http://localhost:3001/api/getFields', {type: item.id})
                         .then((res) => {
-                          setEditType(() => ({
-                            typeNameQuery: '',
+                          setUpsertType(() => ({
+                            create: false,
+                            typeNameQuery: `UPDATE "Type" SET name='${res.data.result.name}' WHERE id = ${res.data.result.type} RETURNING id INTO typeId;`,
                             insertQuery:[],
                             updateQuery:[],
                             deleteQuery:[],
@@ -85,7 +82,7 @@ function TypesList (props) {
                             fields: res.data.result.fields,
                             allTypes: typesList,
                             typesList: typesList.filter(i => !res.data.result.deps.includes(i.id) )
-                          }), setModifyTypePopup((prevState) => ({ ...prevState, visible: true })))  //as callback, tt shows the popup                         
+                          }), setUpsertTypePopup((prevState) => ({ ...prevState, visible: true })))  //as callback, tt shows the popup                         
                         })
                       }
                     >
@@ -102,8 +99,8 @@ function TypesList (props) {
       <Button 
         floating="bottom-right" 
         onClick={() => {
-          initCreateTypeContext(typesList, typesList)
-          setCreateTypePopup((prevState) => ({ ...prevState, visible: true }))  //it shows the popup                         
+          initUpsertTypeContext(typesList, typesList)
+          setUpsertTypePopup((prevState) => ({ ...prevState, visible: true }))  //it shows the popup                         
         }}
       >
         <AddSVGIcon />
@@ -144,20 +141,13 @@ function TypesList (props) {
           setDeletePopup((prevState) => ({ ...prevState, visible: false }))
         }}
       />
-      <ModifyTypePopup
-        visible={modifyTypePopup.visible}
-        modalType="full-page"
-        cancelCommand={()=>{
-          setModifyTypePopup((prevState) => ({ ...prevState, visible: false }))
-        }}
-      />
-      <CreateTypePopup
-        visible={createTypePopup.visible}
+      <UpsertTypePopup
+        visible={upsertTypePopup.visible}
         name=""
         modalType="full-page"
         typesList={typesList}
         cancelCommand={()=>{
-          setCreateTypePopup((prevState) => ({ ...prevState, visible: false }))
+          setUpsertTypePopup((prevState) => ({ ...prevState, visible: false }))
         }}
       />
     </>

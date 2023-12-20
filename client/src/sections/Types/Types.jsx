@@ -4,9 +4,7 @@ import { Grid, GridCell } from '@react-md/utils'
 import TypesList from './TypesList'
 import gridStyles from "../../styles/Grid.module.scss"
 import axios from 'axios'
-
-import { CreateTypeContextProvider } from "./CreateType/CreateTypeContext"
-import { ModifyTypeContextProvider } from "./ModifyType/ModifyTypeContext"
+import { UpsertTypeContextProvider } from "./UpsertType/UpsertTypeContext"
 import {SocketContext} from "../../Helpers/socket"
 
 function Types () {
@@ -86,11 +84,9 @@ function Types () {
   <>
   <Grid>
     <GridCell colSpan={12} className={gridStyles.item}>
-      <CreateTypeContextProvider>
-      <ModifyTypeContextProvider>
+      <UpsertTypeContextProvider>
         <TypesList typesList={typesList} />
-      </ModifyTypeContextProvider>
-      </CreateTypeContextProvider>
+      </UpsertTypeContextProvider>
     </GridCell>
   </Grid>
   </>

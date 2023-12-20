@@ -7,11 +7,11 @@ import {
   Select
 } from '@react-md/form'
 import formStyles from '../../../styles/Form.module.scss'
-import { ModifyTypeContext } from './ModifyTypeContext'
+import { UpsertTypeContext } from './UpsertTypeContext'
 
 
 function NewField () {
-  const {editType, setEditType} = useContext(ModifyTypeContext)
+  const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [name, setName] = useState("")
   const [type, setType] = useState(0)
 
@@ -19,14 +19,14 @@ function NewField () {
   const InlineNameValidation = (value) => {
     setName(value)
     let pattern = /[^A-Za-z0-9\-_<> ]/g
-    setEditType((prevState) => ({
+    setUpsertType((prevState) => ({
       ...prevState, 
-      fieldNameNotValid: pattern.test(value) || editType.fields.find(i => i.name === value)
+      fieldNameNotValid: pattern.test(value) || upsertType.fields.find(i => i.name === value)
     }))
   }
   const InlineTypeValidation = (value) => {
     setType(Number(value))
-    setEditType((prevState) => ({
+    setUpsertType((prevState) => ({
       ...prevState, 
       fieldTypeNotValid: value === 0
     }))
@@ -36,24 +36,24 @@ function NewField () {
   const handleSubmit = (event) => {
     event.preventDefault()
     //it begins validating the input and then, if both type and name are valid, it proceed with the insert of the field and of the query
-    var typeItem = editType.typesList.find(i => i.id === Number(type))
     let pattern = /[^A-Za-z0-9\-_<> ]/g
-    var fieldNameNotValid = pattern.test(name) || editType.fields.find(i => i.name === name) || name === ""
+    var fieldNameNotValid = pattern.test(name) || upsertType.fields.find(i => i.name === name) || name === ""
     var fieldTypeNotValid = type === 0
-    setEditType((prevState) => ({
+    setUpsertType((prevState) => ({
       ...prevState, 
       fieldNameNotValid: fieldNameNotValid,
       fieldTypeNotValid: fieldTypeNotValid
     }))
     if (!fieldNameNotValid && !fieldTypeNotValid){
-      setEditType((prevState) => ({
+      var QRef = Date.now()
+      setUpsertType((prevState) => ({
         ...prevState, 
-        fields: [...editType.fields, { id: Math.floor(Date.now() / 1000), type: typeItem.name, name: name }],
-        query: [...editType.query, `INSERT into "Field" ("id","name","type","parent_type") VALUES  (DEFAULT, '${name}', ${type}, ${editType.type})`]}), handleReset()
+        fields: [...upsertType.fields, { type: type, name: name, QRef: QRef }],
+        insertQuery: [...upsertType.insertQuery, {query: `INSERT into "Field" (id, name, type, parent_type) VALUES (DEFAULT, '${name}', ${type}, typeId);`, QRef: QRef}]}), handleReset()
       )
     }
   }
-
+  
   //Form Events
   const handleReset = () => {
     setName("")
@@ -72,12 +72,12 @@ function NewField () {
           className={formStyles.item}
           value={name}
           onChange={(e) => InlineNameValidation(e.target.value)}
-          error={editType.fieldNameNotValid}
+          error={upsertType.fieldNameNotValid}
         />
         <Select
           id='field-type'
           key='field-type'
-          options={editType.typesList.map((item) => ({
+          options={upsertType.typesList.map((item) => ({
             label: item.name,
             value: item.id
           }))}
@@ -86,7 +86,7 @@ function NewField () {
           label="Field Type"
           className={formStyles.item}
           onChange={(value) => InlineTypeValidation(value)}
-          error={editType.fieldTypeNotValid}
+          error={upsertType.fieldTypeNotValid}
         />
         <div className={formStyles.btn_container}>
           <Button
@@ -94,7 +94,7 @@ function NewField () {
             theme="primary"
             themeType="outline"
             className={formStyles.btn}
-            disabled={editType.fieldNameNotValid || editType.fieldTypeNotValid}
+            disabled={upsertType.fieldNameNotValid || upsertType.fieldTypeNotValid}
           >
             Add
           </Button>

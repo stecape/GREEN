@@ -38,7 +38,7 @@ function DeleteFieldPopup (props) {
         </Button>
         <Button
           id="dialog-discard"
-          onClick={()=>props.delField(props.id)}
+          onClick={()=>props.delField()}
           theme="error"
         >
           Delete
