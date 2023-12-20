@@ -8,23 +8,22 @@ function QueryList () {
 
   return (
     <List>
-        <ListItem key={`typeNameQuery`} id={`typeNameQuery`}>{createType.typeNameQuery}</ListItem>
-        {console.log(createType)}
-        {createType.insertQuery.map((q, i) => (
-        <ListItem key={`insertQuery_${i}`} id={`insertQuery_${i}`}>
-            {q.query}
-        </ListItem>
-        ))}
-        {createType.updateQuery.map((q, i) => (
-        <ListItem key={`updateQuery_${i}`} id={`updateQuery_${i}`}>
-            {q.query}
-        </ListItem>
-        ))}
-        {createType.deleteQuery.map((q, i) => (
-        <ListItem key={`updateQuery_${i}`} id={`updateQuery_${i}`}>
-            {q.query}
-        </ListItem>
-        ))}
+      <ListItem key={`typeNameQuery`} id={`typeNameQuery`}>{createType.typeNameQuery}</ListItem>
+      {createType.insertQuery.map((q, i) => (
+      <ListItem key={`insertQuery_${i}`} id={`insertQuery_${i}`}>
+          {q.query}
+      </ListItem>
+      ))}
+      {createType.updateQuery.map((q, i) => (
+      <ListItem key={`updateQuery_${i}`} id={`updateQuery_${i}`}>
+          {q.query}
+      </ListItem>
+      ))}
+      {createType.deleteQuery.map((q, i) => (
+      <ListItem key={`deleteQuery_${i}`} id={`deleteQuery_${i}`}>
+      {q.query}
+      </ListItem>
+      ))}
     </List>
   )
 }
