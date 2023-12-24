@@ -19,9 +19,9 @@ function Types () {
     //Socket listeners callbacks definition
     //on connect
     const types_on_connect = () => {
-      axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
+      axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id", "base_type"]})
         .then(response => {
-          setTypesList(response.data.result.map((val) => ({name:val[0], id:val[1]})))
+          setTypesList(response.data.result.map((val) => ({name:val[0], id:val[1], base_type:val[2]})))
           setInit((prevState) => ({ ...prevState, types: true}))
         })
     }
@@ -56,9 +56,9 @@ function Types () {
 
     //On component load request the lists
     if(init.types === false){
-      axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id"]})
+      axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id", "base_type"]})
         .then(response => {
-          setTypesList(response.data.result.map((val) => ({name:val[0], id:val[1]})))
+          setTypesList(response.data.result.map((val) => ({name:val[0], id:val[1], base_type:val[2]})))
           setInit((prevState) => ({ ...prevState, types: true}))
           addMessage({children: response.data.message})
         })

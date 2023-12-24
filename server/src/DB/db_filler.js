@@ -40,6 +40,7 @@ module.exports = function () {
     (
       id SERIAL PRIMARY KEY,
       name text NOT NULL,
+      base_type bool NOT NULL,
       CONSTRAINT unique_type_name UNIQUE (name)
     );
     
@@ -146,10 +147,10 @@ module.exports = function () {
       ON public."Var"(type);
 
       
-    INSERT INTO "Type"(id,name) VALUES (DEFAULT, 'Real') ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name) VALUES (DEFAULT, 'Text') ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name) VALUES (DEFAULT, 'Int') ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name) VALUES (DEFAULT, 'Bool') ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (DEFAULT, 'Real', true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (DEFAULT, 'Text', true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (DEFAULT, 'Int', true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (DEFAULT, 'Bool', true) ON CONFLICT (name) DO NOTHING;
 
     -- triggers function
     -- FUNCTION: public.return_data()
@@ -200,11 +201,6 @@ module.exports = function () {
     CREATE OR REPLACE TRIGGER \"FieldUpdatingTrigger\" AFTER UPDATE ON \"Field\" FOR EACH ROW EXECUTE PROCEDURE return_data();
     CREATE OR REPLACE TRIGGER \"FieldDeletingTrigger\" AFTER DELETE ON \"Field\" FOR EACH ROW EXECUTE PROCEDURE return_data();
     CREATE OR REPLACE TRIGGER \"FieldTruncatingTrigger\" AFTER TRUNCATE ON \"Field\" FOR EACH STATEMENT EXECUTE PROCEDURE return_data();
-    -- triggers on NewTypeTmp
-    CREATE OR REPLACE TRIGGER \"NewTypeTmpFieldInsertionTrigger\" AFTER INSERT ON \"NewTypeTmp\" FOR EACH ROW EXECUTE PROCEDURE return_data();
-    CREATE OR REPLACE TRIGGER \"NewTypeTmpFieldUpdatingTrigger\" AFTER UPDATE ON \"NewTypeTmp\" FOR EACH ROW EXECUTE PROCEDURE return_data();
-    CREATE OR REPLACE TRIGGER \"NewTypeTmpFieldDeletingTrigger\" AFTER DELETE ON \"NewTypeTmp\" FOR EACH ROW EXECUTE PROCEDURE return_data();
-    CREATE OR REPLACE TRIGGER \"NewTypeTmpFieldTruncatingTrigger\" AFTER TRUNCATE ON \"NewTypeTmp\" FOR EACH STATEMENT EXECUTE PROCEDURE return_data();
   `
     pool.query({
       text: queryString
