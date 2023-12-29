@@ -37,7 +37,6 @@ function TypesList (props) {
         </TableHeader>
         <TableBody>
           {typesList.map((item) => {
-            console.log(item)
             return (
               <TableRow
                 key={item.id}
