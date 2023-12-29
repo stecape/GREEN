@@ -10,9 +10,7 @@ module.exports = function () {
       id SERIAL PRIMARY KEY,
       name text COLLATE pg_catalog."default" NOT NULL,
       type integer NOT NULL,
-      parent_type integer NOT NULL,
-      logic_values text COLLATE pg_catalog."default",
-      um text COLLATE pg_catalog."default"
+      parent_type integer NOT NULL
     );
   
     CREATE TABLE IF NOT EXISTS public."FieldPath"
@@ -147,10 +145,29 @@ module.exports = function () {
       ON public."Var"(type);
 
       
-    INSERT INTO "Type"(id,name,base_type) VALUES (DEFAULT, 'Real', true) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type) VALUES (DEFAULT, 'Text', true) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type) VALUES (DEFAULT, 'Int', true) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type) VALUES (DEFAULT, 'Bool', true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (1, 'Real', true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (2, 'Text', true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (3, 'Int', true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (4, 'Bool', true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (5, '_Set', false) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (6, '_Act', false) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (7, '_Limit', false) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (8, 'Set', false) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (9, 'Act', false) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type) VALUES (10, 'SetAct', false) ON CONFLICT (name) DO NOTHING;
+
+    INSERT INTO "Field"(id, name, type, parent_type) VALUES (1, 'InputValue', 1, 5) ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type) VALUES (2, 'Value', 1, 5) ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type) VALUES (3, 'Value', 1, 6) ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type) VALUES (4, 'Min', 1, 7) ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type) VALUES (5, 'Max', 1, 7) ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type) VALUES (6, 'Set', 5, 8) ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type) VALUES (7, 'Limit', 7, 8) ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type) VALUES (8, 'Act', 6, 9) ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type) VALUES (9, 'Limit', 7, 9) ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type) VALUES (10, 'Set', 5, 10) ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type) VALUES (11, 'Act', 6, 10) ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type) VALUES (12, 'Limit', 7, 10) ON CONFLICT (name, parent_type) DO NOTHING;
 
     -- triggers function
     -- FUNCTION: public.return_data()
