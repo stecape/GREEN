@@ -73,7 +73,7 @@ function TypeName (props) {
           onBlur={(e) => {
             if (prevName !== upsertType.name && !upsertType.typeNameNotValid) {
               upsertType.create ? 
-              setUpsertType((prevState) => ({...prevState, typeNameQuery: `INSERT INTO "Type" (name, base_type) VALUES ('${upsertType.name}', false) RETURNING id INTO typeId;`})) :
+              setUpsertType((prevState) => ({...prevState, typeNameQuery: `INSERT INTO "Type" (id, name, base_type) VALUES (DEFAULT, '${upsertType.name}', false) RETURNING id INTO typeId;`})) :
               setUpsertType((prevState) => ({...prevState, typeNameQuery: `UPDATE "Type" SET name='${upsertType.name}' WHERE id = ${upsertType.type} RETURNING id INTO typeId;`}))
               setPrevName(upsertType.name)
             }

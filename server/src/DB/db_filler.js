@@ -12,139 +12,107 @@ module.exports = function () {
       type integer NOT NULL,
       parent_type integer NOT NULL
     );
-  
-    CREATE TABLE IF NOT EXISTS public."FieldPath"
-    (
-      id SERIAL PRIMARY KEY
-    );
     
-    CREATE TABLE IF NOT EXISTS public."FieldPathElement"
-    (
-      id SERIAL PRIMARY KEY,
-      field_path integer NOT NULL,
-      index integer NOT NULL,
-      field integer NOT NULL
-    );
-    
+
     CREATE TABLE IF NOT EXISTS public."Tag"
     (
+      id SERIAL PRIMARY KEY,
+      name text COLLATE pg_catalog."default" NOT NULL UNIQUE,
       var integer NOT NULL,
-      field_path integer NOT NULL,
-      value bytea NOT NULL,
-      CONSTRAINT tag_id PRIMARY KEY (var, field_path)
+      parent_tag integer NOT NULL,
+      type_field integer NOT NULL,
+      value bytea NOT NULL
     );
     
+
     CREATE TABLE IF NOT EXISTS public."Type"
     (
       id SERIAL PRIMARY KEY,
       name text NOT NULL,
-      base_type bool NOT NULL,
-      CONSTRAINT unique_type_name UNIQUE (name)
+      base_type bool NOT NULL
     );
     
-    CREATE TABLE IF NOT EXISTS public."TypeFieldPath"
-    (
-      id SERIAL PRIMARY KEY,
-      type integer NOT NULL,
-      field_path integer NOT NULL
-    );
-    
+
     CREATE TABLE IF NOT EXISTS public."Var"
     (
       id SERIAL PRIMARY KEY,
       type integer NOT NULL,
-      name text COLLATE pg_catalog."default" NOT NULL,
-      CONSTRAINT unique_var_name UNIQUE (name)
+      name text COLLATE pg_catalog."default" NOT NULL UNIQUE
     );
     
+
+    CREATE UNIQUE INDEX ui_field_name_and_parent_type 
+      ON public."Field" (name, parent_type);
+
     ALTER TABLE IF EXISTS public."Field"
-      DROP CONSTRAINT IF EXISTS name_and_parent_id,
-      ADD CONSTRAINT name_and_parent_id UNIQUE (name, parent_type),
-      DROP CONSTRAINT IF EXISTS type_id,
-      ADD CONSTRAINT type_id FOREIGN KEY (type)
-      REFERENCES public."Type" (id) MATCH SIMPLE
-      ON UPDATE NO ACTION
-      ON DELETE NO ACTION
-      NOT VALID,
+      DROP CONSTRAINT IF EXISTS field_type_id,
+      ADD CONSTRAINT field_type_id FOREIGN KEY (type)
+        REFERENCES public."Type" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
       DROP CONSTRAINT IF EXISTS parent_type_id,
       ADD CONSTRAINT parent_type_id FOREIGN KEY (parent_type)
-      REFERENCES public."Type" (id) MATCH SIMPLE
-      ON UPDATE NO ACTION
-      ON DELETE NO ACTION
-      NOT VALID;
-
-      
-    ALTER TABLE IF EXISTS public."FieldPathElement"
-      DROP CONSTRAINT IF EXISTS field_path_id,
-      ADD CONSTRAINT field_path_id FOREIGN KEY (field_path)
-      REFERENCES public."FieldPath" (id) MATCH SIMPLE
-      ON UPDATE NO ACTION
-      ON DELETE NO ACTION
-      NOT VALID;
-    CREATE INDEX IF NOT EXISTS fki_field_path_id
-      ON public."FieldPathElement"(field_path);
+        REFERENCES public."Type" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,      
+      DROP CONSTRAINT IF EXISTS unique_field_name_and_parent_type,
+      ADD CONSTRAINT unique_field_name_and_parent_type UNIQUE USING INDEX ui_field_name_and_parent_type;
 
 
-    ALTER TABLE IF EXISTS public."FieldPathElement"
-      DROP CONSTRAINT IF EXISTS field_id,
-      ADD CONSTRAINT field_id FOREIGN KEY (field)
-      REFERENCES public."Field" (id) MATCH SIMPLE
-      ON UPDATE NO ACTION
-      ON DELETE NO ACTION
-      NOT VALID;
-    CREATE INDEX IF NOT EXISTS fki_field_id
-      ON public."FieldPathElement"(field);
-    
+    CREATE UNIQUE INDEX ui_tag_var_and_type_field 
+      ON public."Tag" (var, type_field);
     
     ALTER TABLE IF EXISTS public."Tag"
-      DROP CONSTRAINT IF EXISTS field_path_id,
-      ADD CONSTRAINT field_path_id FOREIGN KEY (field_path)
-      REFERENCES public."FieldPath" (id) MATCH SIMPLE
-      ON UPDATE NO ACTION
-      ON DELETE NO ACTION
-      NOT VALID;
-    
-    
-    ALTER TABLE IF EXISTS public."Tag"
+      DROP CONSTRAINT IF EXISTS unique_tag_name,
+      ADD CONSTRAINT unique_tag_name UNIQUE (name),
+      DROP CONSTRAINT IF EXISTS parent_tag_id,
+      ADD CONSTRAINT parent_tag_id FOREIGN KEY (parent_tag)
+        REFERENCES public."Tag" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
       DROP CONSTRAINT IF EXISTS var_id,
       ADD CONSTRAINT var_id FOREIGN KEY (var)
-      REFERENCES public."Var" (id) MATCH SIMPLE
-      ON UPDATE NO ACTION
-      ON DELETE NO ACTION
-      NOT VALID;
-    CREATE INDEX IF NOT EXISTS fki_var_id
-      ON public."Tag"(var);
-    
-    
-    ALTER TABLE IF EXISTS public."TypeFieldPath"
-      DROP CONSTRAINT IF EXISTS field_path_id,
-      ADD CONSTRAINT field_path_id FOREIGN KEY (field_path)
-      REFERENCES public."FieldPath" (id) MATCH SIMPLE
-      ON UPDATE NO ACTION
-      ON DELETE NO ACTION
-      NOT VALID;
-    
-    
-    ALTER TABLE IF EXISTS public."TypeFieldPath"
-      DROP CONSTRAINT IF EXISTS type_id,
-      ADD CONSTRAINT type_id FOREIGN KEY (type)
-      REFERENCES public."Type" (id) MATCH SIMPLE
-      ON UPDATE NO ACTION
-      ON DELETE NO ACTION
-      NOT VALID;
-    
-    
-    ALTER TABLE IF EXISTS public."Var"
-      DROP CONSTRAINT IF EXISTS type_id,
-      ADD CONSTRAINT type_id FOREIGN KEY (type)
-      REFERENCES public."Type" (id) MATCH SIMPLE
-      ON UPDATE NO ACTION
-      ON DELETE NO ACTION
-      NOT VALID;
-    CREATE INDEX IF NOT EXISTS fki_type_id
-      ON public."Var"(type);
+        REFERENCES public."Var" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+      DROP CONSTRAINT IF EXISTS type_field_id,
+      ADD CONSTRAINT type_field_id FOREIGN KEY (type_field)
+        REFERENCES public."Field" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+      DROP CONSTRAINT IF EXISTS unique_tag_var_and_type_field,
+      ADD CONSTRAINT unique_tag_var_and_type_field UNIQUE USING INDEX ui_tag_var_and_type_field;
 
-      
+    
+    ALTER TABLE IF EXISTS public."Type"
+      DROP CONSTRAINT IF EXISTS unique_type_name,
+      ADD CONSTRAINT unique_type_name UNIQUE (name);
+
+  
+    ALTER TABLE IF EXISTS public."Var"
+      DROP CONSTRAINT IF EXISTS unique_var_name,
+      ADD CONSTRAINT unique_var_name UNIQUE (name),
+      DROP CONSTRAINT IF EXISTS var_type_id,
+      ADD CONSTRAINT var_type_id FOREIGN KEY (type)
+        REFERENCES public."Type" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID;
+  
+  
+    ALTER SEQUENCE IF EXISTS public."Type_id_seq"
+      START 100;
+    SELECT setval('public."Type_id_seq"', 99, true);
+
+    ALTER SEQUENCE IF EXISTS public."Field_id_seq"
+      START 100;
+    SELECT setval('public."Field_id_seq"', 99, true);
+
     INSERT INTO "Type"(id,name,base_type) VALUES (1, 'Real', true) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "Type"(id,name,base_type) VALUES (2, 'Text', true) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "Type"(id,name,base_type) VALUES (3, 'Int', true) ON CONFLICT (name) DO NOTHING;

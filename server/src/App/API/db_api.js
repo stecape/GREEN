@@ -97,16 +97,16 @@ Power: {
 }
 
 devo generare tutte le tag che la compongono:
-ID (PK) Name                    Parent Var (FK)   Parent Tag (IFK)   TypeField (FK)  Value
-10      Power                   Power(id)         NULL               7               NULL
-11      Power.Set               Power(id)         10                 2               NULL
-12      Power.Act               Power(id)         10                 3               NULL
-13      Power.Limit             Power(id)         10                 4               NULL
-14      Power.Set.InputValue    Power(id)         11                 8               0
-15      Power.Set.Value         Power(id)         11                 9               0
-16      Power.Act.Value         Power(id)         12                 6               0
-17      Power.Limit.Min         Power(id)         13                 5               0
-18      Power.Limit.Max         Power(id)         13                 8               0
+(PK) = Var (FK) + TypeField (FK)      Name                    Var (FK)          Parent Tag (IFK)   TypeField (FK)  Value
+                                      Power                   Power(id)         NULL               7               NULL
+                                      Power.Set               Power(id)         10                 2               NULL
+                                      Power.Act               Power(id)         10                 3               NULL
+                                      Power.Limit             Power(id)         10                 4               NULL
+                                      Power.Set.InputValue    Power(id)         11                 8               0
+                                      Power.Set.Value         Power(id)         11                 9               0
+                                      Power.Act.Value         Power(id)         12                 6               0
+                                      Power.Limit.Min         Power(id)         13                 5               0
+                                      Power.Limit.Max         Power(id)         13                 8               0
 
 For each t in Types
   Select_One parent_type from Fields where type == t
@@ -126,7 +126,7 @@ For each t in Types
             parentTagId "Tag".id%TYPE;
           BEGIN
             INSERT INTO "Var" (id, name, type) VALUES (DEFAULT, 'Power', 7) RETURNING id into varId;
-            INSERT INTO "Tag" (id, name, parent_var, parent_tag, type_field, value) VALUES (DEFAULT, 'Power', varId, NULL, '52', NULL) RETURNING id INTO parentTagId;
+            INSERT INTO "Tag" (id, name, var, parent_tag, type_field, value) VALUES (DEFAULT, 'Power', varId, NULL, '52', NULL) RETURNING id INTO parentTagId;
         END $$
 
   */
