@@ -8,14 +8,13 @@ function DeleteTypePopup (props) {
   const [modalState, setModalState] = useState({ visible: false, name: '' })
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, visible: props.visible}))
-  },[props.name, props.visible])
+    setModalState((prevState) => ({ ...prevState, visible: props.visible}))
+  },[props.visible])
   
   return (
     <Dialog
       id="delete-type-dialog"
       role="alertdialog"
-      modal={modalState.modal}
       visible={modalState.visible}
       onRequestClose={props.cancelCommand}
       aria-labelledby="dialog-title"
@@ -27,7 +26,7 @@ function DeleteTypePopup (props) {
           margin="none"
           color="secondary"
         >
-          Delete {modalState.name}?
+          Delete {props.name}?
         </Typography>
       </DialogContent>
       <DialogFooter>

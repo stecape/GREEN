@@ -71,6 +71,83 @@ module.exports = function (app, pool) {
   })
 
 
+/*
+0: real
+1: bool
+2: _Set
+3: _Act
+4: _Limit
+5: Set
+6: Act
+7: SetAct
+
+Creo una Var "Power" di tipo SetAct:
+Power: {
+  Set: {
+    InputValue: 0.0,
+    Value: 0.0
+  },
+  Act: {
+    Value: 0.0
+  },
+  Limit: {
+    Min: 0.0,
+    Max: 0.0
+  },
+}
+
+devo generare tutte le tag che la compongono:
+ID (PK) Name                    Parent Var (FK)   Parent Tag (IFK)   TypeField (FK)  Value
+10      Power                   Power(id)         NULL               7               NULL
+11      Power.Set               Power(id)         10                 2               NULL
+12      Power.Act               Power(id)         10                 3               NULL
+13      Power.Limit             Power(id)         10                 4               NULL
+14      Power.Set.InputValue    Power(id)         11                 8               0
+15      Power.Set.Value         Power(id)         11                 9               0
+16      Power.Act.Value         Power(id)         12                 6               0
+17      Power.Limit.Min         Power(id)         13                 5               0
+18      Power.Limit.Max         Power(id)         13                 8               0
+
+For each t in Types
+  Select_One parent_type from Fields where type == t
+*/
+  /*
+  Add a record
+  Type:   POST
+  Route:  '/api/addVar'
+  Body:   {
+            fields: [ 'name', 'type' ],
+            values: [ 'Power', 7 ]      //Type: SetAct
+          }
+  Query:  
+        DO $$ 
+          DECLARE
+            varId "Var".id%TYPE;
+            parentTagId "Tag".id%TYPE;
+          BEGIN
+            INSERT INTO "Var" (id, name, type) VALUES (DEFAULT, 'Power', 7) RETURNING id into varId;
+            INSERT INTO "Tag" (id, name, parent_var, parent_tag, type_field, value) VALUES (DEFAULT, 'Power', varId, NULL, '52', NULL) RETURNING id INTO parentTagId;
+        END $$
+
+  */
+  const Search = () => {
+    ;
+  }
+  app.post('/api/addVar', (req, res) => {
+    var queryString="INSERT INTO \"" + req.body.table + "\" (\"id\",\"" + req.body.fields.join('","') + "\") VALUES (DEFAULT,'" + req.body.values.join("','") + "') RETURNING \"id\",\"" + req.body.fields.join('","') + "\""
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then((data) => {
+      res.status(200).json({result: data.rows[0], message: "Record correctly inserted in table \"" + req.body.table + "\" "})
+    })
+    .catch((error) => {
+      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error: ' + error.code})
+    })
+  })
+
+
 
   /*
   Add a record

@@ -1,6 +1,5 @@
 import { useState, useContext } from "react"
 import { Button } from '@react-md/button'
-import { AutoComplete } from '@react-md/autocomplete'
 import {
   Form,
   TextField,
@@ -58,7 +57,7 @@ function NewField () {
   //Form Events
   const handleReset = () => {
     setName("")
-    setType(0)
+    setType({id: 0, name: ''})
   }
 
   return(
@@ -76,34 +75,20 @@ function NewField () {
           error={upsertType.fieldNameNotValid}
         />
         <Select
-          id='field-type1'
-          key='field-type1'
-          options={upsertType.typesList.map((item) => ({
-            label: item.name,
-            value: item.id
-          }))}
-          value={type.toString()}
-          placeholder="Choose..."
-          label="Field Type"
-          className={formStyles.item}
-          autoComplete="both"
-          onChange={(value) => InlineTypeValidation(value)}
-          error={upsertType.fieldTypeNotValid}
-        />
-        <AutoComplete
-          id="field-type"
-          key='field-type'
-          placeholder="Choose..."
-          label="Field Type"
-          className={formStyles.item}
-          data={upsertType.typesList.map((item) => ({
-            label: item.name,
-            value: item.name
-          }))}
-          labelKey="label"
-          valueKey="label"
-          error={upsertType.fieldTypeNotValid}
-        />
+        id='field-type1'
+        key='field-type1'
+        options={upsertType.typesList.map((item) => ({
+          label: item.name,
+          value: item.id
+        }))}
+        value={type.toString()}
+        placeholder="Choose..."
+        label="Field Type"
+        className={formStyles.item}
+        autoComplete="both"
+        onChange={(value) => InlineTypeValidation(value)}
+        error={upsertType.fieldTypeNotValid}
+      />
         <div className={formStyles.btn_container}>
           <Button
             type="submit"

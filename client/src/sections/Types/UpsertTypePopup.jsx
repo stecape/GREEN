@@ -19,24 +19,27 @@ function UpsertTypePopup (props) {
   const upserttType = ()=> {
     return new Promise((innerResolve, innerReject) => {
       var query = `DO $$ 
-      DECLARE
-          typeId "Type".id%TYPE;
-      BEGIN
-      `
-      +
-      upsertType.typeNameQuery
-      +
-      upsertType.insertQuery.map(q => q.query).join(`
-      `)
-      +
-      upsertType.updateQuery.map(q => q.query).join(`
-      `)
-      +
-      upsertType.deleteQuery.map(q => q.query).join(`
-      `)
-      +
-      `
-      END $$`
+DECLARE
+  typeId "Type".id%TYPE;
+BEGIN
+  `
+  +
+  upsertType.typeNameQuery
+  +
+  `
+  `
+  +
+  upsertType.insertQuery.map(q => q.query).join(`
+  `)
+  +
+  upsertType.updateQuery.map(q => q.query).join(`
+  `)
+  +
+  upsertType.deleteQuery.map(q => q.query).join(`
+  `)
+  +
+  `
+END $$`
       console.log(query)
       axios.post('http://localhost:3001/api/exec', {query: query})
       .then((value)=>{innerResolve(value)})
