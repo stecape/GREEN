@@ -71,251 +71,6 @@ module.exports = function (app, pool) {
   })
 
 
-  /*
-  0: real
-  1: bool
-  2: _Set
-  3: _Act
-  4: _Limit
-  5: Set
-  6: Act
-  7: SetAct
-
-  Creo una Var "Power" di tipo SetAct:
-  Power: {
-    Set: {
-      InputValue: 0.0,
-      Value: 0.0
-    },
-    Act: {
-      Value: 0.0
-    },
-    Limit: {
-      Min: 0.0,
-      Max: 0.0
-    },
-  }
-
-  devo generare tutte le tag che la compongono:
-  (PK) = Var (FK) + TypeField (FK)      Name                    Var (FK)          Parent Tag (IFK)   TypeField (FK)  Value
-                                        Power                   Power(id)         NULL               7               NULL
-                                        Power.Set               Power(id)         10                 2               NULL
-                                        Power.Act               Power(id)         10                 3               NULL
-                                        Power.Limit             Power(id)         10                 4               NULL
-                                        Power.Set.InputValue    Power(id)         11                 8               0
-                                        Power.Set.Value         Power(id)         11                 9               0
-                                        Power.Act.Value         Power(id)         12                 6               0
-                                        Power.Limit.Min         Power(id)         13                 5               0
-                                        Power.Limit.Max         Power(id)         13                 8               0
-
-  For each t in Types
-    Select_One parent_type from Fields where type == t
-
-    
-  Add a Var
-  Type:   POST
-  Route:  '/api/addVar'
-  Body:   {
-            fields: [ 'name', 'type' ],
-            values: [ 'Power', 7 ]      //Type: SetAct
-          }
-  Query:  
-        DO $$ 
-          DECLARE
-            varId "Var".id%TYPE;
-            parentTagId "Tag".id%TYPE;
-          BEGIN
-            INSERT INTO "Var" (id, name, type) VALUES (DEFAULT, 'Power', 7) RETURNING id into varId;
-            INSERT INTO "Tag" (id, name, var, parent_tag, type_field, value) VALUES (DEFAULT, 'Power', varId, NULL, '52', NULL) RETURNING id INTO parentTagId;
-        END $$
-
-  */
-  const GenerateTags = (varId, name, type, typesList, fieldsList, parent_tag) => {
-    //Iterate through the types tree until it reaches the leaves, generating the tags
-    fieldsList.filter(i => i[3] === type).forEach(f => {
-      var tagName = name+'.'+f[1]
-      var queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field) VALUES (DEFAULT, '${tagName}', ${varId}, ${parent_tag}, ${f[0]}) RETURNING "id"`
-      pool.query({
-        text: queryString,
-        rowMode: 'array'
-      })
-      .then((data) => {
-        var _base_type = typesList.find(i => i[0] === f[2])
-        _base_type = _base_type[2]
-        if (!_base_type){
-          GenerateTags(varId, tagName, f[2], typesList, fieldsList, data.rows[0][0])
-        }
-      })
-      .catch((error) => {
-        error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error5: ' + error.code})
-      })
-      return
-    })
-  }
-
-  app.post('/api/addVar', (req, res) => {
-    var varId, typesList, fieldsList
-    var varName = req.body.name
-    var varType = req.body.type
-    //Retreiving the typesList
-    var queryString = `SELECT * from "Type"`
-    pool.query({
-      text: queryString,
-      rowMode: 'array'
-    })
-    .then((data) => {  
-      typesList = data.rows 
-      //Retreiving the fieldsList
-      queryString = `SELECT * from "Field"`
-      pool.query({
-        text: queryString,
-        rowMode: 'array'
-      })
-      .then((data) => {  
-        fieldsList = data.rows 
-        //Inserting the Var
-        queryString = `INSERT INTO "Var" (id, name, type) VALUES (DEFAULT, '${varName}', ${varType}) RETURNING "id"`
-        console.log("1st Insert (Var): ", queryString)
-        pool.query({
-          text: queryString,
-          rowMode: 'array'
-        })
-        .then((data) => {
-          varId = data.rows[0][0]
-          //Inserting the first Tag corresponding to the var
-          queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field) VALUES (DEFAULT, '${varName}', ${varId}, NULL,  NULL) RETURNING "id"`
-          console.log("2nd Insert (Main Tag): ", queryString)
-          pool.query({
-            text: queryString,
-            rowMode: 'array'
-          })
-          .then((data) => {
-            var _base_type = typesList.find(i => i[0] === varType)
-            _base_type = _base_type[2]
-            //If is not a base type, we must generate all the sub tags iterating all the items
-            if (!_base_type){
-              GenerateTags(varId, varName, varType, typesList, fieldsList, data.rows[0][0])
-            }
-          })
-          .catch((error) => {
-            error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error1: ' + error.code})
-          })
-        })
-        .catch((error) => {
-          error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error2: ' + error.code})
-        })
-      })
-      .catch((error) => {
-        error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error3: ' + error.code})
-      })
-    })
-    .catch((error) => {
-      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error4: ' + error.code})
-    })
-  })
-
-  app.post('/api/modifyVar', (req, res) => {
-    var varId, typesList, fieldsList
-    var varName = req.body.name
-    var varType = req.body.type
-    //Retreiving the typesList
-    var queryString = `DELETE FROM "Tag" WHERE var = ${req.body.id}`
-    pool.query({
-      text: queryString,
-      rowMode: 'array'
-    })
-    .then(() => {
-      queryString = `SELECT * from "Type"`
-      pool.query({
-        text: queryString,
-        rowMode: 'array'
-      })
-      .then((data) => {  
-        typesList = data.rows 
-        //Retreiving the fieldsList
-        queryString = `SELECT * from "Field"`
-        pool.query({
-          text: queryString,
-          rowMode: 'array'
-        })
-        .then((data) => {  
-          fieldsList = data.rows 
-          //Inserting the Var
-          queryString=`UPDATE "Var" SET name = '${varName}', type = ${varType} WHERE id = ${req.body.id}`
-          console.log("1st Insert (Var): ", queryString)
-          pool.query({
-            text: queryString,
-            rowMode: 'array'
-          })
-          .then(() => {
-            varId = req.body.id
-            //Inserting the first Tag corresponding to the var
-            queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field) VALUES (DEFAULT, '${varName}', ${varId}, NULL,  NULL) RETURNING "id"`
-            console.log("2nd Insert (Main Tag): ", queryString)
-            pool.query({
-              text: queryString,
-              rowMode: 'array'
-            })
-            .then((data) => {
-              console.log(varId, varName, varType, typesList, fieldsList, data.rows[0][0])
-              var _base_type = typesList.find(i => i[0] === varType)
-              _base_type = _base_type[2]
-              //If is not a base type, we must generate all the sub tags iterating all the items
-              if (!_base_type){
-                GenerateTags(varId, varName, varType, typesList, fieldsList, data.rows[0][0])
-              }
-            })
-            .catch((error) => {
-              error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error1: ' + error.code})
-            })
-          })
-          .catch((error) => {
-            error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error2: ' + error.code})
-          })
-        })
-        .catch((error) => {
-          error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error3: ' + error.code})
-        })
-      })
-      .catch((error) => {
-        error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error4: ' + error.code})
-      })
-    })
-    .catch((error) => {
-      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error5: ' + error.code})
-    })
-  })
-
-
-  /*
-  Delete a record
-  Type:   POST
-  Route:  '/api/removeVar'
-  Body:   { id: 126 }
-  Query:  DELETE FROM "Var" WHERE "id" = 126
-  Event:  {
-            operation: 'DELETE',
-            table: 'Var',
-            data: { id: 126, type: 1, name: 'Temperature 4' }
-          }
-  Res:    200
-  Err:    400
-  */
-  app.post('/api/removeVar', (req, res) => {
-    var queryString=`DELETE FROM "Var" WHERE id = ${req.body.id}`
-    pool.query({
-      text: queryString,
-      rowMode: 'array'
-    })
-    .then((data)=>{
-      res.status(200).json({result: data.rows, message: "Record correctly removed from table \"" + req.body.table + "\" "})
-    })
-    .catch((error) => {
-      res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
-    })
-  })
-
-
 
   /*
   Delete a TYPE
@@ -452,5 +207,278 @@ module.exports = function (app, pool) {
       res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
     })
   })
+
+  
+  /*
+  0: real
+  1: bool
+  2: _Set
+  3: _Act
+  4: _Limit
+  5: Set
+  6: Act
+  7: SetAct
+
+  Creo una Var "Power" di tipo SetAct:
+  Power: {
+    Set: {
+      InputValue: 0.0,
+      Value: 0.0
+    },
+    Act: {
+      Value: 0.0
+    },
+    Limit: {
+      Min: 0.0,
+      Max: 0.0
+    },
+  }
+
+  devo generare tutte le tag che la compongono:
+  (PK) = Var (FK) + TypeField (FK)      Name                    Var (FK)          Parent Tag (IFK)   TypeField (FK)  Value
+                                        Power                   Power(id)         NULL               7               NULL
+                                        Power.Set               Power(id)         10                 2               NULL
+                                        Power.Act               Power(id)         10                 3               NULL
+                                        Power.Limit             Power(id)         10                 4               NULL
+                                        Power.Set.InputValue    Power(id)         11                 8               0
+                                        Power.Set.Value         Power(id)         11                 9               0
+                                        Power.Act.Value         Power(id)         12                 6               0
+                                        Power.Limit.Min         Power(id)         13                 5               0
+                                        Power.Limit.Max         Power(id)         13                 8               0
+
+  For each t in Types
+    Select_One parent_type from Fields where type == t
+  */
+
+
+  const GenerateTags = (varId, name, type, typesList, fieldsList, parent_tag) => {
+    //Iterate through the types tree until it reaches the leaves, generating the tags
+    fieldsList.filter(i => i[3] === type).forEach(f => {
+      var tagName = name+'.'+f[1]
+      var queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field) VALUES (DEFAULT, '${tagName}', ${varId}, ${parent_tag}, ${f[0]}) RETURNING "id"`
+      pool.query({
+        text: queryString,
+        rowMode: 'array'
+      })
+      .then((data) => {
+        var _base_type = typesList.find(i => i[0] === f[2])
+        _base_type = _base_type[2]
+        if (!_base_type){
+          GenerateTags(varId, tagName, f[2], typesList, fieldsList, data.rows[0][0])
+        }
+      })
+      .catch((error) => {
+        error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error5: ' + error.code})
+      })
+      return
+    })
+  }
+
+
+  /*
+  Add a Var
+  Type:   POST
+  Route:  '/api/addVar'
+  Body:   {
+            fields: [ 'name', 'type' ],
+            values: [ 'Power', 7 ]      //Type: SetAct
+          }
+  Query:  
+        DO $$ 
+          DECLARE
+            varId "Var".id%TYPE;
+            parentTagId "Tag".id%TYPE;
+          BEGIN
+            INSERT INTO "Var" (id, name, type) VALUES (DEFAULT, 'Power', 7) RETURNING id into varId;
+            INSERT INTO "Tag" (id, name, var, parent_tag, type_field, value) VALUES (DEFAULT, 'Power', varId, NULL, '52', NULL) RETURNING id INTO parentTagId;
+        END $$
+
+  */
+
+  app.post('/api/addVar', (req, res) => {
+    var varId, typesList, fieldsList
+    var varName = req.body.name
+    var varType = req.body.type
+    //Retreiving the typesList
+    var queryString = `SELECT * from "Type"`
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then((data) => {  
+      typesList = data.rows 
+      //Retreiving the fieldsList
+      queryString = `SELECT * from "Field"`
+      pool.query({
+        text: queryString,
+        rowMode: 'array'
+      })
+      .then((data) => {  
+        fieldsList = data.rows 
+        //Inserting the Var
+        queryString = `INSERT INTO "Var" (id, name, type) VALUES (DEFAULT, '${varName}', ${varType}) RETURNING "id"`
+        console.log("1st Insert (Var): ", queryString)
+        pool.query({
+          text: queryString,
+          rowMode: 'array'
+        })
+        .then((data) => {
+          varId = data.rows[0][0]
+          //Inserting the first Tag corresponding to the var
+          queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field) VALUES (DEFAULT, '${varName}', ${varId}, NULL,  NULL) RETURNING "id"`
+          console.log("2nd Insert (Main Tag): ", queryString)
+          pool.query({
+            text: queryString,
+            rowMode: 'array'
+          })
+          .then((data) => {
+            var _base_type = typesList.find(i => i[0] === varType)
+            _base_type = _base_type[2]
+            //If is not a base type, we must generate all the sub tags iterating all the items
+            if (!_base_type){
+              GenerateTags(varId, varName, varType, typesList, fieldsList, data.rows[0][0])
+            }
+          })
+          .catch((error) => {
+            error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error1: ' + error.code})
+          })
+        })
+        .catch((error) => {
+          error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error2: ' + error.code})
+        })
+      })
+      .catch((error) => {
+        error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error3: ' + error.code})
+      })
+    })
+    .catch((error) => {
+      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error4: ' + error.code})
+    })
+  })
+
+  /*
+  Modify a Var
+  Type:   POST
+  Route:  '/api/modifyVar'
+  Body:   {
+            fields: [ 'name', 'type' ],
+            values: [ 'Power', 7 ]      //Type: SetAct
+          }
+  Query:  
+        DO $$ 
+          DECLARE
+            varId "Var".id%TYPE;
+            parentTagId "Tag".id%TYPE;
+          BEGIN
+            INSERT INTO "Var" (id, name, type) VALUES (DEFAULT, 'Power', 7) RETURNING id into varId;
+            INSERT INTO "Tag" (id, name, var, parent_tag, type_field, value) VALUES (DEFAULT, 'Power', varId, NULL, '52', NULL) RETURNING id INTO parentTagId;
+        END $$
+
+  */
+
+
+
+  app.post('/api/modifyVar', (req, res) => {
+    var varId, typesList, fieldsList
+    var varName = req.body.name
+    var varType = req.body.type
+    //Retreiving the typesList
+    var queryString = `DELETE FROM "Tag" WHERE var = ${req.body.id}`
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then(() => {
+      queryString = `SELECT * from "Type"`
+      pool.query({
+        text: queryString,
+        rowMode: 'array'
+      })
+      .then((data) => {  
+        typesList = data.rows 
+        //Retreiving the fieldsList
+        queryString = `SELECT * from "Field"`
+        pool.query({
+          text: queryString,
+          rowMode: 'array'
+        })
+        .then((data) => {  
+          fieldsList = data.rows 
+          //Inserting the Var
+          queryString=`UPDATE "Var" SET name = '${varName}', type = ${varType} WHERE id = ${req.body.id}`
+          console.log("1st Insert (Var): ", queryString)
+          pool.query({
+            text: queryString,
+            rowMode: 'array'
+          })
+          .then(() => {
+            varId = req.body.id
+            //Inserting the first Tag corresponding to the var
+            queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field) VALUES (DEFAULT, '${varName}', ${varId}, NULL,  NULL) RETURNING "id"`
+            console.log("2nd Insert (Main Tag): ", queryString)
+            pool.query({
+              text: queryString,
+              rowMode: 'array'
+            })
+            .then((data) => {
+              console.log(varId, varName, varType, typesList, fieldsList, data.rows[0][0])
+              var _base_type = typesList.find(i => i[0] === varType)
+              _base_type = _base_type[2]
+              //If is not a base type, we must generate all the sub tags iterating all the items
+              if (!_base_type){
+                GenerateTags(varId, varName, varType, typesList, fieldsList, data.rows[0][0])
+              }
+            })
+            .catch((error) => {
+              error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error1: ' + error.code})
+            })
+          })
+          .catch((error) => {
+            error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error2: ' + error.code})
+          })
+        })
+        .catch((error) => {
+          error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error3: ' + error.code})
+        })
+      })
+      .catch((error) => {
+        error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error4: ' + error.code})
+      })
+    })
+    .catch((error) => {
+      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error5: ' + error.code})
+    })
+  })
+
+
+  /*
+  Delete a var
+  Type:   POST
+  Route:  '/api/removeVar'
+  Body:   { id: 126 }
+  Query:  DELETE FROM "Var" WHERE "id" = 126
+  Event:  {
+            operation: 'DELETE',
+            table: 'Var',
+            data: { id: 126, type: 1, name: 'Temperature 4' }
+          }
+  Res:    200
+  Err:    400
+  */
+  app.post('/api/removeVar', (req, res) => {
+    var queryString=`DELETE FROM "Var" WHERE id = ${req.body.id}`
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then((data)=>{
+      res.status(200).json({result: data.rows, message: "Record correctly removed from table \"" + req.body.table + "\" "})
+    })
+    .catch((error) => {
+      res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
+    })
+  })
+
+
 
 }
