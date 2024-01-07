@@ -20,7 +20,7 @@ module.exports = function () {
       name text COLLATE pg_catalog."default" NOT NULL UNIQUE,
       var integer NOT NULL,
       parent_tag integer,
-      type_field integer,
+      type_field integer NOT NULL,
       value bytea
     );
     
@@ -48,13 +48,13 @@ module.exports = function () {
       DROP CONSTRAINT IF EXISTS field_type_id,
       ADD CONSTRAINT field_type_id FOREIGN KEY (type)
         REFERENCES public."Type" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
+        ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,
       DROP CONSTRAINT IF EXISTS parent_type_id,
       ADD CONSTRAINT parent_type_id FOREIGN KEY (parent_type)
         REFERENCES public."Type" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
+        ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,      
       DROP CONSTRAINT IF EXISTS unique_field_name_and_parent_type,
@@ -70,19 +70,19 @@ module.exports = function () {
       DROP CONSTRAINT IF EXISTS parent_tag_id,
       ADD CONSTRAINT parent_tag_id FOREIGN KEY (parent_tag)
         REFERENCES public."Tag" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
+        ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,
       DROP CONSTRAINT IF EXISTS var_id,
       ADD CONSTRAINT var_id FOREIGN KEY (var)
         REFERENCES public."Var" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
         NOT VALID,
       DROP CONSTRAINT IF EXISTS type_field_id,
       ADD CONSTRAINT type_field_id FOREIGN KEY (type_field)
         REFERENCES public."Field" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
+        ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,
       DROP CONSTRAINT IF EXISTS unique_parent_tag_and_type_field,

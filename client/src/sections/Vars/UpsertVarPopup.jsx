@@ -20,10 +20,10 @@ function UpsertVarPopup (props) {
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.upsertVar({fields: ["name", "type"], values: [modalState.name, modalState.type]})
+    props.upsertVar({name:modalState.name, type: modalState.type})
     setModalState((prevState) => ({ ...prevState, name: "", type: 0}))
   }
-  const handleReset = (event) => {
+  const handleReset = () => {
     setModalState((prevState) => ({ ...prevState, name: "", type: 0}))
     props.cancelCommand()
   }

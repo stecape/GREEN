@@ -80,7 +80,7 @@ function VarsList (props) {
         visible={deletePopup.visible}
         name={deletePopup.name}
         delVar={()=>{
-          axios.post('http://localhost:3001/api/removeOne', {table: "Var", id: deletePopup.id})
+          axios.post('http://localhost:3001/api/removeVar', {id: deletePopup.id})
             .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
@@ -94,7 +94,7 @@ function VarsList (props) {
         modalType="full-page"
         typesList={typesList}
         upsertVar={(data)=>{
-          axios.post('http://localhost:3001/api/modify', {table: "Var", id: modifyVarPopup.id, fields: data.fields, values: data.values})
+          axios.post('http://localhost:3001/api/modifyVar', {id: modifyVarPopup.id, name: data.name, type: data.type})
             .then(setModifyVarPopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
@@ -109,7 +109,7 @@ function VarsList (props) {
         modalType="full-page"
         typesList={typesList}
         upsertVar={(data)=>{
-          axios.post('http://localhost:3001/api/add', {table: "Var", fields: data.fields, values: data.values})
+          axios.post('http://localhost:3001/api/addVar', data)
             .then(setCreateVarPopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
