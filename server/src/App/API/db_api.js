@@ -2,6 +2,31 @@
 module.exports = function (app, pool) {
   const pg = require ('pg')
 
+  const getTypes = () => {
+    return new Promise((resolve, reject) => {
+      //Retreiving the typesList
+      var queryString = `SELECT * from "Type"`
+      pool.query({
+        text: queryString,
+        rowMode: 'array'
+      })
+      .then(data => resolve(data.rows))
+      .catch(error => reject(error))      
+    })
+  }
+
+  const getFields = () => {
+    return new Promise((resolve, reject) => {
+      //Retreiving the fieldsList
+      queryString = `SELECT * from "Field"`
+      pool.query({
+        text: queryString,
+        rowMode: 'array'
+      })
+      .then(data => resolve(data.rows))
+      .catch(error => reject(error))      
+    })
+  }
 
 
   /*
@@ -111,11 +136,24 @@ module.exports = function (app, pool) {
   Event:  -
   Res:    200,
           {
-            value: [
-              [ 'Temperature 1', 1, 131 ],
-              [ 'Temperature 2', 1, 124 ],
-              [ 'Temperature 3', 3, 125 ]
-            ]
+            "result": {
+              "name": "_Act",
+              "type": 6,
+              "fields": [
+                  {
+                      "id": 3,
+                      "name": "Value",
+                      "type": 1,
+                      "QRef": 0
+                  }
+              ],
+              "deps": [
+                  6,
+                  9,
+                  10
+              ]
+            },
+            "message": "Record(s) from table \"Field\" returned correctly"
           }
   Err:    400
   */
@@ -139,74 +177,78 @@ module.exports = function (app, pool) {
     }
   }
 
-
-  app.post('/api/getFields', (req, res) => {
-    var response = {
-      name: "",
-      type: req.body.type,
-      fields: [],
-      deps: []
-    }
-    var queryString=`SELECT name FROM "Type" WHERE id = ${req.body.type}`
-    pool.query({
-      text: queryString,
-      rowMode: 'array'
-    })
-    .then((name) => { 
-      response.name = name.rows[0][0]
-      var queryString=`SELECT * FROM "Field" WHERE parent_type = ${req.body.type}`
+  const getDeps = (req, res) => {
+    return new Promise((resolve, reject) => {
+      var response = {
+        name: "",
+        type: req.body.type,
+        fields: [],
+        deps: []
+      }
+      var queryString=`SELECT name FROM "Type" WHERE id = ${req.body.type}`
       pool.query({
         text: queryString,
         rowMode: 'array'
       })
-      .then((data)=>{
-        response.fields = data.rows.map((field, i) => ({id: field[0], name: field[1], type: field[2], QRef: i}))
-        var result = []
-        var queryString=`
-        SELECT
-        distinct "Type".id, "Field".parent_type
-        FROM "Type"
-        INNER JOIN "Field" ON "Field".type="Type".id
-        ORDER by id
-        `
+      .then((name) => { 
+        response.name = name.rows[0][0]
+        var queryString=`SELECT * FROM "Field" WHERE parent_type = ${req.body.type}`
         pool.query({
           text: queryString,
           rowMode: 'array'
         })
-        .then((data) => {
-          result = data.rows
+        .then((data)=>{
+          response.fields = data.rows.map((field, i) => ({id: field[0], name: field[1], type: field[2], QRef: i}))
+          var result = []
           var queryString=`
-            SELECT
-            distinct "Field".parent_type
-            FROM "Field"
-            LEFT JOIN (
-              SELECT
-              distinct "Type".id
-              FROM "Type"
-              INNER JOIN "Field" ON "Field".type="Type".id
-            ) a ON a.id = "Field".parent_type
-            WHERE a.id IS NULL
+          SELECT
+          distinct "Type".id, "Field".parent_type
+          FROM "Type"
+          INNER JOIN "Field" ON "Field".type="Type".id
+          ORDER by id
           `
           pool.query({
             text: queryString,
             rowMode: 'array'
           })
           .then((data) => {
-            //creating the Graph of the dependencies of the types
-            var graph = {}
-            //for each row of the previous query, non ricordo cosa ritorna la query... fuck! Questa va commentata
-            result.forEach(k => graph[k[0]] = result.filter(i => i[0] == k[0]).map(j => j[1]))
-            data.rows.map(k => graph[k[0]] = [])
-            response.deps = [...DFS(graph, req.body.type)]       //Spread operator, DSF returns a Set, I want an array
-            res.status(200).json({result: response, message: "Record(s) from table \"Field\" returned correctly"})
+            result = data.rows
+            var queryString=`
+              SELECT
+              distinct "Field".parent_type
+              FROM "Field"
+              LEFT JOIN (
+                SELECT
+                distinct "Type".id
+                FROM "Type"
+                INNER JOIN "Field" ON "Field".type="Type".id
+              ) a ON a.id = "Field".parent_type
+              WHERE a.id IS NULL
+            `
+            pool.query({
+              text: queryString,
+              rowMode: 'array'
+            })
+            .then((data) => {
+              //creating the Graph of the dependencies of the types
+              var graph = {}
+              //for each row of the previous query, non ricordo cosa ritorna la query... fuck! Questa va commentata
+              result.forEach(k => graph[k[0]] = result.filter(i => i[0] == k[0]).map(j => j[1]))
+              data.rows.map(k => graph[k[0]] = [])
+              response.deps = [...DFS(graph, req.body.type)]       //Spread operator, DSF returns a Set, I want an array
+              res.status(200).json({result: response, message: "Record(s) from table \"Field\" returned correctly"})
+              resolve(response)
+            })
           })
         })
       })
+      .catch((error) => {
+        res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
+        reject(error)
+      })    
     })
-    .catch((error) => {
-      res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
-    })
-  })
+  }
+  app.post('/api/getFields', (req, res) => getDeps(req, res))
 
   
   /*
@@ -251,7 +293,7 @@ module.exports = function (app, pool) {
   */
 
 
-  const GenerateTags = (varId, name, type, typesList, fieldsList, parent_tag) => {
+  const _GenerateTags = (varId, name, type, typesList, fieldsList, parent_tag) => {
     //Iterate through the types tree until it reaches the leaves, generating the tags
     fieldsList.filter(i => i[3] === type).forEach(f => {
       var tagName = name+'.'+f[1]
@@ -264,7 +306,7 @@ module.exports = function (app, pool) {
         var _base_type = typesList.find(i => i[0] === f[2])
         _base_type = _base_type[2]
         if (!_base_type){
-          GenerateTags(varId, tagName, f[2], typesList, fieldsList, data.rows[0][0])
+          _GenerateTags(varId, tagName, f[2], typesList, fieldsList, data.rows[0][0])
         }
       })
       .catch((error) => {
@@ -274,6 +316,40 @@ module.exports = function (app, pool) {
     })
   }
 
+  const GenerateTags = (varId, varName, varType, typesList, fieldsList) => {
+    return new Promise((resolve, reject) => {
+      //Delete old tags
+      var queryString = `DELETE FROM "Tag" WHERE var = ${varId}`
+      pool.query({
+        text: queryString,
+        rowMode: 'array'
+      })
+      .then(() => {
+        //Inserting the first Tag corresponding to the var
+        queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field) VALUES (DEFAULT, '${varName}', ${varId}, NULL,  NULL) RETURNING "id"`
+        console.log("2nd Insert (Main Tag): ", queryString)
+        pool.query({
+          text: queryString,
+          rowMode: 'array'
+        })
+        .then((data) => {
+          var _base_type = typesList.find(i => i[0] === varType)
+          _base_type = _base_type[2]
+          //If is not a base type, we must generate all the sub tags iterating all the items
+          if (!_base_type){
+            _GenerateTags(varId, varName, varType, typesList, fieldsList, data.rows[0][0])
+          }
+          resolve()
+        })
+        .catch((error) => {
+          reject(error)
+        })
+      })
+      .catch((error) => {
+        reject(error)
+      })
+    })
+  }
 
   /*
   Add a Var
@@ -324,21 +400,7 @@ module.exports = function (app, pool) {
         })
         .then((data) => {
           varId = data.rows[0][0]
-          //Inserting the first Tag corresponding to the var
-          queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field) VALUES (DEFAULT, '${varName}', ${varId}, NULL,  NULL) RETURNING "id"`
-          console.log("2nd Insert (Main Tag): ", queryString)
-          pool.query({
-            text: queryString,
-            rowMode: 'array'
-          })
-          .then((data) => {
-            var _base_type = typesList.find(i => i[0] === varType)
-            _base_type = _base_type[2]
-            //If is not a base type, we must generate all the sub tags iterating all the items
-            if (!_base_type){
-              GenerateTags(varId, varName, varType, typesList, fieldsList, data.rows[0][0])
-            }
-          })
+          GenerateTags(varId, varName, varType, typesList, fieldsList)
           .catch((error) => {
             error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error1: ' + error.code})
           })
@@ -382,71 +444,46 @@ module.exports = function (app, pool) {
     var varId, typesList, fieldsList
     var varName = req.body.name
     var varType = req.body.type
-    //Retreiving the typesList
-    var queryString = `DELETE FROM "Tag" WHERE var = ${req.body.id}`
+    //Delete old tags
+    var queryString = `SELECT * from "Type"`
     pool.query({
       text: queryString,
       rowMode: 'array'
     })
-    .then(() => {
-      queryString = `SELECT * from "Type"`
+    .then((data) => {  
+      typesList = data.rows 
+      //Retreiving the fieldsList
+      queryString = `SELECT * from "Field"`
       pool.query({
         text: queryString,
         rowMode: 'array'
       })
       .then((data) => {  
-        typesList = data.rows 
-        //Retreiving the fieldsList
-        queryString = `SELECT * from "Field"`
+        fieldsList = data.rows 
+        //Inserting the Var
+        queryString=`UPDATE "Var" SET name = '${varName}', type = ${varType} WHERE id = ${req.body.id}`
+        console.log("1st Insert (Var): ", queryString)
         pool.query({
           text: queryString,
           rowMode: 'array'
         })
-        .then((data) => {  
-          fieldsList = data.rows 
-          //Inserting the Var
-          queryString=`UPDATE "Var" SET name = '${varName}', type = ${varType} WHERE id = ${req.body.id}`
-          console.log("1st Insert (Var): ", queryString)
-          pool.query({
-            text: queryString,
-            rowMode: 'array'
-          })
-          .then(() => {
-            varId = req.body.id
-            //Inserting the first Tag corresponding to the var
-            queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field) VALUES (DEFAULT, '${varName}', ${varId}, NULL,  NULL) RETURNING "id"`
-            console.log("2nd Insert (Main Tag): ", queryString)
-            pool.query({
-              text: queryString,
-              rowMode: 'array'
-            })
-            .then((data) => {
-              console.log(varId, varName, varType, typesList, fieldsList, data.rows[0][0])
-              var _base_type = typesList.find(i => i[0] === varType)
-              _base_type = _base_type[2]
-              //If is not a base type, we must generate all the sub tags iterating all the items
-              if (!_base_type){
-                GenerateTags(varId, varName, varType, typesList, fieldsList, data.rows[0][0])
-              }
-            })
-            .catch((error) => {
-              error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error1: ' + error.code})
-            })
-          })
+        .then(() => {
+          varId = req.body.id
+          GenerateTags(varId, varName, varType, typesList, fieldsList)
           .catch((error) => {
-            error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error2: ' + error.code})
+            error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error1: ' + error.code})
           })
         })
         .catch((error) => {
-          error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error3: ' + error.code})
+          error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error2: ' + error.code})
         })
       })
       .catch((error) => {
-        error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error4: ' + error.code})
+        error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error3: ' + error.code})
       })
     })
     .catch((error) => {
-      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error5: ' + error.code})
+      error.code == '23505' ? res.status(400).json({code: error.code, detail: error.detail, message: error.detail}) : res.status(400).json({code: error.code, detail: "", message: 'Generic error4: ' + error.code})
     })
   })
 
@@ -473,6 +510,33 @@ module.exports = function (app, pool) {
     })
     .then((data)=>{
       res.status(200).json({result: data.rows, message: "Record correctly removed from table \"" + req.body.table + "\" "})
+    })
+    .catch((error) => {
+      res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
+    })
+  })
+
+
+  /*
+  Refresh tags
+  Type:   POST
+  Route:  '/api/refreshTags'
+  Body:   { id: 126 }
+  Query:  DELETE FROM "Var" WHERE "id" = 126
+  Event:  {
+            operation: 'DELETE',
+            table: 'Var',
+            data: { id: 126, type: 1, name: 'Temperature 4' }
+          }
+  Res:    200
+  Err:    400
+  */
+  app.post('/api/refreshTags', (req, res) => {
+    getDeps(req, res)
+    .then((result)=>{
+      result.deps.forEach(type => {
+        // per ogni var di questo tipo bisogna rigenerare le tags => faccio diventare la generate tags una Promise?
+      })
     })
     .catch((error) => {
       res.status(400).json({code: error.code, detail: error.detail, message: error.detail})
