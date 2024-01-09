@@ -41,8 +41,8 @@ BEGIN
   `
 END $$`
       console.log(query)
-      axios.post('http://localhost:3001/api/exec', {query: query})
-      .then((value)=>{innerResolve(value)})
+      axios.post('http://localhost:3001/api/exec', {query: query, generateTags: true})
+      .then((value)=>{innerResolve(value)})777777777777777777777777777777777777 axios post refreshTags 
       .catch((error)=>{innerReject(error)})
     })
   }

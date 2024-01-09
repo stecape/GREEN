@@ -107,11 +107,11 @@ module.exports = function () {
   
     ALTER SEQUENCE IF EXISTS public."Type_id_seq"
       START 100;
-    SELECT setval('public."Type_id_seq"', 99, true);
+    --SELECT setval('public."Type_id_seq"', 99, true);
 
     ALTER SEQUENCE IF EXISTS public."Field_id_seq"
       START 100;
-    SELECT setval('public."Field_id_seq"', 99, true);
+    --SELECT setval('public."Field_id_seq"', 99, true);
 
     INSERT INTO "Type"(id,name,base_type) VALUES (1, 'Real', true) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "Type"(id,name,base_type) VALUES (2, 'Text', true) ON CONFLICT (name) DO NOTHING;
