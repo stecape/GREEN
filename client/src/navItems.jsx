@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { LayoutNavigationItem, LayoutNavigationTree } from "@react-md/layout";
-import { HomeSVGIcon, AllInclusiveSVGIcon, AllOutSVGIcon } from "@react-md/material-icons";
+import { HomeSVGIcon, AllInclusiveSVGIcon, AllOutSVGIcon, SettingsInputComponentSVGIcon } from "@react-md/material-icons";
 
 /**
  * Note: The `parentId` **must** be defaulted to `null` for the navigation tree
@@ -27,6 +27,7 @@ const navItems: LayoutNavigationTree = {
   "/": createRoute("/", "Home", <HomeSVGIcon />),
   "/types": createRoute("/types", "Types", <AllOutSVGIcon />),
   "/vars": createRoute("/vars", "Vars", <AllInclusiveSVGIcon />),
+  "/tags": createRoute("/tags", "Tags", <SettingsInputComponentSVGIcon />),
 };
 
 export default navItems;

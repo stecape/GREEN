@@ -16,33 +16,43 @@ function UpsertTypePopup (props) {
   
   const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [modalState, setModalState] = useState({ visible: false, modalType: props.modalType })
-  const upserttType = ()=> {
+  const _upsertType = () => {
     return new Promise((innerResolve, innerReject) => {
-      var query = `DO $$ 
-DECLARE
-  typeId "Type".id%TYPE;
-BEGIN
-  `
-  +
-  upsertType.typeNameQuery
-  +
-  `
-  `
-  +
-  upsertType.insertQuery.map(q => q.query).join(`
-  `)
-  +
-  upsertType.updateQuery.map(q => q.query).join(`
-  `)
-  +
-  upsertType.deleteQuery.map(q => q.query).join(`
-  `)
-  +
-  `
-END $$`
-      console.log(query)
-      axios.post('http://localhost:3001/api/exec', {query: query, generateTags: true})
-      .then((value)=>{innerResolve(value)})777777777777777777777777777777777777 axios post refreshTags 
+      
+      axios.post('http://localhost:3001/api/deleteTags')
+      .then(() => {
+        
+        var query = `DO $$ 
+          DECLARE
+            typeId "Type".id%TYPE;
+          BEGIN
+            `
+            +
+            upsertType.typeNameQuery
+            +
+            `
+            `
+            +
+            upsertType.insertQuery.map(q => q.query).join(`
+            `)
+            +
+            upsertType.updateQuery.map(q => q.query).join(`
+            `)
+            +
+            upsertType.deleteQuery.map(q => q.query).join(`
+            `)
+            +
+            `
+          END $$`
+        console.log(query)
+        axios.post('http://localhost:3001/api/exec', {query: query})
+        .then(()=>{
+          axios.post('http://localhost:3001/api/refreshTags')
+          .then(() => innerResolve())
+          .catch((error)=>{innerReject(error)})
+        })
+        .catch((error)=>{innerReject(error)})
+      })
       .catch((error)=>{innerReject(error)})
     })
   }
@@ -77,7 +87,7 @@ END $$`
             <GridCell colSpan={12} className={gridStyles.item}>
               <TypeName
                 reset={handleReset}
-                upsertType={(name)=> upserttType(name)}
+                upsertType={_upsertType}
               />
             </GridCell>
             <GridCell colSpan={12} className={gridStyles.item}>

@@ -26,32 +26,32 @@ function TypeName (props) {
   const handleSubmit = (event) => {
     event.preventDefault()
     //si chiama una promise in arrivo dalle props. La funzione deve eseguire la query di creazione, sul then poi bisogna resettare il form
-    props.upsertType(upsertType.name)
-      .then((response)=>{  
-        addMessage({children: response.data.message})
-      })
-      .catch(error => {
-        if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        addMessage({children: "Error: " + error.response.data.message})
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else if (error.request) {
-        // The request was made but no response was received
-        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-        // http.ClientRequest in node.js
-        addMessage({children: "Error: database not reachable"})
-        console.log(error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        addMessage({children: "Error: wrong request parameters"})
-        console.log('Error', error.message);
-      }
-      console.log(error.config);
-      })
-      .finally(handleReset)
+    props.upsertType()
+    .then(()=>{
+      addMessage({children: "Type updated or inserted"})
+    })
+    .catch(error => {
+      if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      addMessage({children: "Error: " + error.response.data.message})
+      console.log(error.response.data);
+      console.log(error.response.status);
+      console.log(error.response.headers);
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      addMessage({children: "Error: database not reachable"})
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      addMessage({children: "Error: wrong request parameters"})
+      console.log('Error', error.message);
+    }
+    console.log(error.config);
+    })
+    .finally(handleReset)
   }
 
   const handleReset = () => {

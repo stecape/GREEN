@@ -2,6 +2,19 @@
 module.exports = function (app, pool) {
   const pg = require ('pg')
 
+  const getVars = () => {
+    return new Promise((resolve, reject) => {
+      //Retreiving the typesList
+      var queryString = `SELECT id, name, type from "Var"`
+      pool.query({
+        text: queryString,
+        rowMode: 'array'
+      })
+      .then(data => resolve(data.rows))
+      .catch(error => reject(error))      
+    })
+  }
+
   const getTypes = () => {
     return new Promise((resolve, reject) => {
       //Retreiving the typesList
@@ -24,6 +37,19 @@ module.exports = function (app, pool) {
         rowMode: 'array'
       })
       .then(data => resolve(data.rows))
+      .catch(error => reject(error))      
+    })
+  }
+
+  const deleteTags = () => {
+    return new Promise((resolve, reject) => {
+      //Retreiving the fieldsList
+      queryString = `TRUNCATE "Tag"`
+      pool.query({
+        text: queryString,
+        rowMode: 'array'
+      })
+      .then(() => resolve())
       .catch(error => reject(error))      
     })
   }
@@ -166,7 +192,6 @@ module.exports = function (app, pool) {
   }
 
   const getDeps = (type) => {
-    console.log(type)
     return new Promise((resolve, reject) => {
       var response = {
         name: "",
@@ -319,7 +344,6 @@ module.exports = function (app, pool) {
       .then(() => {
         //Inserting the first Tag corresponding to the var
         queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field) VALUES (DEFAULT, '${varName}', ${varId}, NULL,  NULL) RETURNING "id"`
-        console.log("2nd Insert (Main Tag): ", queryString)
         pool.query({
           text: queryString,
           rowMode: 'array'
@@ -381,7 +405,6 @@ module.exports = function (app, pool) {
         fieldsList = data.rows 
         //Inserting the Var
         queryString = `INSERT INTO "Var" (id, name, type) VALUES (DEFAULT, '${varName}', ${varType}) RETURNING "id"`
-        console.log("1st Insert (Var): ", queryString)
         pool.query({
           text: queryString,
           rowMode: 'array'
@@ -442,7 +465,6 @@ module.exports = function (app, pool) {
         fieldsList = data.rows 
         //Inserting the Var
         queryString=`UPDATE "Var" SET name = '${varName}', type = ${varType} WHERE id = ${req.body.id}`
-        console.log("1st Insert (Var): ", queryString)
         pool.query({
           text: queryString,
           rowMode: 'array'
@@ -475,7 +497,7 @@ module.exports = function (app, pool) {
   Err:    400
   */
   app.post('/api/removeVar', (req, res) => {
-    var queryString=`DELETE FROM "Var" WHERE id = ${req.body.id}`
+    var queryString=`DELETE FROM "Var" WHERE id = ${req.body.id};`
     pool.query({
       text: queryString,
       rowMode: 'array'
@@ -483,6 +505,34 @@ module.exports = function (app, pool) {
     .then(data=>{
       res.status(200).json({result: data.rows, message: "Record correctly removed from table \"" + req.body.table + "\" "})
     })
+    .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
+  })
+
+
+
+
+
+
+
+
+  /*
+  Delete tags
+  Type:   POST
+  Route:  '/api/deleteTags'
+  Body:   { id: 126 }
+  Query:  DELETE FROM "Tags" WHERE "type" = 126
+  Event:  {
+            operation: 'DELETE',
+            table: 'Var',
+            data: { id: 126, type: 1, name: 'Temperature 4' }
+          }
+  Res:    200
+  Err:    400
+  */
+  app.post('/api/deleteTags', (req, res) => {
+    //Delete old tags
+    deleteTags()
+    .then(data => res.status(200).json({result: data, message: "Query executed, old tags cleaned"}))
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
   })
 
@@ -502,41 +552,33 @@ module.exports = function (app, pool) {
   Err:    400
   */
   app.post('/api/refreshTags', (req, res) => {
-    var varId, varName, varType, typesList, fieldsList
-    getTypes()
-    .then(data => {
-      typesList = data.rows
-      getFields()
+    var varId, varName, varType, varsList, typesList, fieldsList
+    deleteTags()
+    .then(() => {
+      getVars()
       .then(data => {
-        fieldsList = data.rows
-        getDeps(req, res)
-        .then(result => {
-          result.deps.forEach(type => {
-            // per ogni var di questo tipo bisogna rigenerare le tags => faccio diventare la generate tags una Promise?
-            var queryString=`SELECT id, name, type FROM "Var" WHERE type = ${type[0]}`
-            pool.query({
-              text: queryString,
-              rowMode: 'array'
+        varsList = data
+        getTypes()
+        .then(data => {
+          typesList = data
+          getFields()
+          .then(data => {
+            fieldsList = data
+            varsList.forEach(v => {
+              varId = v[0]
+              varName = v[1]
+              varType = v[2]
+              GenerateTags(varId, varName, varType, typesList, fieldsList)
+              .then(data => res.status(200).json({result: data, message: "Query executed, tags regenerated"}))
+              .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
             })
-            .then(data => {
-              data.rows.forEach(v => {
-                varId = v[0]
-                varName = v[1]
-                varType = v[2]
-                GenerateTags(varId, varName, varType, typesList, fieldsList)
-                .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
-              })
-            })
-            .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
           })
+          .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
         })
-        .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
       })
       .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
     })
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
   })
-
-
 
 }
