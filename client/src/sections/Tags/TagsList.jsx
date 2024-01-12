@@ -33,14 +33,15 @@ function TagsList (props) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tagsList.map((item) => {
+          {varsList.length>0 && typesList.length>0 && fieldsList.length>0 && tagsList.map((item) => {
             var typeItem =1
             if (item.type_field === null) {
               //Head tag, which has no type_field
               var varItem = varsList.find(i => i.id === item.var)
-              console.log(item, varsList, varItem)
+              //console.log(item, varsList, varItem)
               typeItem = typesList.find(i => i.id === varItem.type)
             } else {
+              //console.log(fieldsList, typesList, item)
               var fieldItem = fieldsList.find(i => i.id === item.type_field)
               typeItem = typesList.find(i => i.id === fieldItem.type)
             }
