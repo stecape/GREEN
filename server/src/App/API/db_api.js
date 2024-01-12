@@ -77,7 +77,7 @@ module.exports = function (app, pool) {
       text: queryString,
       rowMode: 'array'
     })
-    .then(data => res.status(200).json({result: data, message: "Query executed"}))
+    .then(data => res.json({result: data, message: "Query executed"}))
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
   })
 
@@ -109,7 +109,7 @@ module.exports = function (app, pool) {
       text: queryString,
       rowMode: 'array'
     })
-    .then(data => res.status(200).json({result: data.rows, message: data.rowCount + " record(s) from table \"" + req.body.table + "\" returned correctly"}))
+    .then(data => res.json({result: data.rows, message: data.rowCount + " record(s) from table \"" + req.body.table + "\" returned correctly"}))
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
   })
 
@@ -135,7 +135,7 @@ module.exports = function (app, pool) {
       text: queryString,
       rowMode: 'array'
     })
-    .then(data=> res.status(200).json({result: data.rows[0], message: "Record correctly removed from table \"" + req.body.table + "\" "}))
+    .then(data=> res.json({result: data.rows[0], message: "Record correctly removed from table \"" + req.body.table + "\" "}))
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
   })
 
@@ -265,7 +265,7 @@ module.exports = function (app, pool) {
 
   app.post('/api/getFields', (req, res) => {
     getDeps(req.body.type)
-    .then(response =>  res.status(200).json({result: response, message: "Record(s) from table \"Field\" returned correctly"}))
+    .then(response =>  res.json({result: response, message: "Record(s) from table \"Field\" returned correctly"}))
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))    
   })
 
@@ -503,7 +503,7 @@ module.exports = function (app, pool) {
       rowMode: 'array'
     })
     .then(data=>{
-      res.status(200).json({result: data.rows, message: "Record correctly removed from table \"" + req.body.table + "\" "})
+      res.json({result: data.rows, message: "Record correctly removed from table \"" + req.body.table + "\" "})
     })
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
   })
@@ -532,7 +532,7 @@ module.exports = function (app, pool) {
   app.post('/api/deleteTags', (req, res) => {
     //Delete old tags
     deleteTags()
-    .then(data => res.status(200).json({result: data, message: "Query executed, old tags cleaned"}))
+    .then(data => res.json({result: data, message: "Query executed, old tags cleaned"}))
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
   })
 
@@ -569,7 +569,6 @@ module.exports = function (app, pool) {
               varName = v[1]
               varType = v[2]
               GenerateTags(varId, varName, varType, typesList, fieldsList)
-              .then(data => res.status(200).json({result: data, message: "Query executed, tags regenerated"}))
               .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
             })
           })
