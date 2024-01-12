@@ -32,7 +32,6 @@ function VarsList (props) {
           <TableRow>
             <TableCell hAlign="left" grow >Name</TableCell>
             <TableCell hAlign="center">Type</TableCell>
-            <TableCell hAlign="center">Value</TableCell>
             <TableCell hAlign="center">UM/Status</TableCell>
             <TableCell hAlign="center">Actions</TableCell>
           </TableRow>
@@ -46,7 +45,6 @@ function VarsList (props) {
                 >
                   <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
                   <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
-                  <TableCell className={tableStyles.cell}></TableCell>
                   <TableCell className={tableStyles.cell}></TableCell>
                   <TableCell className={tableStyles.cell}>
                     <Button

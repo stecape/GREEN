@@ -21,6 +21,7 @@ module.exports = function () {
       var integer NOT NULL,
       parent_tag integer,
       type_field integer,
+      um integer,
       value bytea
     );
     
