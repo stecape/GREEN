@@ -22,7 +22,7 @@ module.exports = function () {
       parent_tag integer,
       type_field integer,
       um integer,
-      value bytea
+      value json
     );
     
 

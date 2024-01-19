@@ -9,7 +9,6 @@ import {
 import tableStyles from '../../styles/Table.module.scss'
 
 function TagsList (props) {
-
   const [tagsList, setTagsList] = useState(props.tagsList)
   const [varsList, setVarsList] = useState(props.varsList)
   const [typesList, setTypesList] = useState(props.typesList)
@@ -34,6 +33,7 @@ function TagsList (props) {
         </TableHeader>
         <TableBody>
           {varsList.length>0 && typesList.length>0 && fieldsList.length>0 && tagsList.map((item) => {
+            //1 is a placeholder test value, to not have it undefined
             var typeItem =1
             if (item.type_field === null) {
               //Head tag, which has no type_field
@@ -46,14 +46,13 @@ function TagsList (props) {
               typeItem = typesList.find(i => i.id === fieldItem.type)
             }
 
-
               return (
                 <TableRow key={item.id}>
                   <TableCell className={tableStyles.cell} hAlign="center">{item.id}</TableCell>
                   <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
                   <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
                   <TableCell className={tableStyles.cell}>{item.um}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.value}</TableCell>
+                  <TableCell className={tableStyles.cell}>{item.value !== null && item.value.value}</TableCell>
                 <TableCell />
                 </TableRow>
               )

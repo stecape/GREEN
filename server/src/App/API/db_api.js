@@ -104,7 +104,7 @@ module.exports = function (app, pool) {
   Err:    400
   */
   app.post('/api/getAll', (req, res) => {
-    var queryString=`SELECT ${req.body.fields.join(',')} FROM "${req.body.table}"`
+    var queryString=`SELECT ${req.body.fields.join(',')} FROM "${req.body.table}" ORDER BY id ASC`
     pool.query({
       text: queryString,
       rowMode: 'array'
