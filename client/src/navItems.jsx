@@ -26,6 +26,7 @@ function createRoute(
 const navItems: LayoutNavigationTree = {
   "/": createRoute("/", "Home", <HomeSVGIcon />),
   "/types": createRoute("/types", "Types", <AllOutSVGIcon />),
+  "/um": createRoute("/um", "um", <SettingsInputComponentSVGIcon />),
   "/vars": createRoute("/vars", "Vars", <AllInclusiveSVGIcon />),
   "/tags": createRoute("/tags", "Tags", <SettingsInputComponentSVGIcon />),
 };

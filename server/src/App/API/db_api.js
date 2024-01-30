@@ -580,4 +580,87 @@ module.exports = function (app, pool) {
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
   })
 
+      
+  /*
+  Add a Um
+  Type:   POST
+  Route:  '/api/addUm'
+  Body:   {
+            fields: [ 'name', 'metric', 'imperial', 'gain', '"offset"'],
+            values: [ 'm_ft', 'm', 'ft', 3.28084, 0]
+          }
+  Query:
+          INSERT INTO "um" (name, metric, imperial, gain, "offset") VALUES ('m_ft', 'm', 'ft', 3.28084, 0);
+  */
+
+  app.post('/api/addUm', (req, res) => {
+    var name = `"${req.body.values[0]}"`
+    var metric = `"${req.body.values[1]}"`
+    var imperial = `"${req.body.values[2]}"`
+    var gain = req.body.values[3]
+    var offset = req.body.values[4]
+    var queryString = `INSERT INTO "um" (id,${req.body.fields.join(',')}) VALUES (DEFAULT,${name},${metric},${imperial},${gain},${offset})`
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then(data => { res.json({result: data.rows[0], message: "Um inserted"}) })
+    .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
+  })
+
+
+  /*
+  Modify a Um
+  Type:   POST
+  Route:  '/api/modifyUm'
+  Body:   {
+            fields: [ 'id', 'name', 'metric', 'imperial', 'gain', '"offset"'],
+            values: [ 1, 'm_ft', 'm', 'ft', 3.28084, 0]
+          }
+  Query:
+          UPDATE "um" SET (name = "m_ft", metric = "m", imperial = "ft", gain = 3.28084, "offset" = 0) WHERE id = 1;
+  */      
+
+  app.post('/api/modifyUm', (req, res) => {
+    var id = req.body.values[0]
+    var name = `"${req.body.values[1]}"`
+    var metric = `"${req.body.values[2]}"`
+    var imperial = `"${req.body.values[3]}"`
+    var gain = req.body.values[4]
+    var offset = req.body.values[5]
+    var queryString = `UPDATE "um" SET (name=${name}, metric=${metric}, imperial=${imperial}, gain=${gain}, offset=${offset}) WHERE id = ${id}`
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then(data => { res.json({result: data.rows[0], message: "Um inserted"}) })
+    .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
+  })
+
+
+  /*
+  Delete a um
+  Type:   POST
+  Route:  '/api/removeUm'
+  Body:   { id: 126 }
+  Query:  DELETE FROM "um" WHERE "id" = 126
+  Event:  {
+            operation: 'DELETE',
+            table: 'um',
+            data: { id: 126, name: 'm_ft' .... }
+          }
+  Res:    200
+  Err:    400
+  */
+  app.post('/api/removeUm', (req, res) => {
+    var queryString=`DELETE FROM "Um" WHERE id = ${req.body.id};`
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then(data=>{
+      res.json({result: data.rows, message: "Record correctly removed from table \"" + req.body.table + "\" "})
+    })
+    .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
+  })
 }

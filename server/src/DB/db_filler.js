@@ -17,7 +17,7 @@ module.exports = function () {
     CREATE TABLE IF NOT EXISTS public."Tag"
     (
       id SERIAL PRIMARY KEY,
-      name text COLLATE pg_catalog."default" NOT NULL UNIQUE,
+      name text COLLATE pg_catalog."default" NOT NULL,
       var integer NOT NULL,
       parent_tag integer,
       type_field integer,
@@ -29,7 +29,7 @@ module.exports = function () {
     CREATE TABLE IF NOT EXISTS public."Type"
     (
       id SERIAL PRIMARY KEY,
-      name text NOT NULL,
+      name text COLLATE pg_catalog."default" NOT NULL,
       base_type bool NOT NULL
     );
     
@@ -38,7 +38,19 @@ module.exports = function () {
     (
       id SERIAL PRIMARY KEY,
       type integer NOT NULL,
-      name text COLLATE pg_catalog."default" NOT NULL UNIQUE
+      name text COLLATE pg_catalog."default" NOT NULL,
+      um integer
+    );
+    
+
+    CREATE TABLE IF NOT EXISTS public."um"
+    (
+      id SERIAL PRIMARY KEY,
+      name text COLLATE pg_catalog."default" NOT NULL,
+      metric text COLLATE pg_catalog."default" NOT NULL,
+      imperial text COLLATE pg_catalog."default" NOT NULL,
+      gain real NOT NULL,
+      "offset" real NOT NULL
     );
     
 
@@ -103,8 +115,19 @@ module.exports = function () {
         REFERENCES public."Type" (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
+        NOT VALID,
+      DROP CONSTRAINT IF EXISTS var_um_id,
+      ADD CONSTRAINT var_um_id FOREIGN KEY (um)
+        REFERENCES public."um" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
         NOT VALID;
-  
+
+
+    ALTER TABLE IF EXISTS public."um"
+      DROP CONSTRAINT IF EXISTS unique_um_name,
+      ADD CONSTRAINT unique_um_name UNIQUE (name);
+
   
     ALTER SEQUENCE IF EXISTS public."Type_id_seq"
       START 100;
@@ -113,6 +136,10 @@ module.exports = function () {
     ALTER SEQUENCE IF EXISTS public."Field_id_seq"
       START 100;
     --SELECT setval('public."Field_id_seq"', 99, true);
+
+    ALTER SEQUENCE IF EXISTS public."um_id_seq"
+      START 100;
+    --SELECT setval('public."um_id_seq"', 99, true);
 
     INSERT INTO "Type"(id,name,base_type) VALUES (1, 'Real', true) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "Type"(id,name,base_type) VALUES (2, 'Text', true) ON CONFLICT (name) DO NOTHING;
@@ -137,6 +164,11 @@ module.exports = function () {
     INSERT INTO "Field"(id, name, type, parent_type) VALUES (10, 'Set', 5, 10) ON CONFLICT (name, parent_type) DO NOTHING;
     INSERT INTO "Field"(id, name, type, parent_type) VALUES (11, 'Act', 6, 10) ON CONFLICT (name, parent_type) DO NOTHING;
     INSERT INTO "Field"(id, name, type, parent_type) VALUES (12, 'Limit', 7, 10) ON CONFLICT (name, parent_type) DO NOTHING;
+    
+    INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (1, 'm_ft', 'm', 'ft', 3.28084, 0) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (2, '°C_°F', '°C', '°F', 1.8, 32) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (3, '°Bar_psi', 'Bar', 'psi', 14.5038, 0) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (4, 'W_W', 'W', 'W', 1.0, 0) ON CONFLICT (name) DO NOTHING;
 
     -- triggers function
     -- FUNCTION: public.return_data()
