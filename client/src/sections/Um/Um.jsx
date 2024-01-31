@@ -19,7 +19,7 @@ function Um () {
     //Socket listeners callbacks definition
     //on connect
     const um_on_connect = () => {
-      axios.post('http://localhost:3001/api/getAll', {table: "um", fields:["id", "name", "metric", "imperial", "gain", '"offset"']})
+      axios.post('http://localhost:3001/api/getAll', {table: "um", fields:['id', 'name', 'metric', 'imperial', 'gain', '"offset"']})
         .then(response => {
           setUmsList(response.data.result.map((val) => ({id:val[0], name:val[1], metric:val[2], imperial:val[3], gain:val[4], offset:val[5]})))
           setInit((prevState) => ({ ...prevState, um: true}))
@@ -56,7 +56,7 @@ function Um () {
 
     //On component load request the lists
     if(init.um === false){
-      axios.post('http://localhost:3001/api/getAll', {table: "um", fields:["id", "name", "metric", "imperial", "gain", '"offset"']})
+      axios.post('http://localhost:3001/api/getAll', {table: "um", fields:['id', 'name', 'metric', 'imperial', 'gain', '"offset"']})
         .then(response => {
           setUmsList(response.data.result.map((val) => ({id:val[0], name:val[1], metric:val[2], imperial:val[3], gain:val[4], offset:val[5]})))
           setInit((prevState) => ({ ...prevState, um: true}))

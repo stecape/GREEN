@@ -17,13 +17,15 @@ function VarsList (props) {
 
   const [varsList, setVarsList] = useState(props.varsList)
   const [typesList, setTypesList] = useState(props.typesList)
+  const [umsList, setUmsList] = useState(props.umsList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
-  const [modifyVarPopup, setModifyVarPopup] = useState({ visible: false, id: 0, type: 0, name: '' })
+  const [modifyVarPopup, setModifyVarPopup] = useState({ visible: false, id: 0, type: 0, um: 0, name: '' })
   const [createVarPopup, setCreateVarPopup] = useState({ visible: false })
   useEffect(() => {
     setVarsList(props.varsList)
     setTypesList(props.typesList)
-  }, [props.varsList, props.typesList])
+    setUmsList(props.umsList)
+  }, [props.varsList, props.typesList, props.umsList])
 
   return(
     <>
@@ -38,14 +40,16 @@ function VarsList (props) {
         </TableHeader>
         <TableBody>
           {varsList.map((item) => {
+            console.log(item)
               var typeItem = typesList.find(i => i.id === item.type)
+              var umItem = umsList.find(i => i.id === item.um)
               return (
                 <TableRow
                   key={item.id}
                 >
                   <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
                   <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
-                  <TableCell className={tableStyles.cell}></TableCell>
+                  <TableCell className={tableStyles.cell}>{umItem !== undefined ? umItem.name : item.um}</TableCell>
                   <TableCell className={tableStyles.cell}>
                     <Button
                       id="icon-button-4"
@@ -60,7 +64,7 @@ function VarsList (props) {
                       id="icon-button-4"
                       buttonType="icon"
                       aria-label="Edit"
-                      onClick={()=> setModifyVarPopup({visible: true, id: item.id, type: item.type, name: item.name})}
+                      onClick={()=> setModifyVarPopup({visible: true, id: item.id, type: item.type, um: item.um, name: item.name})}
                     >
                       <EditSVGIcon />
                     </Button>
@@ -89,10 +93,12 @@ function VarsList (props) {
         visible={modifyVarPopup.visible}
         name={modifyVarPopup.name}
         type={modifyVarPopup.type}
+        um={modifyVarPopup.um}
         modalType="full-page"
         typesList={typesList}
+        umsList={umsList}
         upsertVar={(data)=>{
-          axios.post('http://localhost:3001/api/modifyVar', {id: modifyVarPopup.id, name: data.name, type: data.type})
+          axios.post('http://localhost:3001/api/modifyVar', {id: modifyVarPopup.id, name: data.name, type: data.type, um: data.um})
             .then(setModifyVarPopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
@@ -104,8 +110,10 @@ function VarsList (props) {
         create
         name=""
         type="0"
+        um="0"
         modalType="full-page"
         typesList={typesList}
+        umsList={umsList}
         upsertVar={(data)=>{
           axios.post('http://localhost:3001/api/addVar', data)
             .then(setCreateVarPopup((prevState) => ({ ...prevState, visible: false })))

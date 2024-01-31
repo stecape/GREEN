@@ -17,7 +17,7 @@ function UmList (props) {
 
   const [umsList, setUmsList] = useState(props.umsList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
-  const [modifyUmPopup, setModifyUmPopup] = useState({ visible: false, id: 0, name: '' })
+  const [modifyUmPopup, setModifyUmPopup] = useState({ visible: false, id: 0, name: '', metric: '', imperial: '', gain: 1.0, offset: 0.0})
   const [createUmPopup, setCreateUmPopup] = useState({ visible: false })
   useEffect(() => {
     setUmsList(props.umsList)
@@ -61,7 +61,7 @@ function UmList (props) {
                       id="icon-button-4"
                       buttonType="icon"
                       aria-label="Edit"
-                      onClick={()=> setModifyUmPopup({visible: true, id: item.id, name: item.name})}
+                      onClick={()=> setModifyUmPopup({visible: true, id: item.id, name: item.name, metric: item.metric, imperial: item.imperial, gain: item.gain, offset: item.offset})}
                     >
                       <EditSVGIcon />
                     </Button>
@@ -79,7 +79,7 @@ function UmList (props) {
         visible={deletePopup.visible}
         name={deletePopup.name}
         delUm={()=>{
-          axios.post('http://localhost:3001/api/removeVar', {id: deletePopup.id})
+          axios.post('http://localhost:3001/api/removeUm', {id: deletePopup.id})
             .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
@@ -89,10 +89,13 @@ function UmList (props) {
       <UpsertUmPopup 
         visible={modifyUmPopup.visible}
         name={modifyUmPopup.name}
-        type={modifyUmPopup.type}
+        metric={modifyUmPopup.metric}
+        imperial={modifyUmPopup.imperial}
+        gain={modifyUmPopup.gain}
+        offset={modifyUmPopup.offset}
         modalType="full-page"
         upsertUm={(data)=>{
-          axios.post('http://localhost:3001/api/modifyVar', {id: modifyUmPopup.id, name: data.name})
+          axios.post('http://localhost:3001/api/modifyUm', {...data, id: modifyUmPopup.id})
             .then(setModifyUmPopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
@@ -103,9 +106,13 @@ function UmList (props) {
         visible={createUmPopup.visible}
         create
         name=""
+        metric=""
+        imperial=""
+        gain={1.0}
+        offset={0.0}
         modalType="full-page"
         upsertUm={(data)=>{
-          axios.post('http://localhost:3001/api/addVar', data)
+          axios.post('http://localhost:3001/api/addUm', data)
             .then(setCreateUmPopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{

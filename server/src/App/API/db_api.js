@@ -105,6 +105,7 @@ module.exports = function (app, pool) {
   */
   app.post('/api/getAll', (req, res) => {
     var queryString=`SELECT ${req.body.fields.join(',')} FROM "${req.body.table}" ORDER BY id ASC`
+    console.log(queryString)
     pool.query({
       text: queryString,
       rowMode: 'array'
@@ -387,6 +388,7 @@ module.exports = function (app, pool) {
     var varId, typesList, fieldsList
     var varName = req.body.name
     var varType = req.body.type
+    var varUm = req.body.um
     //Retreiving the typesList
     var queryString = `SELECT * from "Type"`
     pool.query({
@@ -404,7 +406,7 @@ module.exports = function (app, pool) {
       .then(data => {  
         fieldsList = data.rows 
         //Inserting the Var
-        queryString = `INSERT INTO "Var" (id, name, type) VALUES (DEFAULT, '${varName}', ${varType}) RETURNING "id"`
+        queryString = `INSERT INTO "Var" (id, name, type, um) VALUES (DEFAULT, '${varName}', ${varType}, ${varUm}) RETURNING "id"`
         pool.query({
           text: queryString,
           rowMode: 'array'
@@ -447,6 +449,7 @@ module.exports = function (app, pool) {
     var varId, typesList, fieldsList
     var varName = req.body.name
     var varType = req.body.type
+    var varUm = req.body.um
     //Delete old tags
     var queryString = `SELECT * from "Type"`
     pool.query({
@@ -464,7 +467,7 @@ module.exports = function (app, pool) {
       .then(data => {  
         fieldsList = data.rows 
         //Inserting the Var
-        queryString=`UPDATE "Var" SET name = '${varName}', type = ${varType} WHERE id = ${req.body.id}`
+        queryString=`UPDATE "Var" SET name = '${varName}', type = ${varType}, um = ${varUm} WHERE id = ${req.body.id}`
         pool.query({
           text: queryString,
           rowMode: 'array'
@@ -594,12 +597,7 @@ module.exports = function (app, pool) {
   */
 
   app.post('/api/addUm', (req, res) => {
-    var name = `"${req.body.values[0]}"`
-    var metric = `"${req.body.values[1]}"`
-    var imperial = `"${req.body.values[2]}"`
-    var gain = req.body.values[3]
-    var offset = req.body.values[4]
-    var queryString = `INSERT INTO "um" (id,${req.body.fields.join(',')}) VALUES (DEFAULT,${name},${metric},${imperial},${gain},${offset})`
+    var queryString = `INSERT INTO "um" (id, name, metric, imperial, gain, "offset") VALUES (DEFAULT,'${req.body.name}','${req.body.metric}','${req.body.imperial}',${req.body.gain},${req.body.offset})`
     pool.query({
       text: queryString,
       rowMode: 'array'
@@ -622,18 +620,13 @@ module.exports = function (app, pool) {
   */      
 
   app.post('/api/modifyUm', (req, res) => {
-    var id = req.body.values[0]
-    var name = `"${req.body.values[1]}"`
-    var metric = `"${req.body.values[2]}"`
-    var imperial = `"${req.body.values[3]}"`
-    var gain = req.body.values[4]
-    var offset = req.body.values[5]
-    var queryString = `UPDATE "um" SET (name=${name}, metric=${metric}, imperial=${imperial}, gain=${gain}, offset=${offset}) WHERE id = ${id}`
+    var queryString = `UPDATE "um" SET name='${req.body.name}', metric='${req.body.metric}', imperial='${req.body.imperial}', gain=${req.body.gain}, "offset"=${req.body.offset} WHERE id = ${req.body.id}`
+    console.log(queryString)
     pool.query({
       text: queryString,
       rowMode: 'array'
     })
-    .then(data => { res.json({result: data.rows[0], message: "Um inserted"}) })
+    .then(data => { res.json({result: data.rows[0], message: "Um updated"}) })
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
   })
 
@@ -653,7 +646,7 @@ module.exports = function (app, pool) {
   Err:    400
   */
   app.post('/api/removeUm', (req, res) => {
-    var queryString=`DELETE FROM "Um" WHERE id = ${req.body.id};`
+    var queryString=`DELETE FROM "um" WHERE id = ${req.body.id};`
     pool.query({
       text: queryString,
       rowMode: 'array'

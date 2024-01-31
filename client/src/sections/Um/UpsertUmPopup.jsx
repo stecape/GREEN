@@ -14,12 +14,18 @@ import formStyles from '../../styles/Form.module.scss'
 
 function UpsertUmPopup (props) {
 
-  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType})
+  const [modalState, setModalState] = useState({ visible: false, name: '', metric: '', imperial: '', gain: 1.0, offset: 0.0, modalType: props.modalType})
   
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.upsertUm({name:modalState.name})
+    props.upsertUm({
+      name: modalState.name,
+      metric: modalState.metric,
+      imperial: modalState.imperial,
+      gain: modalState.gain,
+      offset: modalState.offset
+    })
     setModalState((prevState) => ({ ...prevState, name: ""}))
   }
   const handleReset = () => {
@@ -28,8 +34,8 @@ function UpsertUmPopup (props) {
   }
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, visible: props.visible}))
-  },[props.name, props.visible])
+    setModalState((prevState) => ({ ...prevState, name: props.name, metric: props.metric, imperial: props.imperial, gain: props.gain, offset: props.offset, visible: props.visible}))
+  },[props.name, props.metric, props.imperial, props.gain, props.offset, props.visible])
   
   return (
     <Dialog
@@ -62,7 +68,42 @@ function UpsertUmPopup (props) {
                       value={modalState.name}
                       onChange={(e) => setModalState((prevState) => ({ ...prevState, name: e.target.value}))}
                     />
-                    
+                    <TextField
+                      id='metric'
+                      key='metric'
+                      type='string'
+                      label='Metric'
+                      className={formStyles.item}
+                      value={modalState.metric}
+                      onChange={(e) => setModalState((prevState) => ({ ...prevState, metric: e.target.value}))}
+                    />
+                    <TextField
+                      id='imperial'
+                      key='imperial'
+                      type='string'
+                      label='Imperial'
+                      className={formStyles.item}
+                      value={modalState.imperial}
+                      onChange={(e) => setModalState((prevState) => ({ ...prevState, imperial: e.target.value}))}
+                    />
+                    <TextField
+                      id='gain'
+                      key='gain'
+                      type='number'
+                      label='Gain'
+                      className={formStyles.item}
+                      value={Number(modalState.gain)}
+                      onChange={(e) => setModalState((prevState) => ({ ...prevState, gain: e.target.value}))}
+                    />
+                    <TextField
+                      id='offset'
+                      key='offset'
+                      type='number'
+                      label='Offset'
+                      className={formStyles.item}
+                      value={Number(modalState.offset)}
+                      onChange={(e) => setModalState((prevState) => ({ ...prevState, offset: e.target.value}))}
+                    />
                     <div className={formStyles.btn_container}>
                       <Button
                         type="submit"

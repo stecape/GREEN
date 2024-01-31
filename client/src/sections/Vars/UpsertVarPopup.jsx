@@ -15,22 +15,22 @@ import formStyles from '../../styles/Form.module.scss'
 
 function UpsertVarPopup (props) {
 
-  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: 0, typesList: props.typesList })
+  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: 0, um: 0, typesList: props.typesList, umsList: props.umsList })
   
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.upsertVar({name:modalState.name, type: modalState.type})
-    setModalState((prevState) => ({ ...prevState, name: "", type: 0}))
+    props.upsertVar({name:modalState.name, type: modalState.type, um: modalState.um})
+    setModalState((prevState) => ({ ...prevState, name: "", type: 0, um: 0}))
   }
   const handleReset = () => {
-    setModalState((prevState) => ({ ...prevState, name: "", type: 0}))
+    setModalState((prevState) => ({ ...prevState, name: "", type: 0, um: 0}))
     props.cancelCommand()
   }
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, visible: props.visible, typesList: props.typesList}))
-  },[props.name, props.visible, props.type, props.typesList])
+    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, visible: props.visible, typesList: props.typesList, umsList: props.umsList}))
+  },[props.name, props.visible, props.type, props.um, props.umsList, props.typesList])
   
   return (
     <Dialog
@@ -75,6 +75,19 @@ function UpsertVarPopup (props) {
                     label="Var Type"
                     className={formStyles.item}
                     onChange={(value) => setModalState((prevState) => ({ ...prevState, type: Number(value)}))}
+                  />
+                  <Select
+                    id='um'
+                    key='um'
+                    options={modalState.umsList.map((item) => ({
+                      label: item.name,
+                      value: item.id
+                    }))}
+                    value={modalState.um.toString()}
+                    placeholder="Choose..."
+                    label="um"
+                    className={formStyles.item}
+                    onChange={(value) => setModalState((prevState) => ({ ...prevState, um: Number(value)}))}
                   />
                     <div className={formStyles.btn_container}>
                       <Button

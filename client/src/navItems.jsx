@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { LayoutNavigationItem, LayoutNavigationTree } from "@react-md/layout";
-import { HomeSVGIcon, AllInclusiveSVGIcon, AllOutSVGIcon, SettingsInputComponentSVGIcon } from "@react-md/material-icons";
+import { HomeSVGIcon, AllInclusiveSVGIcon, AllOutSVGIcon, SettingsInputComponentSVGIcon, TransformSVGIcon } from "@react-md/material-icons";
 
 /**
  * Note: The `parentId` **must** be defaulted to `null` for the navigation tree
@@ -26,7 +26,7 @@ function createRoute(
 const navItems: LayoutNavigationTree = {
   "/": createRoute("/", "Home", <HomeSVGIcon />),
   "/types": createRoute("/types", "Types", <AllOutSVGIcon />),
-  "/um": createRoute("/um", "um", <SettingsInputComponentSVGIcon />),
+  "/um": createRoute("/um", "um", <TransformSVGIcon />),
   "/vars": createRoute("/vars", "Vars", <AllInclusiveSVGIcon />),
   "/tags": createRoute("/tags", "Tags", <SettingsInputComponentSVGIcon />),
 };

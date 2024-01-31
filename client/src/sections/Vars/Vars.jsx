@@ -12,7 +12,8 @@ function Vars () {
   const addMessage = useAddMessage()
   const [varsList, setVarsList] = useState([])
   const [typesList, setTypesList] = useState([])
-  const [init, setInit] = useState({types: false, vars: false})
+  const [umsList, setUmsList] = useState([])
+  const [init, setInit] = useState({types: false, vars: false, ums: false})
 
   //State management
   useEffect(() => {
@@ -25,9 +26,15 @@ function Vars () {
           setTypesList(response.data.result.map((val) => ({name:val[0], id:val[1]})))
           setInit((prevState) => ({ ...prevState, types: true}))
         })
-      axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:["name", "type", "id"]})
+      axios.post('http://localhost:3001/api/getAll', {table: "um", fields:['id', 'name', 'metric', 'imperial', 'gain', '"offset"']})
         .then(response => {
-          setVarsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
+          setUmsList(response.data.result.map((val) => ({id:val[0], name:val[1], metric:val[2], imperial:val[3], gain:val[4], offset:val[5]})))
+          setInit((prevState) => ({ ...prevState, ums: true}))
+          addMessage({children: response.data.message})
+        })
+      axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:["name", "type", "um", "id"]})
+        .then(response => {
+          setVarsList(response.data.result.map((val) => ({name:val[0], type:val[1], um:val[2], id:val[3]})))
           setInit((prevState) => ({ ...prevState, vars: true}))
         })
     }
@@ -45,6 +52,11 @@ function Vars () {
         var types = typesList
         types.push(value.data)
         setTypesList([...types])
+      }
+      if (value.table === "um" && value.operation === 'INSERT') {
+        var ums = umsList
+        ums.push(value.data)
+        setUmsList([...ums])
       }
       else if (value.table === "Var" && value.operation === 'INSERT') {
         var vars = varsList
@@ -73,10 +85,18 @@ function Vars () {
           setInit((prevState) => ({ ...prevState, types: true}))
         })
     }
-    if(init.vars === false){
-      axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:["name", "type", "id"]})
+    if(init.ums === false){
+      axios.post('http://localhost:3001/api/getAll', {table: "um", fields:['id', 'name', 'metric', 'imperial', 'gain', '"offset"']})
         .then(response => {
-          setVarsList(response.data.result.map((val) => ({name:val[0], type:val[1], id:val[2]})))
+          setUmsList(response.data.result.map((val) => ({id:val[0], name:val[1], metric:val[2], imperial:val[3], gain:val[4], offset:val[5]})))
+          setInit((prevState) => ({ ...prevState, ums: true}))
+          addMessage({children: response.data.message})
+        })
+    }
+    if(init.vars === false){
+      axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:["name", "type", "um", "id"]})
+        .then(response => {
+          setVarsList(response.data.result.map((val) => ({name:val[0], type:val[1], um:val[2], id:val[3]})))
           setInit((prevState) => ({ ...prevState, vars: true}))
           addMessage({children: response.data.message})
         })
@@ -97,12 +117,12 @@ function Vars () {
       socket.off("error", vars_on_error)
       socket.off("update", vars_on_update)
     }
-  },[init, varsList, typesList, socket, addMessage])
+  },[init, varsList, typesList, umsList, socket, addMessage])
   return (
   <>
   <Grid>
     <GridCell colSpan={12} className={gridStyles.item}>
-      <VarsList typesList={typesList} varsList={varsList}/>
+      <VarsList varsList={varsList} typesList={typesList} umsList={umsList}/>
     </GridCell>
   </Grid>
   </>
