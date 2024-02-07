@@ -27,6 +27,7 @@ const navItems: LayoutNavigationTree = {
   "/": createRoute("/", "Home", <HomeSVGIcon />),
   "/types": createRoute("/types", "Types", <AllOutSVGIcon />),
   "/um": createRoute("/um", "um", <TransformSVGIcon />),
+  "/logicState": createRoute("/logicState", "Logic State", <TransformSVGIcon />),
   "/vars": createRoute("/vars", "Vars", <AllInclusiveSVGIcon />),
   "/tags": createRoute("/tags", "Tags", <SettingsInputComponentSVGIcon />),
 };

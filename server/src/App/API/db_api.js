@@ -656,4 +656,82 @@ module.exports = function (app, pool) {
     })
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
   })
+
+        
+  /*
+  Add a LogicState
+  Type:   POST
+  Route:  '/api/addLogicState'
+  Body:   {
+            fields: [ 'name', 'metric', 'imperial', 'gain', '"offset"'],
+            values: [ 'm_ft', 'm', 'ft', 3.28084, 0]
+          }
+  Query:
+          INSERT INTO "um" (name, value) VALUES ('m_ft', 'm', 'ft', 3.28084, 0);
+  */
+
+  app.post('/api/addLogicState', (req, res) => {
+    var queryString = `INSERT INTO "LogicState" (id, name, value) VALUES (DEFAULT,'${req.body.name}','${req.body.value}')`
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then(data => { res.json({result: data.rows[0], message: "LogicState inserted"}) })
+    .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
+  })
+
+
+  /*
+  Modify a LogicState
+  Type:   POST
+  Route:  '/api/modifyLogicState'
+  Body:   {
+            fields: [ 'id', 'name', 'metric', 'imperial', 'gain', '"offset"'],
+            values: [ 1, 'm_ft', 'm', 'ft', 3.28084, 0]
+          }
+  Query:
+          UPDATE "um" SET (name = "m_ft", metric = "m", imperial = "ft", gain = 3.28084, "offset" = 0) WHERE id = 1;
+  */      
+
+  app.post('/api/modifyLogicState', (req, res) => {
+    var queryString = `UPDATE "LogicState" SET name='${req.body.name}', value='${req.body.value}' WHERE id = ${req.body.id}`
+    console.log(queryString)
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then(data => { res.json({result: data.rows[0], message: "Logic State updated"}) })
+    .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
+  })
+
+
+  /*
+  Delete a LogicState
+  Type:   POST
+  Route:  '/api/removeLogicState'
+  Body:   { id: 126 }
+  Query:  DELETE FROM "um" WHERE "id" = 126
+  Event:  {
+            operation: 'DELETE',
+            table: 'um',
+            data: { id: 126, name: 'm_ft' .... }
+          }
+  Res:    200
+  Err:    400
+  */
+  app.post('/api/removeLogicState', (req, res) => {
+    var queryString=`DELETE FROM "LogicState" WHERE id = ${req.body.id};`
+    pool.query({
+      text: queryString,
+      rowMode: 'array'
+    })
+    .then(data=>{
+      res.json({result: data.rows, message: "Record correctly removed from LogicState "})
+    })
+    .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
+  })
+
+
+
+
 }

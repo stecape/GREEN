@@ -54,6 +54,14 @@ module.exports = function () {
     );
     
 
+    CREATE TABLE IF NOT EXISTS public."LogicState"
+    (
+        id integer NOT NULL,
+        name text COLLATE pg_catalog."default" NOT NULL,
+        value text[] COLLATE pg_catalog."default" NOT NULL,
+        CONSTRAINT "LogicState_pkey" PRIMARY KEY (id)
+    );
+
     CREATE UNIQUE INDEX ui_field_name_and_parent_type 
       ON public."Field" (name, parent_type);
 
@@ -128,6 +136,11 @@ module.exports = function () {
       DROP CONSTRAINT IF EXISTS unique_um_name,
       ADD CONSTRAINT unique_um_name UNIQUE (name);
 
+
+    ALTER TABLE IF EXISTS public."LogicState"
+      DROP CONSTRAINT IF EXISTS unique_LogicState_name,
+      ADD CONSTRAINT unique_LogicState_name UNIQUE (name);
+
   
     ALTER SEQUENCE IF EXISTS public."Type_id_seq"
       START 100;
@@ -140,6 +153,10 @@ module.exports = function () {
     ALTER SEQUENCE IF EXISTS public."um_id_seq"
       START 100;
     --SELECT setval('public."um_id_seq"', 99, true);
+
+    ALTER SEQUENCE IF EXISTS public."LogicStatus_id_seq"
+      START 100;
+    --SELECT setval('public."LogicStatus_id_seq"', 99, true);
 
     INSERT INTO "Type"(id,name,base_type) VALUES (1, 'Real', true) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "Type"(id,name,base_type) VALUES (2, 'Text', true) ON CONFLICT (name) DO NOTHING;
