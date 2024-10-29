@@ -35,18 +35,18 @@ function LogicState () {
     //on update
     const logicState_on_update = (...args) => {
       const value = args[0]
-      if (value.table === "LogicStates" && value.operation === 'INSERT') {
+      if (value.table === "LogicState" && value.operation === 'INSERT') {
         var LogicStates = logicStatesList
         LogicStates.push(value.data)
         setLogicStatesList([...LogicStates])
       }
-      else if (value.table === "LogicStates" && value.operation === 'DELETE') {
+      else if (value.table === "LogicState" && value.operation === 'DELETE') {
         setLogicStatesList([...logicStatesList.filter(i => i.id !== value.data.id)])
       }
-      else if (value.table === "LogicStates" && value.operation === 'TRUNCATE') {
+      else if (value.table === "LogicState" && value.operation === 'TRUNCATE') {
         setLogicStatesList([...[]])
       }
-      else if (value.table === "LogicStates" && value.operation === 'UPDATE') {
+      else if (value.table === "LogicState" && value.operation === 'UPDATE') {
         var updLogicStates = logicStatesList
         var index = updLogicStates.findIndex(i => i.id === value.data.id)
         updLogicStates[index] = value.data
@@ -55,7 +55,7 @@ function LogicState () {
     }
 
     //On component load request the lists
-    if(init.LogicStates === false){
+    if(init.logicState === false){
       axios.post('http://localhost:3001/api/getAll', {table: "LogicState", fields:['id', 'name', 'value']})
         .then(response => {
           setLogicStatesList(response.data.result.map((val) => ({id:val[0], name:val[1], value:val[2]})))

@@ -15,7 +15,7 @@ import formStyles from '../../styles/Form.module.scss'
 
 function UpsertVarPopup (props) {
 
-  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: 0, um: 0, typesList: props.typesList, umsList: props.umsList })
+  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: 0, um: 0, logic_state: 0, typesList: props.typesList, umsList: props.umsList })
   
   //Form Events
   const handleSubmit = (event) => {
@@ -29,8 +29,8 @@ function UpsertVarPopup (props) {
   }
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, visible: props.visible, typesList: props.typesList, umsList: props.umsList}))
-  },[props.name, props.visible, props.type, props.um, props.umsList, props.typesList])
+    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, logic_state: props.logic_state, visible: props.visible, typesList: props.typesList, umsList: props.umsList, logic_stateList: props.logic_stateList}))
+  },[props.name, props.visible, props.type, props.um, props.logic_state, props.umsList, props.logic_stateList, props.typesList])
   
   return (
     <Dialog

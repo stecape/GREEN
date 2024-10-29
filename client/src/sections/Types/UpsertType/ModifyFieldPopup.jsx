@@ -10,7 +10,7 @@ import {
 } from '@react-md/form'
 
 function ModifyFieldPopup (props) {
-  const [modalState, setModalState] = useState({ visible: false, name: '', type: 0, fieldNameNotValid: false })
+  const [modalState, setModalState] = useState({ visible: false, name: '', type: 0, um: 0, logic_state: 0, fieldNameNotValid: false })
 
   //Input Validation
   const InlineValidation = (value) => {
@@ -21,7 +21,7 @@ function ModifyFieldPopup (props) {
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.updField({name: modalState.name, type: modalState.type})
+    props.updField({name: modalState.name, type: modalState.type, um: modalState.um})
   }
   const handleReset = (event) => {
     event.preventDefault()
@@ -29,8 +29,8 @@ function ModifyFieldPopup (props) {
   }
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, visible: props.visible}))
-  },[props.name, props.visible, props.type])
+    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, logic_state: props.logic_state, visible: props.visible}))
+  },[props.name, props.visible, props.type, props.um, props.logic_state])
   
   return (
     <Dialog
@@ -71,6 +71,28 @@ function ModifyFieldPopup (props) {
               value={modalState.type.toString()}
               label="Type"
               onChange={(value) => setModalState((prevState) => ({ ...prevState, type: Number(value)}))}
+            />
+            <Select
+              id='um'
+              key='um'
+              options={[]}/* {props.umList.map((item) => ({
+                label: item.name,
+                value: item.id
+              }))}*/
+              value={modalState.um.toString()}
+              label="um"
+              onChange={(value) => setModalState((prevState) => ({ ...prevState, um: Number(value)}))}
+            />
+            <Select
+              id='logic_state'
+              key='logic_state'
+              options={[]}/* {props.logicStateList.map((item) => ({
+                label: item.name,
+                value: item.id
+              }))}*/
+              value={modalState.logic_state.toString()}
+              label="Logic State"
+              onChange={(value) => setModalState((prevState) => ({ ...prevState, logic_state: Number(value)}))}
             />
           </DialogContent>
           <DialogFooter>

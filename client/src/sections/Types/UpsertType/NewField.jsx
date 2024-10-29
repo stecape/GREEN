@@ -14,6 +14,8 @@ function NewField () {
   const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [name, setName] = useState("")
   const [type, setType] = useState(0)
+  const [um, setUm] = useState(0)
+  const [logic_state, setLogicState] = useState(0)
 
   //Input Validation
   const InlineNameValidation = (value) => {
@@ -48,18 +50,20 @@ function NewField () {
       var QRef = Date.now()
       setUpsertType((prevState) => ({
         ...prevState, 
-        fields: [...upsertType.fields, { type: type, name: name, QRef: QRef }],
-        insertQuery: [...upsertType.insertQuery, {query: `INSERT into "Field" (id, name, type, parent_type) VALUES (DEFAULT, '${name}', ${type}, typeId);`, QRef: QRef}]}), handleReset()
+        fields: [...upsertType.fields, { type: type, name: name, um: um, logic_state: logic_state, QRef: QRef }],
+        insertQuery: [...upsertType.insertQuery, {query: `INSERT into "Field" (id, name, type, um, logic_state, parent_type) VALUES (DEFAULT, '${name}', ${type}, ${um !== 0 ? um : 'NULL'}, ${logic_state !== 0 ? logic_state : 'NULL'}, typeId);`, QRef: QRef}]}), handleReset()
       )
     }
   }
-  
+
   //Form Events
   const handleReset = () => {
     setName("")
-    setType({id: 0, name: ''})
+    setType(0)
+    setUm(0)
+    setLogicState(0)
   }
-
+  
   return(
     <div className={formStyles.container}>
     <FormThemeProvider theme='outline'>
@@ -75,20 +79,48 @@ function NewField () {
           error={upsertType.fieldNameNotValid}
         />
         <Select
-        id='field-type1'
-        key='field-type1'
-        options={upsertType.typesList.map((item) => ({
-          label: item.name,
-          value: item.id
-        }))}
-        value={type.toString()}
-        placeholder="Choose..."
-        label="Field Type"
-        className={formStyles.item}
-        autoComplete="both"
-        onChange={(value) => InlineTypeValidation(value)}
-        error={upsertType.fieldTypeNotValid}
-      />
+          id='field-type1'
+          key='field-type1'
+          options={upsertType.typesList.map((item) => ({
+            label: item.name,
+            value: item.id
+          }))}
+          value={type.toString()}
+          placeholder="Choose..."
+          label="Field Type"
+          className={formStyles.item}
+          autoComplete="both"
+          onChange={(value) => InlineTypeValidation(value)}
+          error={upsertType.fieldTypeNotValid}
+        />
+        <Select
+          id='field-um'
+          key='field-um'
+          options= {upsertType.umList.map((item) => ({
+            label: item.name,
+            value: item.id
+          }))}
+          value={um.toString()}
+          placeholder="Choose..."
+          label="Field um"
+          className={formStyles.item}
+          autoComplete="both"
+          onChange={(value) => setUm(Number(value))}
+        />
+        <Select
+          id='field-logic_state'
+          key='field-logic_state'
+          options= {upsertType.logic_stateList.map((item) => ({
+            label: item.name,
+            value: item.id
+          }))}
+          value={logic_state.toString()}
+          placeholder="Choose..."
+          label="Field logic state"
+          className={formStyles.item}
+          autoComplete="both"
+          onChange={(value) => setLogicState(Number(value))}
+        />
         <div className={formStyles.btn_container}>
           <Button
             type="submit"

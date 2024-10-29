@@ -10,7 +10,9 @@ module.exports = function () {
       id SERIAL PRIMARY KEY,
       name text COLLATE pg_catalog."default" NOT NULL,
       type integer NOT NULL,
-      parent_type integer NOT NULL
+      parent_type integer NOT NULL,
+      um integer,
+      logic_state integer
     );
     
 
@@ -39,7 +41,8 @@ module.exports = function () {
       id SERIAL PRIMARY KEY,
       type integer NOT NULL,
       name text COLLATE pg_catalog."default" NOT NULL,
-      um integer
+      um integer,
+      logic_state integer
     );
     
 
@@ -56,10 +59,9 @@ module.exports = function () {
 
     CREATE TABLE IF NOT EXISTS public."LogicState"
     (
-        id integer NOT NULL,
+        id SERIAL PRIMARY KEY,
         name text COLLATE pg_catalog."default" NOT NULL,
-        value text[] COLLATE pg_catalog."default" NOT NULL,
-        CONSTRAINT "LogicState_pkey" PRIMARY KEY (id)
+        value text[] COLLATE pg_catalog."default" NOT NULL
     );
 
     CREATE UNIQUE INDEX ui_field_name_and_parent_type 
@@ -77,7 +79,19 @@ module.exports = function () {
         REFERENCES public."Type" (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE NO ACTION
-        NOT VALID,      
+        NOT VALID,
+      DROP CONSTRAINT IF EXISTS field_um_id,
+      ADD CONSTRAINT field_um_id FOREIGN KEY (um)
+        REFERENCES public."um" (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION
+        NOT VALID,
+      DROP CONSTRAINT IF EXISTS field_logic_state_id,
+      ADD CONSTRAINT field_logic_state_id FOREIGN KEY (logic_state)
+        REFERENCES public."LogicState" (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION
+        NOT VALID,     
       DROP CONSTRAINT IF EXISTS unique_field_name_and_parent_type,
       ADD CONSTRAINT unique_field_name_and_parent_type UNIQUE USING INDEX ui_field_name_and_parent_type;
 
@@ -129,6 +143,12 @@ module.exports = function () {
         REFERENCES public."um" (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
+        NOT VALID,
+      DROP CONSTRAINT IF EXISTS var_logic_state_id,
+      ADD CONSTRAINT var_logic_state_id FOREIGN KEY (logic_state)
+        REFERENCES public."LogicState" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
         NOT VALID;
 
 
@@ -154,9 +174,9 @@ module.exports = function () {
       START 100;
     --SELECT setval('public."um_id_seq"', 99, true);
 
-    ALTER SEQUENCE IF EXISTS public."LogicStatus_id_seq"
+    ALTER SEQUENCE IF EXISTS public."LogicState_id_seq"
       START 100;
-    --SELECT setval('public."LogicStatus_id_seq"', 99, true);
+    --SELECT setval('public."LogicState_id_seq"', 99, true);
 
     INSERT INTO "Type"(id,name,base_type) VALUES (1, 'Real', true) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "Type"(id,name,base_type) VALUES (2, 'Text', true) ON CONFLICT (name) DO NOTHING;
@@ -241,6 +261,11 @@ module.exports = function () {
     CREATE OR REPLACE TRIGGER \"UmUpdatingTrigger\" AFTER UPDATE ON \"um\" FOR EACH ROW EXECUTE PROCEDURE return_data();
     CREATE OR REPLACE TRIGGER \"UmDeletingTrigger\" AFTER DELETE ON \"um\" FOR EACH ROW EXECUTE PROCEDURE return_data();
     CREATE OR REPLACE TRIGGER \"UmTruncatingTrigger\" AFTER TRUNCATE ON \"um\" FOR EACH STATEMENT EXECUTE PROCEDURE return_data();
+    -- triggers on LogicState
+    CREATE OR REPLACE TRIGGER \"LogicStateInsertionTrigger\" AFTER INSERT ON \"LogicState\" FOR EACH ROW EXECUTE PROCEDURE return_data();
+    CREATE OR REPLACE TRIGGER \"LogicStateUpdatingTrigger\" AFTER UPDATE ON \"LogicState\" FOR EACH ROW EXECUTE PROCEDURE return_data();
+    CREATE OR REPLACE TRIGGER \"LogicStateDeletingTrigger\" AFTER DELETE ON \"LogicState\" FOR EACH ROW EXECUTE PROCEDURE return_data();
+    CREATE OR REPLACE TRIGGER \"LogicStateTruncatingTrigger\" AFTER TRUNCATE ON \"LogicState\" FOR EACH STATEMENT EXECUTE PROCEDURE return_data();
   `
     pool.query({
       text: queryString

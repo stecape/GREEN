@@ -11,7 +11,7 @@ function Types () {
   const socket = useContext(SocketContext)
   const addMessage = useAddMessage()
   const [typesList, setTypesList] = useState([])
-  const [init, setInit] = useState({types: false, fields: false})
+  const [init, setInit] = useState({types: false, um: false, logic_state: false, fields: false})
 
   //State management
   useEffect(() => {
@@ -85,7 +85,7 @@ function Types () {
   <Grid>
     <GridCell colSpan={12} className={gridStyles.item}>
       <UpsertTypeContextProvider>
-        <TypesList typesList={typesList} />
+        <TypesList typesList={typesList}/>
       </UpsertTypeContextProvider>
     </GridCell>
   </Grid>

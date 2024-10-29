@@ -24,7 +24,7 @@ import { UpsertTypeContext } from './UpsertTypeContext'
 function FieldsList () {
   const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
-  const [modifyFieldPopup, setModifyFieldPopup] = useState({ visible: false, type: 0, name: '', QRef: undefined })
+  const [modifyFieldPopup, setModifyFieldPopup] = useState({ visible: false, type: 0, um: 0, logic_state: 0, name: '', QRef: undefined })
 
   const updateField = (data)=>{
     //we retreive the field to update object from the array of the fileds and his index,
@@ -34,6 +34,8 @@ function FieldsList () {
     var fieldToUpdate = upsertType.fields[fieldToUpdateIndex]
     fieldToUpdate.name = data.name
     fieldToUpdate.type = data.type
+    fieldToUpdate.um = data.um
+    fieldToUpdate.logic_state = data.logic_state
     var fields = upsertType.fields
     fields[fieldToUpdateIndex] = fieldToUpdate
 
@@ -51,14 +53,14 @@ function FieldsList () {
           ...prevState,
           updateQuery: [
             ...upsertType.updateQuery, 
-            {query: `UPDATE "Field" SET name='${data.name}', type=${data.type} WHERE name = '${modifyFieldPopup.name}' AND parent_type = typeId;`, QRef: fieldToUpdate.QRef}
+            {query: `UPDATE "Field" SET name='${data.name}', type=${data.type}, um=${data.um}, logic_state=${data.logic_state} WHERE name = '${modifyFieldPopup.name}' AND parent_type = typeId;`, QRef: fieldToUpdate.QRef}
           ],
           fields: fields
         }), setModifyFieldPopup((prevState) => ({ ...prevState, visible: false })))
       } else {
         //the field is in the insert list. The field has been inserted this round, so it is possible to update the insert query
         newQuery = upsertType.insertQuery
-        newQuery[newQuery.findIndex(i => i.QRef===fieldToUpdate.QRef)] = {query: `INSERT INTO "Field" (id, name, type, parent_type) VALUES (DEFAULT, '${fieldToUpdate.name}', ${fieldToUpdate.type}, typeId);`, QRef: fieldToUpdate.QRef} 
+        newQuery[newQuery.findIndex(i => i.QRef===fieldToUpdate.QRef)] = {query: `INSERT INTO "Field" (id, name, type, um, logic_state, parent_type) VALUES (DEFAULT, '${fieldToUpdate.name}', ${fieldToUpdate.type}, ${fieldToUpdate.um}, ${fieldToUpdate.logic_state}, typeId);`, QRef: fieldToUpdate.QRef} 
         setUpsertType((prevState) => ({
           ...prevState,
           insertQuery: newQuery,
@@ -68,7 +70,7 @@ function FieldsList () {
       //the field is already in the update list. It is a preexisting field (not in the insert list) that has been already modified this round.
       //It is possible to update the update query
       newQuery = upsertType.updateQuery
-      newQuery[newQuery.findIndex(i => i.QRef===fieldToUpdate.QRef)] = {query: `UPDATE "Field" SET name='${fieldToUpdate.name}', type=${fieldToUpdate.type} WHERE name = '${modifyFieldPopup.name}' AND parent_type = typeId;`, QRef: fieldToUpdate.QRef}
+      newQuery[newQuery.findIndex(i => i.QRef===fieldToUpdate.QRef)] = {query: `UPDATE "Field" SET name='${fieldToUpdate.name}', type=${fieldToUpdate.type}, um=${fieldToUpdate.um}, logic_state=${fieldToUpdate.logic_state} WHERE name = '${modifyFieldPopup.name}' AND parent_type = typeId;`, QRef: fieldToUpdate.QRef}
       setUpsertType((prevState) => ({
         ...prevState,
         updateQuery: newQuery,
@@ -105,18 +107,26 @@ function FieldsList () {
           <TableRow>
             <TableCell hAlign="left" grow >Name</TableCell>
             <TableCell hAlign="center">Type</TableCell>
+            <TableCell hAlign="center">um</TableCell>
+            <TableCell hAlign="center">LogicState</TableCell>
             <TableCell hAlign="center">Actions</TableCell>
           </TableRow>
         </TableHeader>
         <TableBody>
           {upsertType.fields.map((item) => {
+            console.log(upsertType)
             var typeItem = upsertType.typesList.find(i => i.id === item.type)
+            var umItem = upsertType.umList.find(i => i.id === item.um)
+            var logic_stateItem = upsertType.logic_stateList.find(i => i.id === item.logic_state)
+            console.log(upsertType, umItem, logic_stateItem)
               return (
                 <TableRow
                   key={item.QRef}
                 >
                   <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
                   <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
+                  <TableCell className={tableStyles.cell}>{item.um !== undefined && item.um !== 0 && umItem.name}</TableCell>
+                  <TableCell className={tableStyles.cell}>{item.logic_state !== undefined && item.logic_state !== 0 && logic_stateItem.name}</TableCell>
                   <TableCell className={tableStyles.cell}>
                     <Button
                       id="icon-button-4"
@@ -154,8 +164,12 @@ function FieldsList () {
         visible={modifyFieldPopup.visible}
         name={modifyFieldPopup.name}
         type={modifyFieldPopup.type}
+        um={modifyFieldPopup.um}
+        logic_state={modifyFieldPopup.logic_state}
         QRef={modifyFieldPopup.QRef}
         typesList={upsertType.typesList}
+        umList={upsertType.umList}
+        logic_stateList={upsertType.logic_stateList}
         fields={upsertType.fields}
         updField={(data) => updateField(data)}
         cancelCommand={()=>{

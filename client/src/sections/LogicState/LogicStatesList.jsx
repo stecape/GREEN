@@ -40,7 +40,7 @@ function LogicStatesList (props) {
                   key={item.id}
                 >
                   <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.value}</TableCell>
+                  <TableCell className={tableStyles.cell}>{item.value.map(i => i!=="" && `'${i}' `)}</TableCell>
                   <TableCell className={tableStyles.cell}>
                     <Button
                       id="icon-button-4"
@@ -87,21 +87,21 @@ function LogicStatesList (props) {
         modalType="full-page"
         upsertLogicState={(data)=>{
           axios.post('http://localhost:3001/api/modifyLogicState', {...data, id: modifyLogicStatePopup.id})
-            .then(setModifyLogicStatePopup((prevState) => ({ ...prevState, visible: false })))
+            .then(setModifyLogicStatePopup((prevState) => ({ ...prevState, visible: false, value: Array(8).fill("")  })))
         }}
         cancelCommand={()=>{
-          setModifyLogicStatePopup((prevState) => ({ ...prevState, visible: false }))
+          setModifyLogicStatePopup((prevState) => ({ ...prevState, visible: false, value: Array(8).fill("")  }))
         }}
       />
       <UpsertLogicStatePopup 
         visible={createLogicStatePopup.visible}
         create
         name=""
-        value={[]}
+        value={Array(8).fill("")}
         modalType="full-page"
         upsertLogicState={(data)=>{
           axios.post('http://localhost:3001/api/addLogicState', data)
-            .then(setCreateLogicStatePopup((prevState) => ({ ...prevState, visible: false })))
+            .then(setCreateLogicStatePopup((prevState) => ({ ...prevState, visible: false, value: Array(8).fill("") })))
         }}
         cancelCommand={()=>{
           setCreateLogicStatePopup((prevState) => ({ ...prevState, visible: false }))

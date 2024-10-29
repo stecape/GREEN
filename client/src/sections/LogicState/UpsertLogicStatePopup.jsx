@@ -14,14 +14,14 @@ import formStyles from '../../styles/Form.module.scss'
 
 function UpsertLogicStatePopup (props) {
 
-  const [modalState, setModalState] = useState({ visible: false, name: '', value: [], modalType: props.modalType})
+  const [modalState, setModalState] = useState({ visible: false, name: '', value: Array(8).fill(""), modalType: props.modalType})
   
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
     props.upsertLogicState({
       name: modalState.name,
-      metric: modalState.value
+      value: modalState.value
     })
     setModalState((prevState) => ({ ...prevState, name: ""}))
   }
@@ -33,8 +33,9 @@ function UpsertLogicStatePopup (props) {
 
   const updateValue = (index, value) => {
     var valueArray = modalState.value
-    valueArray[index] = toString(value)
-    setModalState((prevState) => ({ ...prevState, value: value}))
+    console.log(index, value)
+    valueArray[index] = value
+    setModalState((prevState) => ({ ...prevState, value: valueArray}))
   }
 
   useEffect(() => {
@@ -54,7 +55,7 @@ function UpsertLogicStatePopup (props) {
       <AppBarNav onClick={handleReset} aria-label="Close">
         <ArrowBackSVGIcon />
       </AppBarNav>
-      <AppBarTitle>{props.create ? "Creating Um" : "Modifying " + modalState.name}</AppBarTitle>
+      <AppBarTitle>{props.create ? "Creating LogicState" : "Modifying " + modalState.name}</AppBarTitle>
     </AppBar>
       <DialogContent>
         <div className={formStyles.container}>
@@ -96,17 +97,17 @@ function UpsertLogicStatePopup (props) {
             <GridCell colSpan={12} className={gridStyles.item}>
               <div className={formStyles.container}>
                 {
-                  Array.from({ length: 8 }, (_, index) => index).map(i => {return (
+                  Array.from({ length: 8 }, (_, i) => (
                   <TextField
                     id={i.toString()}
                     key={i.toString()}
                     type='string'
                     label={i.toString()}
                     className={formStyles.item}
-                    value={modalState.value}
+                    value={modalState.value[i]}
                     onChange={(e) => updateValue(i, e.target.value)}
                   />
-                  )})
+                  ))
                 }
               </div>
             </GridCell>

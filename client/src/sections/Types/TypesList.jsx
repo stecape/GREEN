@@ -73,6 +73,7 @@ function TypesList (props) {
                       //to avoid circular references
                       axios.post('http://localhost:3001/api/getFields', {type: item.id})
                       .then((res) => {
+                        console.log(res)
                         setUpsertType(() => ({
                           create: false,
                           typeNameQuery: `UPDATE "Type" SET name='${res.data.result.name}' WHERE id = ${res.data.result.type} RETURNING id INTO typeId;`,
@@ -83,7 +84,9 @@ function TypesList (props) {
                           type: res.data.result.type,
                           fields: res.data.result.fields,
                           allTypes: typesList,
-                          typesList: typesList.filter(i => !res.data.result.deps.includes(i.id) )
+                          typesList: typesList.filter(i => !res.data.result.deps.includes(i.id) ),
+                          umList: res.data.result.umList,
+                          logic_stateList: res.data.result.logic_stateList
                         }), setUpsertTypePopup((prevState) => ({ ...prevState, visible: true })))  //as callback, tt shows the popup                         
                       })
                     }
@@ -101,8 +104,11 @@ function TypesList (props) {
       <Button 
         floating="bottom-right" 
         onClick={() => {
-          initUpsertTypeContext(typesList, typesList)
-          setUpsertTypePopup((prevState) => ({ ...prevState, visible: true }))  //it shows the popup                         
+          axios.post('http://localhost:3001/api/getUmsAndLogicStates')
+          .then((res) => {
+            initUpsertTypeContext(typesList, typesList, res.data.result.umList, res.data.result.logic_stateList)
+            setUpsertTypePopup((prevState) => ({ ...prevState, visible: true }))  //it shows the popup
+          })                         
         }}
       >
         <AddSVGIcon />
