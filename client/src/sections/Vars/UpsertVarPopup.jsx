@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { AppBar, AppBarTitle, AppBarNav } from '@react-md/app-bar';
 import { Grid, GridCell } from '@react-md/utils'
 import { Button } from "@react-md/button"
@@ -10,27 +10,29 @@ import {
   FormThemeProvider,
   Select
 } from '@react-md/form'
+import {ctxData} from "../../Helpers/CtxProvider"
 import gridStyles from '../../styles/Grid.module.scss'
 import formStyles from '../../styles/Form.module.scss'
 
 function UpsertVarPopup (props) {
 
-  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: 0, um: 0, logic_state: 0, typesList: props.typesList, umsList: props.umsList })
+  const ctx = useContext(ctxData)
+  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: 0, um: 0, logic_state: 0 })
   
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.upsertVar({name:modalState.name, type: modalState.type, um: modalState.um})
-    setModalState((prevState) => ({ ...prevState, name: "", type: 0, um: 0}))
+    props.upsertVar({name:modalState.name, type: modalState.type, um: modalState.um === 0 ? 'NULL' : modalState.um, logic_state: modalState.logic_state === 0 ? 'NULL' : modalState.logic_state})
+    setModalState((prevState) => ({ ...prevState, name: "", type: 0, um: 0, logic_state: 0}))
   }
   const handleReset = () => {
-    setModalState((prevState) => ({ ...prevState, name: "", type: 0, um: 0}))
+    setModalState((prevState) => ({ ...prevState, name: "", type: 0, um: 0, logic_state: 0}))
     props.cancelCommand()
   }
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, logic_state: props.logic_state, visible: props.visible, typesList: props.typesList, umsList: props.umsList, logic_stateList: props.logic_stateList}))
-  },[props.name, props.visible, props.type, props.um, props.logic_state, props.umsList, props.logic_stateList, props.typesList])
+    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, logic_state: props.logic_state, visible: props.visible}))
+  },[props.name, props.visible, props.type, props.um, props.logic_state])
   
   return (
     <Dialog
@@ -55,40 +57,53 @@ function UpsertVarPopup (props) {
                 <FormThemeProvider theme='outline'>
                   <Form className={formStyles.form} onSubmit={handleSubmit} onReset={handleReset}>
                     <TextField
-                    id='name'
-                    key='name'
-                    type='string'
-                    label="Var Name"
-                    className={formStyles.item}
-                    value={modalState.name}
-                    onChange={(e) => setModalState((prevState) => ({ ...prevState, name: e.target.value}))}
-                  />
-                  <Select
-                    id='type'
-                    key='type'
-                    options={modalState.typesList.map((item) => ({
-                      label: item.name,
-                      value: item.id
-                    }))}
-                    value={modalState.type.toString()}
-                    placeholder="Choose..."
-                    label="Var Type"
-                    className={formStyles.item}
-                    onChange={(value) => setModalState((prevState) => ({ ...prevState, type: Number(value)}))}
-                  />
-                  <Select
-                    id='um'
-                    key='um'
-                    options={modalState.umsList.map((item) => ({
-                      label: item.name,
-                      value: item.id
-                    }))}
-                    value={modalState.um.toString()}
-                    placeholder="Choose..."
-                    label="um"
-                    className={formStyles.item}
-                    onChange={(value) => setModalState((prevState) => ({ ...prevState, um: Number(value)}))}
-                  />
+                      id='name'
+                      key='name'
+                      type='string'
+                      label="Var Name"
+                      className={formStyles.item}
+                      value={modalState.name}
+                      onChange={(e) => setModalState((prevState) => ({ ...prevState, name: e.target.value}))}
+                    />
+                    <Select
+                      id='type'
+                      key='type'
+                      options={ctx.types.map((item) => ({
+                        label: item.name,
+                        value: item.id
+                      }))}
+                      value={modalState.type.toString()}
+                      placeholder="Choose..."
+                      label="Var Type"
+                      className={formStyles.item}
+                      onChange={(value) => setModalState((prevState) => ({ ...prevState, type: Number(value)}))}
+                    />
+                    <Select
+                      id='um'
+                      key='um'
+                      options={ctx.ums.map((item) => ({
+                        label: item.name,
+                        value: item.id
+                      }))}
+                      value={modalState.um.toString()}
+                      placeholder="Choose..."
+                      label="um"
+                      className={formStyles.item}
+                      onChange={(value) => setModalState((prevState) => ({ ...prevState, um: Number(value)}))}
+                    />
+                    <Select
+                      id='logic_state'
+                      key='logic_state'
+                      options={ctx.logicStates.map((item) => ({
+                        label: item.name,
+                        value: item.id
+                      }))}
+                      value={modalState.logic_state!==undefined ? modalState.logic_state.toString() : 0}
+                      placeholder="Choose..."
+                      label="Logic state"
+                      className={formStyles.item}
+                      onChange={(value) => setModalState((prevState) => ({ ...prevState, logic_state: Number(value)}))}
+                    />
                     <div className={formStyles.btn_container}>
                       <Button
                         type="submit"

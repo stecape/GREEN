@@ -118,15 +118,15 @@ function FieldsList () {
             var typeItem = upsertType.typesList.find(i => i.id === item.type)
             var umItem = upsertType.umList.find(i => i.id === item.um)
             var logic_stateItem = upsertType.logic_stateList.find(i => i.id === item.logic_state)
-            console.log(upsertType, umItem, logic_stateItem)
+            console.log(upsertType, umItem, logic_stateItem, item)
               return (
                 <TableRow
                   key={item.QRef}
                 >
                   <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
                   <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.um !== undefined && item.um !== 0 && umItem.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.logic_state !== undefined && item.logic_state !== 0 && logic_stateItem.name}</TableCell>
+                  <TableCell className={tableStyles.cell}>{item.um !== undefined && item.um !== 0 && item.um !== null && umItem.name}</TableCell>
+                  <TableCell className={tableStyles.cell}>{item.logic_state !== undefined && item.logic_state !== 0 && item.logic_state !== null && logic_stateItem.name}</TableCell>
                   <TableCell className={tableStyles.cell}>
                     <Button
                       id="icon-button-4"
@@ -141,7 +141,7 @@ function FieldsList () {
                       id="icon-button-4"
                       buttonType="icon"
                       aria-label="Edit"
-                      onClick={() => setModifyFieldPopup({visible: true, type: item.type, name: item.name, QRef: item.QRef})}
+                      onClick={() => setModifyFieldPopup({visible: true, type: item.type, um: item.um, logic_state: item.logic_state, name: item.name, QRef: item.QRef})}
                     >
                       <EditSVGIcon />
                     </Button>

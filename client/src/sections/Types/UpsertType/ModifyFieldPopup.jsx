@@ -21,7 +21,7 @@ function ModifyFieldPopup (props) {
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.updField({name: modalState.name, type: modalState.type, um: modalState.um})
+    props.updField({name: modalState.name, type: modalState.type, um: modalState.um, logic_state: modalState.logic_state})
   }
   const handleReset = (event) => {
     event.preventDefault()
@@ -75,22 +75,22 @@ function ModifyFieldPopup (props) {
             <Select
               id='um'
               key='um'
-              options={[]}/* {props.umList.map((item) => ({
+              options={props.umList.map((item) => ({
                 label: item.name,
                 value: item.id
-              }))}*/
-              value={modalState.um.toString()}
+              }))}
+              value={modalState.um !== null && modalState.um.toString()}
               label="um"
               onChange={(value) => setModalState((prevState) => ({ ...prevState, um: Number(value)}))}
             />
             <Select
               id='logic_state'
               key='logic_state'
-              options={[]}/* {props.logicStateList.map((item) => ({
+              options={props.logic_stateList.map((item) => ({
                 label: item.name,
                 value: item.id
-              }))}*/
-              value={modalState.logic_state.toString()}
+              }))}
+              value={modalState.logic_state !== null && modalState.logic_state.toString()}
               label="Logic State"
               onChange={(value) => setModalState((prevState) => ({ ...prevState, logic_state: Number(value)}))}
             />

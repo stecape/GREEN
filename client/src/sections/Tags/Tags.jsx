@@ -37,7 +37,7 @@ function Tags () {
           setVarsList(response.data.result.map((val) => ({id:val[0], type:val[1]})))
           setInit((prevState) => ({ ...prevState, vars: true}))
         })
-      axios.post('http://localhost:3001/api/getAll', {table: "Tag", fields:["id", "name", "var", "type_field", "um", "value"]})
+      axios.post('http://localhost:3001/api/getAll', {table: "Tag", fields:["id", "name", "var", "type_field", "um", "logic_state", "value"]})
         .then(response => {
           setTagsList(response.data.result.map((val) => ({id:val[0], name:val[1], var:val[2], type_field:val[3], um:val[4], value:val[5]})))
           setInit((prevState) => ({ ...prevState, tags: true}))

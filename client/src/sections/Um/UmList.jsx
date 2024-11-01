@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useAddMessage } from "@react-md/alert"
 import { Button } from "@react-md/button"
 import DeleteUmPopup from "./DeleteUmPopup"
 import UpsertUmPopup from "./UpsertUmPopup"
@@ -14,7 +15,7 @@ import axios from 'axios'
 import tableStyles from '../../styles/Table.module.scss'
 
 function UmList (props) {
-
+  const addMessage = useAddMessage()
   const [umsList, setUmsList] = useState(props.umsList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyUmPopup, setModifyUmPopup] = useState({ visible: false, id: 0, name: '', metric: '', imperial: '', gain: 1.0, offset: 0.0})
@@ -80,7 +81,31 @@ function UmList (props) {
         name={deletePopup.name}
         delUm={()=>{
           axios.post('http://localhost:3001/api/removeUm', {id: deletePopup.id})
-            .then(setDeletePopup((prevState) => ({ ...prevState, visible: false })))
+            .then(response => {
+              addMessage({children: response.data.message})
+            })
+            .catch(error => {
+              if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                addMessage({children: "Error: " + error.response.data.message, messageId: Date.now().toString()})
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                addMessage({children: "Error: database not reachable"})
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                addMessage({children: "Error: wrong request parameters"})
+                console.log('Error', error.message);
+              }
+              console.log(error.config);
+            })
+            .finally(()=>setDeletePopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{
           setDeletePopup((prevState) => ({ ...prevState, visible: false }))

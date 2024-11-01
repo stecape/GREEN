@@ -27,13 +27,15 @@ function TagsList (props) {
             <TableCell hAlign="center">Id</TableCell>
             <TableCell hAlign="left" grow >Name</TableCell>
             <TableCell hAlign="center">Type</TableCell>
-            <TableCell hAlign="center">UM/Status</TableCell>
+            <TableCell hAlign="center">UM</TableCell>
+            <TableCell hAlign="center">Logic State</TableCell>
             <TableCell hAlign="center">Value</TableCell>
           </TableRow>
         </TableHeader>
         <TableBody>
           {varsList.length>0 && typesList.length>0 && fieldsList.length>0 && tagsList.map((item) => {
             //1 is a placeholder test value, to not have it undefined
+            console.log(item)
             var typeItem =1
             if (item.type_field === null) {
               //Head tag, which has no type_field

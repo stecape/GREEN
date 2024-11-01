@@ -213,7 +213,7 @@ module.exports = function (app, pool) {
           rowMode: 'array'
         })
         .then(data=>{
-          response.fields = data.rows.map((field, i) => ({id: field[0], name: field[1], type: field[2], QRef: i}))
+          response.fields = data.rows.map((field, i) => ({id: field[0], name: field[1], type: field[2], parent_type: field[3], um: field[4], logic_state: field[5], QRef: i}))
           var result = []
           var queryString=`
           SELECT
@@ -426,6 +426,7 @@ module.exports = function (app, pool) {
         fieldsList = data.rows 
         //Inserting the Var
         queryString = `INSERT INTO "Var" (id, name, type, um, logic_state) VALUES (DEFAULT, '${varName}', ${varType}, ${varUm}, ${varLogicState}) RETURNING "id"`
+        console.log(queryString)
         pool.query({
           text: queryString,
           rowMode: 'array'
