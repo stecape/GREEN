@@ -22,7 +22,7 @@ function UpsertVarPopup (props) {
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.upsertVar({name:modalState.name, type: modalState.type, um: modalState.um === 0 ? 'NULL' : modalState.um, logic_state: modalState.logic_state === 0 ? 'NULL' : modalState.logic_state})
+    props.upsertVar({name:modalState.name, type: modalState.type, um: modalState.um === 0 ? null : modalState.um, logic_state: modalState.logic_state === 0 ? null : modalState.logic_state})
     setModalState((prevState) => ({ ...prevState, name: "", type: 0, um: 0, logic_state: 0}))
   }
   const handleReset = () => {

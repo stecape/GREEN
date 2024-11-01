@@ -10,9 +10,11 @@ export const CtxProvider = ({ children }) => {
   const addMessage = useAddMessage()
   const socket = useContext(SocketContext)
   const [types, setTypes] = useState([])
+  const [fields, setFields] = useState([])
   const [ums, setUms] = useState([])
   const [logicStates, setLogicStates] = useState([])
   const [vars, setVars] = useState([])
+  const [tags, setTags] = useState([])
   const [init, setInit] = useState(false)
 
   useEffect(() => {
@@ -22,18 +24,28 @@ export const CtxProvider = ({ children }) => {
         .then(response => {
           setTypes(response.data.result.map((val) => ({name:val[0], id:val[1], base_type:val[2]})))
           addMessage({children: response.data.message})
-          axios.post('http://localhost:3001/api/getAll', {table: "um", fields:['id', 'name', 'metric', 'imperial', 'gain', '"offset"']})
+          axios.post('http://localhost:3001/api/getAll', {table: "Field", fields:['id', 'name', 'type', 'um', 'logic_state']})
             .then(response => {
-              setUms(response.data.result.map((val) => ({id:val[0], name:val[1], metric:val[2], imperial:val[3], gain:val[4], offset:val[5]})))
+              setFields(response.data.result.map((val) => ({id:val[0], name:val[1], type:val[2], um:val[2], logic_state:val[3]})))
               addMessage({children: response.data.message})
-              axios.post('http://localhost:3001/api/getAll', {table: "LogicState", fields:['id', 'name', 'value']})
+              axios.post('http://localhost:3001/api/getAll', {table: "um", fields:['id', 'name', 'metric', 'imperial', 'gain', '"offset"']})
                 .then(response => {
-                  setLogicStates(response.data.result.map((val) => ({id:val[0], name:val[1], value:val[2]})))
+                  setUms(response.data.result.map((val) => ({id:val[0], name:val[1], metric:val[2], imperial:val[3], gain:val[4], offset:val[5]})))
                   addMessage({children: response.data.message})
-                  axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:['id', 'name', 'type', 'um', 'logic_state']})
+                  axios.post('http://localhost:3001/api/getAll', {table: "LogicState", fields:['id', 'name', 'value']})
                     .then(response => {
-                      setVars(response.data.result.map((val) => ({id:val[0], name:val[1], type:val[2], um:val[3], logic_state:val[4]})))
+                      setLogicStates(response.data.result.map((val) => ({id:val[0], name:val[1], value:val[2]})))
                       addMessage({children: response.data.message})
+                      axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:['id', 'name', 'type', 'um', 'logic_state']})
+                        .then(response => {
+                          setVars(response.data.result.map((val) => ({id:val[0], name:val[1], type:val[2], um:val[3], logic_state:val[4]})))
+                          addMessage({children: response.data.message})
+                          axios.post('http://localhost:3001/api/getAll', {table: "Tag", fields:['id', 'name', 'var', 'parent_tag', 'type_field', 'um', 'logic_state', 'value']})
+                            .then(response => {
+                              setTags(response.data.result.map((val) => ({id:val[0], name:val[1], var:val[2], parent_tag:val[3], type_field:val[4], um:val[5], logic_state:val[6], value:val[7]})))
+                              addMessage({children: response.data.message})
+                            })
+                        })
                     })
                 })
             })
@@ -65,6 +77,25 @@ export const CtxProvider = ({ children }) => {
         var indexTypes = updTypes.findIndex(i => i.id === value.data.id)
         updTypes[indexTypes] = value.data
         setTypes([...updTypes])
+      }
+
+      //Field
+      if (value.table === "Field" && value.operation === 'INSERT') {
+        var fieldsList = fields
+        fieldsList.push(value.data)
+        setFields([...fieldsList])
+      }
+      else if (value.table === "Field" && value.operation === 'DELETE') {
+        setFields([...fields.filter(i => i.id !== value.data.id)])
+      }
+      else if (value.table === "Field" && value.operation === 'TRUNCATE') {
+        setFields([...[]])
+      }
+      else if (value.table === "Field" && value.operation === 'UPDATE') {
+        var updFields = fields
+        var indexFields = updFields.findIndex(i => i.id === value.data.id)
+        updFields[indexFields] = value.data
+        setFields([...updFields])
       }
 
       //um
@@ -124,6 +155,25 @@ export const CtxProvider = ({ children }) => {
         setVars([...updVars])
       }
 
+      //Tags      
+      if (value.table === "Tag" && value.operation === 'INSERT') {
+        var tagsList = tags
+        tagsList.push(value.data)
+        setTags([...tagsList])
+      }
+      else if (value.table === "Tag" && value.operation === 'DELETE') {
+        setTags([...tags.filter(i => i.id !== value.data.id)])
+      }
+      else if (value.table === "Tag" && value.operation === 'TRUNCATE') {
+        setTags([...[]])
+      }
+      else if (value.table === "Tag" && value.operation === 'UPDATE') {
+        var updTags = tags
+        var indexTags = updTags.findIndex(i => i.id === value.data.id)
+        updTags[indexTags] = value.data
+        setTags([...updTags])
+      }
+
     }
 
     //On component load request the lists
@@ -146,11 +196,11 @@ export const CtxProvider = ({ children }) => {
       socket.off("error", on_error)
       socket.off("update", on_update)
     }
-  }, [addMessage, init, logicStates, socket, types, ums, vars])
+  }, [addMessage, init, logicStates, socket, types, fields, ums, vars, tags])
 
   const value = useMemo(
-    () => ({ types, setTypes, ums, setUms, logicStates, setLogicStates, vars, setVars }),
-    [types, setTypes, ums, setUms, logicStates, setLogicStates, vars, setVars]
+    () => ({ types, setTypes, fields, setFields, ums, setUms, logicStates, setLogicStates, vars, setVars, tags, setTags }),
+    [types, setTypes, fields, setFields, ums, setUms, logicStates, setLogicStates, vars, setVars, tags, setTags]
   );
 
   return (

@@ -34,7 +34,6 @@ function VarsList (props) {
         </TableHeader>
         <TableBody>
           {ctx.vars.map((item) => {
-            console.log(item)
               var typeItem = ctx.types.find(i => i.id === item.type)
               var umItem = ctx.ums.find(i => i.id === item.um)
               var logic_stateItem = ctx.logicStates.find(i => i.id === item.logic_state)
@@ -44,8 +43,8 @@ function VarsList (props) {
                 >
                   <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
                   <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.um !== undefined && item.um !== 0 && item.um !== null && umItem.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.logic_state !== undefined && item.logic_state !== 0 && item.logic_state !== null && logic_stateItem.name}</TableCell>
+                  <TableCell className={tableStyles.cell}>{umItem !== undefined && item.um !== 0 && item.um !== null && umItem.name}</TableCell>
+                  <TableCell className={tableStyles.cell}>{logic_stateItem !== undefined && item.logic_state !== 0 && item.logic_state !== null && logic_stateItem.name}</TableCell>
                   <TableCell className={tableStyles.cell}>
                     <Button
                       id="icon-button-4"

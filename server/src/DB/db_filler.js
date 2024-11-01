@@ -24,6 +24,7 @@ module.exports = function () {
       parent_tag integer,
       type_field integer,
       um integer,
+      logic_state integer,
       value json
     );
     
@@ -120,6 +121,18 @@ module.exports = function () {
         ON UPDATE CASCADE
         ON DELETE NO ACTION
         NOT VALID,
+      DROP CONSTRAINT IF EXISTS field_um_id,
+      ADD CONSTRAINT field_um_id FOREIGN KEY (um)
+        REFERENCES public."um" (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION
+        NOT VALID,
+      DROP CONSTRAINT IF EXISTS field_logic_state_id,
+      ADD CONSTRAINT field_logic_state_id FOREIGN KEY (logic_state)
+        REFERENCES public."LogicState" (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION
+        NOT VALID,     
       DROP CONSTRAINT IF EXISTS unique_parent_tag_and_type_field,
       ADD CONSTRAINT unique_parent_tag_and_type_field UNIQUE USING INDEX ui_parent_tag_and_type_field;
 

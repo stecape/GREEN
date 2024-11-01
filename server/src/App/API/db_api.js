@@ -335,7 +335,7 @@ module.exports = function (app, pool) {
     //Iterate through the types tree until it reaches the leaves, generating the tags
     fieldsList.filter(i => i[3] === type).forEach(f => {
       var tagName = name+'.'+f[1]
-      var queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field) VALUES (DEFAULT, '${tagName}', ${varId}, ${parent_tag}, ${f[0]}) RETURNING "id"`
+      var queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field, um, logic_state) VALUES (DEFAULT, '${tagName}', ${varId}, ${parent_tag}, ${f[0]}, ${f[4] !== undefined ? f[4] : 'NULL'}, ${f[5] !== undefined ? f[5] : 'NULL'}) RETURNING "id"`
       pool.query({
         text: queryString,
         rowMode: 'array'
@@ -352,7 +352,7 @@ module.exports = function (app, pool) {
     })
   }
 
-  const GenerateTags = (varId, varName, varType, typesList, fieldsList) => {
+  const GenerateTags = (varId, varName, varType, typesList, fieldsList, um, logic_state) => {
     return new Promise((resolve, reject) => {
       //Delete old tags
       var queryString = `DELETE FROM "Tag" WHERE var = ${varId}`
@@ -362,7 +362,7 @@ module.exports = function (app, pool) {
       })
       .then(() => {
         //Inserting the first Tag corresponding to the var
-        queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field) VALUES (DEFAULT, '${varName}', ${varId}, NULL,  NULL) RETURNING "id"`
+        queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field, um, logic_state) VALUES (DEFAULT, '${varName}', ${varId}, NULL,  NULL, ${um !== undefined ? um : 'NULL'}, ${logic_state !== undefined ? logic_state : 'NULL'}) RETURNING "id"`
         pool.query({
           text: queryString,
           rowMode: 'array'
@@ -426,14 +426,13 @@ module.exports = function (app, pool) {
         fieldsList = data.rows 
         //Inserting the Var
         queryString = `INSERT INTO "Var" (id, name, type, um, logic_state) VALUES (DEFAULT, '${varName}', ${varType}, ${varUm}, ${varLogicState}) RETURNING "id"`
-        console.log(queryString)
         pool.query({
           text: queryString,
           rowMode: 'array'
         })
         .then(data => {
           varId = data.rows[0][0]
-          GenerateTags(varId, varName, varType, typesList, fieldsList)
+          GenerateTags(varId, varName, varType, typesList, fieldsList, varUm, varLogicState)
           .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
         })
         .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))

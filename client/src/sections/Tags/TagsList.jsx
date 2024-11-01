@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useContext } from "react"
 import {
   Table,
   TableBody,
@@ -6,19 +6,11 @@ import {
   TableHeader,
   TableRow,
 } from '@react-md/table'
+import {ctxData} from "../../Helpers/CtxProvider"
 import tableStyles from '../../styles/Table.module.scss'
 
-function TagsList (props) {
-  const [tagsList, setTagsList] = useState(props.tagsList)
-  const [varsList, setVarsList] = useState(props.varsList)
-  const [typesList, setTypesList] = useState(props.typesList)
-  const [fieldsList, setFieldsList] = useState(props.fieldsList)
-  useEffect(() => {
-    setTagsList(props.tagsList)
-    setVarsList(props.varsList)
-    setTypesList(props.typesList)
-    setFieldsList(props.fieldsList)
-  }, [props.tagsList, props.varsList, props.typesList, props.fieldsList])
+function TagsList () {
+  const ctx = useContext(ctxData)
   return(
     <>
       <Table fullWidth className={tableStyles.table}>
@@ -33,19 +25,24 @@ function TagsList (props) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {varsList.length>0 && typesList.length>0 && fieldsList.length>0 && tagsList.map((item) => {
+          {ctx.vars.length>0 && ctx.types.length>0 && ctx.fields.length>0 && ctx.tags.map((item) => {
             //1 is a placeholder test value, to not have it undefined
-            console.log(item)
             var typeItem =1
+            var umItem =1
+            var logic_stateItem =1
             if (item.type_field === null) {
               //Head tag, which has no type_field
-              var varItem = varsList.find(i => i.id === item.var)
+              var varItem = ctx.vars.find(i => i.id === item.var)
               //console.log(item, varsList, varItem)
-              typeItem = typesList.find(i => i.id === varItem.type)
+              typeItem = ctx.types.find(i => i.id === varItem.type)
+              umItem = ctx.ums.find(i => i.id === varItem.um)
+              logic_stateItem = ctx.logicStates.find(i => i.id === varItem.logic_state)
             } else {
               //console.log(fieldsList, typesList, item)
-              var fieldItem = fieldsList.find(i => i.id === item.type_field)
-              typeItem = typesList.find(i => i.id === fieldItem.type)
+              var fieldItem = ctx.fields.find(i => i.id === item.type_field)
+              typeItem = ctx.types.find(i => i.id === fieldItem.type)
+              umItem = ctx.ums.find(i => i.id === fieldItem.um)
+              logic_stateItem = ctx.logicStates.find(i => i.id === fieldItem.logic_state)
             }
 
               return (
@@ -53,7 +50,8 @@ function TagsList (props) {
                   <TableCell className={tableStyles.cell} hAlign="center">{item.id}</TableCell>
                   <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
                   <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.um}</TableCell>
+                  <TableCell className={tableStyles.cell}>{umItem !== undefined && umItem.name}</TableCell>
+                  <TableCell className={tableStyles.cell}>{logic_stateItem !== undefined && logic_stateItem.name}</TableCell>
                   <TableCell className={tableStyles.cell}>{item.value !== null && item.value.value}</TableCell>
                 <TableCell />
                 </TableRow>
