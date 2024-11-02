@@ -14,7 +14,7 @@ import axios from 'axios'
 import {ctxData} from "../../Helpers/CtxProvider"
 import tableStyles from '../../styles/Table.module.scss'
 
-function VarsList (props) {
+function VarsList () {
   const ctx = useContext(ctxData)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyVarPopup, setModifyVarPopup] = useState({ visible: false, id: 0, type: 0, um: 0, logic_state: 0, name: '' })

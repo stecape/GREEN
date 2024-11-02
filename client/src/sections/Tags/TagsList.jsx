@@ -38,8 +38,8 @@ function TagsList () {
               umItem = ctx.ums.find(i => i.id === varItem.um)
               logic_stateItem = ctx.logicStates.find(i => i.id === varItem.logic_state)
             } else {
-              //console.log(fieldsList, typesList, item)
               var fieldItem = ctx.fields.find(i => i.id === item.type_field)
+              //console.log(fieldItem, ctx, item)
               typeItem = ctx.types.find(i => i.id === fieldItem.type)
               umItem = ctx.ums.find(i => i.id === fieldItem.um)
               logic_stateItem = ctx.logicStates.find(i => i.id === fieldItem.logic_state)

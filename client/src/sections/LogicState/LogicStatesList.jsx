@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Button } from "@react-md/button"
 import DeleteLogicStatePopup from "./DeleteLogicStatePopup"
@@ -12,17 +12,15 @@ import {
   TableRow,
 } from '@react-md/table'
 import axios from 'axios'
+import {ctxData} from "../../Helpers/CtxProvider"
 import tableStyles from '../../styles/Table.module.scss'
 
 function LogicStatesList (props) {
+  const ctx = useContext(ctxData)
   const addMessage = useAddMessage()
-  const [logicStatesList, setLogicStatesList] = useState(props.logicStatesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyLogicStatePopup, setModifyLogicStatePopup] = useState({ visible: false, id: 0, name: '', value: []})
   const [createLogicStatePopup, setCreateLogicStatePopup] = useState({ visible: false })
-  useEffect(() => {
-    setLogicStatesList(props.logicStatesList)
-  }, [props.logicStatesList])
 
   return(
     <>
@@ -35,7 +33,7 @@ function LogicStatesList (props) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {logicStatesList.map((item) => {
+          {ctx.logicStates.map((item) => {
               return (
                 <TableRow
                   key={item.id}

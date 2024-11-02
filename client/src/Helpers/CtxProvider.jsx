@@ -24,9 +24,9 @@ export const CtxProvider = ({ children }) => {
         .then(response => {
           setTypes(response.data.result.map((val) => ({name:val[0], id:val[1], base_type:val[2]})))
           addMessage({children: response.data.message})
-          axios.post('http://localhost:3001/api/getAll', {table: "Field", fields:['id', 'name', 'type', 'um', 'logic_state']})
+          axios.post('http://localhost:3001/api/getAll', {table: "Field", fields:['id', 'name', 'type', 'parent_type', 'um', 'logic_state']})
             .then(response => {
-              setFields(response.data.result.map((val) => ({id:val[0], name:val[1], type:val[2], um:val[2], logic_state:val[3]})))
+              setFields(response.data.result.map((val) => ({id:val[0], name:val[1], type:val[2], parent_type:val[3], um:val[4], logic_state:val[5]})))
               addMessage({children: response.data.message})
               axios.post('http://localhost:3001/api/getAll', {table: "um", fields:['id', 'name', 'metric', 'imperial', 'gain', '"offset"']})
                 .then(response => {

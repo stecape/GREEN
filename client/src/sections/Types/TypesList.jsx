@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Button } from "@react-md/button"
 import DeleteTypePopup from "./DeleteTypePopup"
@@ -12,19 +12,16 @@ import {
   TableRow,
 } from '@react-md/table'
 import axios from 'axios'
-import tableStyles from '../../styles/Table.module.scss'
+import {ctxData} from "../../Helpers/CtxProvider"
 import { UpsertTypeContext } from "./UpsertType/UpsertTypeContext";
+import tableStyles from '../../styles/Table.module.scss'
 
-function TypesList (props) {
+function TypesList () {
+  const ctx = useContext(ctxData)
   const addMessage = useAddMessage()
-  const [typesList, setTypesList] = useState(props.typesList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [upsertTypePopup, setUpsertTypePopup] = useState({ visible: false })
   const {setUpsertType, initUpsertTypeContext} = useContext(UpsertTypeContext)
-
-  useEffect(() => {
-    setTypesList(props.typesList)
-  }, [props.typesList, addMessage])
 
   return(
     <>
@@ -36,7 +33,7 @@ function TypesList (props) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {typesList.map((item) => {
+          {ctx.types.map((item) => {
             return (
               <TableRow
                 key={item.id}
@@ -83,10 +80,10 @@ function TypesList (props) {
                           name: res.data.result.name,
                           type: res.data.result.type,
                           fields: res.data.result.fields,
-                          allTypes: typesList,
-                          typesList: typesList.filter(i => !res.data.result.deps.includes(i.id) ),
-                          umList: res.data.result.umList,
-                          logic_stateList: res.data.result.logic_stateList
+                          allTypes: ctx.types,
+                          typesList: ctx.types.filter(i => !res.data.result.deps.includes(i.id) ),
+                          umList: ctx.ums,
+                          logic_stateList: ctx.logicStates
                         }), setUpsertTypePopup((prevState) => ({ ...prevState, visible: true })))  //as callback, tt shows the popup                         
                       })
                     }
@@ -104,11 +101,8 @@ function TypesList (props) {
       <Button 
         floating="bottom-right" 
         onClick={() => {
-          axios.post('http://localhost:3001/api/getUmsAndLogicStates')
-          .then((res) => {
-            initUpsertTypeContext(typesList, typesList, res.data.result.umList, res.data.result.logic_stateList)
-            setUpsertTypePopup((prevState) => ({ ...prevState, visible: true }))  //it shows the popup
-          })                         
+          initUpsertTypeContext(ctx.types, ctx.types, ctx.ums, ctx.logicstates)
+          setUpsertTypePopup((prevState) => ({ ...prevState, visible: true }))  //it shows the popup
         }}
       >
         <AddSVGIcon />
@@ -153,7 +147,7 @@ function TypesList (props) {
         visible={upsertTypePopup.visible}
         name=""
         modalType="full-page"
-        typesList={typesList}
+        typesList={ctx.types}
         cancelCommand={()=>{
           setUpsertTypePopup((prevState) => ({ ...prevState, visible: false }))
         }}

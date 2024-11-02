@@ -267,23 +267,7 @@ module.exports = function (app, pool) {
   app.post('/api/getFields', (req, res) => {
     getDeps(req.body.type)
     .then(response => {
-      var getFieldsResponse = response
-      pool.query({
-        text: `SELECT * FROM "um"`,
-        rowMode: 'array'
-      })
-      .then(response => {
-        getFieldsResponse["umList"] = response.rows.map((um) => ({id: um[0], name: um[1], metric: um[2], imperial: um[3], gain: um[4], offset: um[5]}))
-        pool.query({
-          text: `SELECT * FROM "LogicState"`,
-          rowMode: 'array'
-        })
-        .then(response => {
-          getFieldsResponse["logic_stateList"] = response.rows.map((logic_state) => ({id: logic_state[0], name: logic_state[1], value: logic_state[2]}))
-          console.log(getFieldsResponse)
-          res.json({result: getFieldsResponse, message: "Record(s) from table \"Field\" returned correctly"})
-        })
-      })
+      res.json({result: response, message: "Record(s) from table \"Field\" returned correctly"})
     })
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))    
   })
@@ -779,88 +763,6 @@ module.exports = function (app, pool) {
     })
     .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
   })
-
-
-  /*
-  Return the lists of all the  LogicStates and all the Ums
-  Type:   POST
-  Route:  '/api/getUmsAndLogicStates'
-  Body:   {}
-  Query:  SELECT * FROM "um";
-          SELECT * FROM "LogicState";
-  Event:  {
-            operation: 'SELECT',
-            table: 'um', 'LogicState',
-            data: {
-              {
-                umList: [
-                  {
-                    id: 1,
-                    name: 'm_ft',
-                    metric: 'm',
-                    imperial: 'ft',
-                    gain: 3.28084,
-                    offset: 0
-                  },
-                  {
-                    id: 2,
-                    name: '°C_°F',
-                    metric: '°C',
-                    imperial: '°F',
-                    gain: 1.8,
-                    offset: 32
-                  },
-                  {
-                    id: 3,
-                    name: 'Bar_psi',
-                    metric: 'Bar',
-                    imperial: 'psi',
-                    gain: 14.5038,
-                    offset: 0
-                  },
-                  {
-                    id: 4,
-                    name: 'W_W',
-                    metric: 'W',
-                    imperial: 'W',
-                    gain: 1,
-                    offset: 0
-                  }
-                ]
-                logic_stateList: [
-                  {
-                    id: 1,
-                    name: 'OFF_ON',
-                    value: ['OFF', 'ON', '', '', '', '', '', '']
-                  }
-                ]
-              }
-            }
-  Res:    200
-  Err:    400
-  */
-
-  app.post('/api/getUmsAndLogicStates', (req, res) => {
-    var finalResponse = {}
-    pool.query({
-      text: `SELECT * FROM "um"`,
-      rowMode: 'array'
-    })
-    .then(response => {
-      finalResponse["umList"] = response.rows.map((um) => ({id: um[0], name: um[1], metric: um[2], imperial: um[3], gain: um[4], offset: um[5]}))
-      pool.query({
-        text: `SELECT * FROM "LogicState"`,
-        rowMode: 'array'
-      })
-      .then(response => {
-        finalResponse["logic_stateList"] = response.rows.map((logic_state) => ({id: logic_state[0], name: logic_state[1], value: logic_state[2]}))
-        res.json({result: finalResponse, message: " Um and Logic State lists returned correctly"})
-      })
-    })
-    .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
-  })
-
-
 
 
 }

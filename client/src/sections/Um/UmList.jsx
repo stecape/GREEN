@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useContext } from "react"
 import { useAddMessage } from "@react-md/alert"
 import { Button } from "@react-md/button"
 import DeleteUmPopup from "./DeleteUmPopup"
@@ -12,17 +12,15 @@ import {
   TableRow,
 } from '@react-md/table'
 import axios from 'axios'
+import {ctxData} from "../../Helpers/CtxProvider"
 import tableStyles from '../../styles/Table.module.scss'
 
-function UmList (props) {
+function UmList () {
+  const ctx = useContext(ctxData)
   const addMessage = useAddMessage()
-  const [umsList, setUmsList] = useState(props.umsList)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyUmPopup, setModifyUmPopup] = useState({ visible: false, id: 0, name: '', metric: '', imperial: '', gain: 1.0, offset: 0.0})
   const [createUmPopup, setCreateUmPopup] = useState({ visible: false })
-  useEffect(() => {
-    setUmsList(props.umsList)
-  }, [props.umsList])
 
   return(
     <>
@@ -38,7 +36,7 @@ function UmList (props) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {umsList.map((item) => {
+          {ctx.UMS.map((item) => {
               return (
                 <TableRow
                   key={item.id}
