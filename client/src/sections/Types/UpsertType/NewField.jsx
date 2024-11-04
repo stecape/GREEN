@@ -6,11 +6,13 @@ import {
   FormThemeProvider,
   Select
 } from '@react-md/form'
-import formStyles from '../../../styles/Form.module.scss'
+import {ctxData} from "../../../Helpers/CtxProvider"
 import { UpsertTypeContext } from './UpsertTypeContext'
+import formStyles from '../../../styles/Form.module.scss'
 
 
 function NewField () {
+  const ctx = useContext(ctxData)
   const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [name, setName] = useState("")
   const [type, setType] = useState(0)
@@ -96,7 +98,7 @@ function NewField () {
         <Select
           id='field-um'
           key='field-um'
-          options= {upsertType.umList.map((item) => ({
+          options= {ctx.ums.map((item) => ({
             label: item.name,
             value: item.id
           }))}
@@ -110,7 +112,7 @@ function NewField () {
         <Select
           id='field-logic_state'
           key='field-logic_state'
-          options= {upsertType.logic_stateList.map((item) => ({
+          options= {ctx.logicStates.map((item) => ({
             label: item.name,
             value: item.id
           }))}

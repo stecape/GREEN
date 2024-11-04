@@ -218,7 +218,7 @@ module.exports = function () {
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (1, 'm_ft', 'm', 'ft', 3.28084, 0) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (2, '°C_°F', '°C', '°F', 1.8, 32) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (3, 'Bar_psi', 'Bar', 'psi', 14.5038, 0) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (4, 'W_W', 'W', 'W', 1.0, 0) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (4, 'W', 'W', 'W', 1.0, 0) ON CONFLICT (name) DO NOTHING;
 
     -- triggers function
     -- FUNCTION: public.return_data()

@@ -95,7 +95,7 @@ function VarsList () {
         umsList={ctx.ums}
         logic_stateList={ctx.logicStates}
         upsertVar={(data)=>{
-          axios.post('http://localhost:3001/api/modifyVar', {id: modifyVarPopup.id, name: data.name, type: data.type, um: data.um, logic_state: data.logic_state})
+          axios.post('http://localhost:3001/api/modifyVar', {...data, id: modifyVarPopup.id})
             .then(setModifyVarPopup((prevState) => ({ ...prevState, visible: false })))
         }}
         cancelCommand={()=>{

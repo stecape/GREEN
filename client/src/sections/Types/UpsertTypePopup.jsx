@@ -48,8 +48,13 @@ function UpsertTypePopup (props) {
         axios.post('http://localhost:3001/api/exec', {query: query})
         .then(()=>{
           axios.post('http://localhost:3001/api/refreshTags')
-          .then(() => innerResolve())
-          .catch((error)=>{innerReject(error)})
+          .then(() => {
+            innerResolve()
+          })
+          .catch((error)=>{
+            console.log("error during refresh tags", error)
+            innerReject(error)
+          })
         })
         .catch((error)=>{innerReject(error)})
       })

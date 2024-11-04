@@ -12,16 +12,13 @@ const UpsertTypeContextProvider = ({children}) => {
         name: '',
         type: 0,
         fields: [],
-        allTypes: [],
         typesList: [],
-        umList: [],
-        logic_stateList: [],
         typeNameNotValid: false,
         fieldTypeNotValid: false,
         fieldNameNotValid: false
     })
 
-    const initUpsertTypeContext = useCallback((typesList, filteredTypesList, umList, logic_stateList) => {
+    const initUpsertTypeContext = useCallback((filteredTypesList) => {
       setUpsertType({
         create: true,
         typeNameQuery: '',
@@ -31,10 +28,7 @@ const UpsertTypeContextProvider = ({children}) => {
         name: '',
         type: 0,
         fields: [],
-        allTypes: typesList,
         typesList: filteredTypesList,
-        umList: umList,
-        logic_stateList: logic_stateList,
         typeNameNotValid: false,
         fieldTypeNotValid: false,
         fieldNameNotValid: false

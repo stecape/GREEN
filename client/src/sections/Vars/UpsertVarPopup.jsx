@@ -85,7 +85,7 @@ function UpsertVarPopup (props) {
                         label: item.name,
                         value: item.id
                       }))}
-                      value={modalState.um.toString()}
+                      value={modalState.um !== null ? modalState.um.toString() : 0}
                       placeholder="Choose..."
                       label="um"
                       className={formStyles.item}
@@ -98,7 +98,7 @@ function UpsertVarPopup (props) {
                         label: item.name,
                         value: item.id
                       }))}
-                      value={modalState.logic_state!==undefined ? modalState.logic_state.toString() : 0}
+                      value={modalState.logic_state !== null ? modalState.logic_state.toString() : 0}
                       placeholder="Choose..."
                       label="Logic state"
                       className={formStyles.item}

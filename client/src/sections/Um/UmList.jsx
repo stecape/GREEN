@@ -36,7 +36,7 @@ function UmList () {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {ctx.UMS.map((item) => {
+          {ctx.ums.map((item) => {
               return (
                 <TableRow
                   key={item.id}

@@ -80,10 +80,7 @@ function TypesList () {
                           name: res.data.result.name,
                           type: res.data.result.type,
                           fields: res.data.result.fields,
-                          allTypes: ctx.types,
                           typesList: ctx.types.filter(i => !res.data.result.deps.includes(i.id) ),
-                          umList: ctx.ums,
-                          logic_stateList: ctx.logicStates
                         }), setUpsertTypePopup((prevState) => ({ ...prevState, visible: true })))  //as callback, tt shows the popup                         
                       })
                     }
@@ -101,7 +98,7 @@ function TypesList () {
       <Button 
         floating="bottom-right" 
         onClick={() => {
-          initUpsertTypeContext(ctx.types, ctx.types, ctx.ums, ctx.logicstates)
+          initUpsertTypeContext(ctx.types)
           setUpsertTypePopup((prevState) => ({ ...prevState, visible: true }))  //it shows the popup
         }}
       >

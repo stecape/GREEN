@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { Button } from "@react-md/button"
 import { Dialog, DialogContent, DialogFooter } from "@react-md/dialog"
 import { Typography } from "@react-md/typography"
@@ -8,8 +8,10 @@ import {
   FormThemeProvider,
   Select
 } from '@react-md/form'
+import {ctxData} from "../../../Helpers/CtxProvider"
 
 function ModifyFieldPopup (props) {
+  const ctx = useContext(ctxData)
   const [modalState, setModalState] = useState({ visible: false, name: '', type: 0, um: 0, logic_state: 0, fieldNameNotValid: false })
 
   //Input Validation
@@ -75,7 +77,7 @@ function ModifyFieldPopup (props) {
             <Select
               id='um'
               key='um'
-              options={props.umList.map((item) => ({
+              options={ctx.ums.map((item) => ({
                 label: item.name,
                 value: item.id
               }))}
@@ -86,7 +88,7 @@ function ModifyFieldPopup (props) {
             <Select
               id='logic_state'
               key='logic_state'
-              options={props.logic_stateList.map((item) => ({
+              options={ctx.logicStates.map((item) => ({
                 label: item.name,
                 value: item.id
               }))}

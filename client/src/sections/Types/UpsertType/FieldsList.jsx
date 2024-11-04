@@ -10,8 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from '@react-md/table'
-import tableStyles from '../../../styles/Table.module.scss'
+import {ctxData} from "../../../Helpers/CtxProvider"
 import { UpsertTypeContext } from './UpsertTypeContext'
+import tableStyles from '../../../styles/Table.module.scss'
 
 //If a field is already in the DB it has an Id.
 //If a field is created in this round, it doesn't have an Id
@@ -22,6 +23,7 @@ import { UpsertTypeContext } from './UpsertTypeContext'
 //The QRef is valid only during the active round, the next round it could change.
 
 function FieldsList () {
+  const ctx = useContext(ctxData)
   const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyFieldPopup, setModifyFieldPopup] = useState({ visible: false, type: 0, um: 0, logic_state: 0, name: '', QRef: undefined })
@@ -114,11 +116,11 @@ function FieldsList () {
         </TableHeader>
         <TableBody>
           {upsertType.fields.map((item) => {
-            console.log(upsertType)
-            var typeItem = upsertType.typesList.find(i => i.id === item.type)
-            var umItem = upsertType.umList.find(i => i.id === item.um)
-            var logic_stateItem = upsertType.logic_stateList.find(i => i.id === item.logic_state)
-            console.log(upsertType, umItem, logic_stateItem, item)
+            //console.log(upsertType)
+            var typeItem = ctx.types.find(i => i.id === item.type)
+            var umItem = ctx.ums.find(i => i.id === item.um)
+            var logic_stateItem = ctx.logicStates.find(i => i.id === item.logic_state)
+            //console.log(upsertType, umItem, logic_stateItem, item)
               return (
                 <TableRow
                   key={item.QRef}
@@ -138,7 +140,7 @@ function FieldsList () {
                       <DeleteSVGIcon />
                     </Button>
                     <Button
-                      id="icon-button-4"
+                      id="icon-button-5"
                       buttonType="icon"
                       aria-label="Edit"
                       onClick={() => setModifyFieldPopup({visible: true, type: item.type, um: item.um, logic_state: item.logic_state, name: item.name, QRef: item.QRef})}
@@ -168,8 +170,6 @@ function FieldsList () {
         logic_state={modifyFieldPopup.logic_state}
         QRef={modifyFieldPopup.QRef}
         typesList={upsertType.typesList}
-        umList={upsertType.umList}
-        logic_stateList={upsertType.logic_stateList}
         fields={upsertType.fields}
         updField={(data) => updateField(data)}
         cancelCommand={()=>{
