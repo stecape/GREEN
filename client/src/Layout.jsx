@@ -5,6 +5,7 @@ import {
   useCrossFadeTransition,
   useIsomorphicLayoutEffect
 } from "react-md"
+import { HomeSVGIcon } from "@react-md/material-icons";
 import { useLocation, Link } from "react-router-dom"
 
 import navItems from "./navItems"
