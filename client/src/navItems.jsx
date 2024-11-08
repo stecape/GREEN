@@ -1,5 +1,3 @@
-import { ReactNode } from "react";
-import { LayoutNavigationItem, LayoutNavigationTree } from "@react-md/layout";
 import { HomeSVGIcon, AllInclusiveSVGIcon, AllOutSVGIcon, SettingsInputComponentSVGIcon, TransformSVGIcon } from "@react-md/material-icons";
 
 /**
@@ -9,11 +7,11 @@ import { HomeSVGIcon, AllInclusiveSVGIcon, AllOutSVGIcon, SettingsInputComponent
  * level of your navigation tree.
  */
 function createRoute(
-  pathname: string,
-  children: string,
-  leftAddon: ReactNode | undefined,
-  parentId: string | null = null
-): LayoutNavigationItem {
+  pathname,
+  children,
+  leftAddon,
+  parentId = null
+) {
   return {
     itemId: pathname,
     parentId,
@@ -23,7 +21,7 @@ function createRoute(
   };
 }
 
-const navItems: LayoutNavigationTree = {
+const navItems = {
   "/": createRoute("/", "Home", <HomeSVGIcon />),
   "/types": createRoute("/types", "Types", <AllOutSVGIcon />),
   "/um": createRoute("/um", "um", <TransformSVGIcon />),

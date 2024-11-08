@@ -15,11 +15,13 @@ export const CtxProvider = ({ children }) => {
   const [logicStates, setLogicStates] = useState([])
   const [vars, setVars] = useState([])
   const [tags, setTags] = useState([])
+  const [socketStatus, setSocketStatus] = useState({connected: false})
   const [init, setInit] = useState(false)
 
   useEffect(() => {
 
     const on_connect = () => {
+      setSocketStatus({connected: true})
       axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id", "base_type"]})
         .then(response => {
           setTypes(response.data.result.map((val) => ({name:val[0], id:val[1], base_type:val[2]})))
@@ -55,7 +57,13 @@ export const CtxProvider = ({ children }) => {
     }
 
     const on_error = (...args) => {
-      console.log(args[0])
+      console.log("socket error:", args[0])
+      setSocketStatus({connected: false})
+    }
+
+    const on_connect_error = (...args) => {
+      console.log("socket connect error:", args[0])
+      setSocketStatus({connected: false})
     }
 
     const on_update = (...args) => {
@@ -177,6 +185,11 @@ export const CtxProvider = ({ children }) => {
 
     }
 
+    const on_close = (...args) => {
+      console.log("socket closed:", args[0])
+      setSocketStatus({connected: false})
+    }
+
     //On component load request the lists
     if(init === false){
       on_connect()
@@ -185,23 +198,31 @@ export const CtxProvider = ({ children }) => {
     //On (re)connection request the lists
     socket.on("connect", on_connect)
     
+    //Connect arror logging
+    socket.on("connect_error", on_connect_error)
+
     //Error logging
     socket.on("error", on_error)
 
     //on update
     socket.on('update', on_update)
 
+    //on close
+    socket.on('close', on_close)
+
     //dismantling listeners
     return () => {
       socket.off("connect", on_connect)
+      socket.off("connect_error", on_connect_error)
       socket.off("error", on_error)
       socket.off("update", on_update)
+      socket.off('close', on_close)
     }
-  }, [addMessage, init, logicStates, socket, types, fields, ums, vars, tags])
+  }, [addMessage, init, socketStatus, logicStates, socket, types, fields, ums, vars, tags])
 
   const value = useMemo(
-    () => ({ types, setTypes, fields, setFields, ums, setUms, logicStates, setLogicStates, vars, setVars, tags, setTags }),
-    [types, setTypes, fields, setFields, ums, setUms, logicStates, setLogicStates, vars, setVars, tags, setTags]
+    () => ({ socketStatus, setSocketStatus, types, setTypes, fields, setFields, ums, setUms, logicStates, setLogicStates, vars, setVars, tags, setTags }),
+    [socketStatus, setSocketStatus, types, setTypes, fields, setFields, ums, setUms, logicStates, setLogicStates, vars, setVars, tags, setTags]
   );
 
   return (

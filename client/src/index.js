@@ -1,8 +1,10 @@
-import {StrictMode} from 'react'
-import {createRoot} from 'react-dom/client'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { MessageQueue } from "@react-md/alert"
 import { Configuration } from "@react-md/layout"
 import { BrowserRouter } from "react-router-dom"
-import {SocketContext, socket} from './Helpers/socket'
+import { SocketContext, socket } from './Helpers/socket'
+import { CtxProvider } from "./Helpers/CtxProvider"
 import './styles/index.scss'
 
 import Layout from "./Layout"
@@ -12,12 +14,16 @@ const root = createRoot(rootElement)
 
 root.render(
   <StrictMode>
-    <SocketContext.Provider value={socket}>
-      <BrowserRouter>
-        <Configuration>
-          <Layout />
-        </Configuration>
-      </BrowserRouter>
-    </SocketContext.Provider>
+    <MessageQueue id="notify" duplicates="allow">
+      <SocketContext.Provider value={socket}>
+        <CtxProvider>
+          <BrowserRouter>
+            <Configuration>
+              <Layout />
+            </Configuration>
+          </BrowserRouter>
+        </CtxProvider>
+      </SocketContext.Provider>
+    </MessageQueue>
   </StrictMode>,
 )

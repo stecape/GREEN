@@ -1,38 +1,60 @@
-import { useRef } from "react"
+import { useContext, useRef } from "react"
 import {
   Layout,
+  LayoutAppBar,
   useLayoutNavigation,
   useCrossFadeTransition,
   useIsomorphicLayoutEffect
 } from "react-md"
-import { HomeSVGIcon } from "@react-md/material-icons";
+import {
+  AppBarTitle,
+  APP_BAR_OFFSET_CLASSNAME
+} from "@react-md/app-bar"
+import { CloudOffSVGIcon } from "@react-md/material-icons"
+import { CloudQueueSVGIcon } from "@react-md/material-icons"
 import { useLocation, Link } from "react-router-dom"
-
+import { ctxData } from "./Helpers/CtxProvider"
 import navItems from "./navItems"
 
 import App from "./App"
+const appBar = (pathname, socketConnected) => {
+  return (
+    <LayoutAppBar theme="primary">
+      <AppBarTitle
+        className="rmd-typography--capitalize"
+      >
+        <>Green - {pathname.replace("/", "").toUpperCase()}</>
+      </AppBarTitle>
+
+      {socketConnected ? <CloudQueueSVGIcon style={{ marginRight: "20px" }} /> : <CloudOffSVGIcon style={{ marginRight: "20px" }} />}
+    </LayoutAppBar>
+  )
+}
 
 export default function MyLayout() {
+  const ctx = useContext(ctxData)
   const { pathname } = useLocation()
   const prevPathname = useRef(pathname)
   const { elementProps, transitionTo } = useCrossFadeTransition()
   useIsomorphicLayoutEffect(() => {
-        if (pathname === prevPathname.current) {
-          return
-        }
-    
-        prevPathname.current = pathname
-        transitionTo('enter')
-      }, [pathname, transitionTo])
+    if (pathname === prevPathname.current) {
+      return
+    }
+
+    prevPathname.current = pathname
+    transitionTo('enter')
+  }, [pathname, transitionTo])
 
   return (
     <Layout
-      title={<>Green - {pathname.replace("/", "").toUpperCase()}</>}
+      appBar={appBar(pathname, ctx.socketStatus.connected)}
       navHeaderTitle="Menu"
       treeProps={useLayoutNavigation(navItems, pathname, Link)}
       mainProps={elementProps}
     >
-      <App />
+      <div className={APP_BAR_OFFSET_CLASSNAME}>
+        <App />
+      </div>
     </Layout>
   )
 }
