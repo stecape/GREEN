@@ -1,5 +1,5 @@
 module.exports = function () {
-  return new Promise((innerResolve, reject) => {
+  return new Promise((innerResolve, innerReject) => {
     const pg = require ('pg')
     const db_config = require('./db_config')
     const connStr = db_config.db_dialect + '://' + db_config.db_user + ':' + db_config.db_password + '@' + db_config.db_host + ':' + db_config.db_port + '/' + db_config.db_name
@@ -282,7 +282,12 @@ module.exports = function () {
   `
     pool.query({
       text: queryString
-    }).then(() => {innerResolve(pool)})
+    })
+    .then(() => {innerResolve(pool)})
+    .catch(err => {
+      console.log("Error during DB initialization")
+      innerReject(err)
+    })
     
   })
 }
