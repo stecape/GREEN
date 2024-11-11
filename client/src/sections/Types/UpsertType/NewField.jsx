@@ -18,6 +18,7 @@ function NewField () {
   const [type, setType] = useState(0)
   const [um, setUm] = useState(0)
   const [logic_state, setLogicState] = useState(0)
+  const [comment, setComment] = useState('')
 
   //Input Validation
   const InlineNameValidation = (value) => {
@@ -52,8 +53,8 @@ function NewField () {
       var QRef = Date.now()
       setUpsertType((prevState) => ({
         ...prevState, 
-        fields: [...upsertType.fields, { type: type, name: name, um: um, logic_state: logic_state, QRef: QRef }],
-        insertQuery: [...upsertType.insertQuery, {query: `INSERT into "Field" (id, name, type, um, logic_state, parent_type) VALUES (DEFAULT, '${name}', ${type}, ${um !== 0 ? um : 'NULL'}, ${logic_state !== 0 ? logic_state : 'NULL'}, typeId);`, QRef: QRef}]}), handleReset()
+        fields: [...upsertType.fields, { type: type, name: name, um: um, logic_state: logic_state, comment: comment, QRef: QRef }],
+        insertQuery: [...upsertType.insertQuery, {query: `INSERT into "Field" (id, name, type, um, logic_state, comment, parent_type) VALUES (DEFAULT, '${name}', ${type}, ${um !== 0 ? um : 'NULL'}, ${logic_state !== 0 ? logic_state : 'NULL'}, ${comment !== null ? `'${comment}'` : ''}, typeId);`, QRef: QRef}]}), handleReset()
       )
     }
   }
@@ -64,6 +65,7 @@ function NewField () {
     setType(0)
     setUm(0)
     setLogicState(0)
+    setComment('')
   }
   
   return(
@@ -122,6 +124,15 @@ function NewField () {
           className={formStyles.item}
           autoComplete="both"
           onChange={(value) => setLogicState(Number(value))}
+        />
+        <TextField
+          id='field-comment'
+          key='field-comment'
+          type='string'
+          label="Field Comment"
+          className={formStyles.item}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
         />
         <div className={formStyles.btn_container}>
           <Button

@@ -26,7 +26,7 @@ function FieldsList () {
   const ctx = useContext(ctxData)
   const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
-  const [modifyFieldPopup, setModifyFieldPopup] = useState({ visible: false, type: 0, um: 0, logic_state: 0, name: '', QRef: undefined })
+  const [modifyFieldPopup, setModifyFieldPopup] = useState({ visible: false, type: 0, um: 0, logic_state: 0, comment: '', name: '', QRef: undefined })
 
   const updateField = (data)=>{
     //we retreive the field to update object from the array of the fileds and his index,
@@ -38,6 +38,7 @@ function FieldsList () {
     fieldToUpdate.type = data.type
     fieldToUpdate.um = data.um
     fieldToUpdate.logic_state = data.logic_state
+    fieldToUpdate.comment = data.comment
     var fields = upsertType.fields
     fields[fieldToUpdateIndex] = fieldToUpdate
 
@@ -55,14 +56,14 @@ function FieldsList () {
           ...prevState,
           updateQuery: [
             ...upsertType.updateQuery, 
-            {query: `UPDATE "Field" SET name='${data.name}', type=${data.type}, um=${data.um}, logic_state=${data.logic_state} WHERE name = '${modifyFieldPopup.name}' AND parent_type = typeId;`, QRef: fieldToUpdate.QRef}
+            {query: `UPDATE "Field" SET name='${data.name}', type=${data.type}, um=${data.um}, logic_state=${data.logic_state}, comment='${data.comment}' WHERE name = '${modifyFieldPopup.name}' AND parent_type = typeId;`, QRef: fieldToUpdate.QRef}
           ],
           fields: fields
         }), setModifyFieldPopup((prevState) => ({ ...prevState, visible: false })))
       } else {
         //the field is in the insert list. The field has been inserted this round, so it is possible to update the insert query
         newQuery = upsertType.insertQuery
-        newQuery[newQuery.findIndex(i => i.QRef===fieldToUpdate.QRef)] = {query: `INSERT INTO "Field" (id, name, type, um, logic_state, parent_type) VALUES (DEFAULT, '${fieldToUpdate.name}', ${fieldToUpdate.type}, ${fieldToUpdate.um}, ${fieldToUpdate.logic_state}, typeId);`, QRef: fieldToUpdate.QRef} 
+        newQuery[newQuery.findIndex(i => i.QRef===fieldToUpdate.QRef)] = {query: `INSERT INTO "Field" (id, name, type, um, logic_state, comment, parent_type) VALUES (DEFAULT, '${fieldToUpdate.name}', ${fieldToUpdate.type}, ${fieldToUpdate.um}, ${fieldToUpdate.logic_state}, '${fieldToUpdate.comment}', typeId);`, QRef: fieldToUpdate.QRef} 
         setUpsertType((prevState) => ({
           ...prevState,
           insertQuery: newQuery,
@@ -72,7 +73,7 @@ function FieldsList () {
       //the field is already in the update list. It is a preexisting field (not in the insert list) that has been already modified this round.
       //It is possible to update the update query
       newQuery = upsertType.updateQuery
-      newQuery[newQuery.findIndex(i => i.QRef===fieldToUpdate.QRef)] = {query: `UPDATE "Field" SET name='${fieldToUpdate.name}', type=${fieldToUpdate.type}, um=${fieldToUpdate.um}, logic_state=${fieldToUpdate.logic_state} WHERE name = '${modifyFieldPopup.name}' AND parent_type = typeId;`, QRef: fieldToUpdate.QRef}
+      newQuery[newQuery.findIndex(i => i.QRef===fieldToUpdate.QRef)] = {query: `UPDATE "Field" SET name='${fieldToUpdate.name}', type=${fieldToUpdate.type}, um=${fieldToUpdate.um}, logic_state=${fieldToUpdate.logic_state}, comment='${fieldToUpdate.comment}' WHERE name = '${modifyFieldPopup.name}' AND parent_type = typeId;`, QRef: fieldToUpdate.QRef}
       setUpsertType((prevState) => ({
         ...prevState,
         updateQuery: newQuery,
@@ -111,6 +112,7 @@ function FieldsList () {
             <TableCell hAlign="center">Type</TableCell>
             <TableCell hAlign="center">um</TableCell>
             <TableCell hAlign="center">LogicState</TableCell>
+            <TableCell hAlign="left">Comment</TableCell>
             <TableCell hAlign="center">Actions</TableCell>
           </TableRow>
         </TableHeader>
@@ -129,6 +131,7 @@ function FieldsList () {
                   <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
                   <TableCell className={tableStyles.cell}>{item.um !== undefined && item.um !== 0 && item.um !== null && umItem.name}</TableCell>
                   <TableCell className={tableStyles.cell}>{item.logic_state !== undefined && item.logic_state !== 0 && item.logic_state !== null && logic_stateItem.name}</TableCell>
+                  <TableCell className={tableStyles.cell}>{item.comment !== undefined && item.comment !== null && item.comment}</TableCell>
                   <TableCell className={tableStyles.cell}>
                     <Button
                       id="icon-button-4"
@@ -143,7 +146,7 @@ function FieldsList () {
                       id="icon-button-5"
                       buttonType="icon"
                       aria-label="Edit"
-                      onClick={() => setModifyFieldPopup({visible: true, type: item.type, um: item.um, logic_state: item.logic_state, name: item.name, QRef: item.QRef})}
+                      onClick={() => setModifyFieldPopup({visible: true, type: item.type, um: item.um, logic_state: item.logic_state, comment: item.comment, name: item.name, QRef: item.QRef})}
                     >
                       <EditSVGIcon />
                     </Button>
@@ -168,6 +171,7 @@ function FieldsList () {
         type={modifyFieldPopup.type}
         um={modifyFieldPopup.um}
         logic_state={modifyFieldPopup.logic_state}
+        comment={modifyFieldPopup.comment}
         QRef={modifyFieldPopup.QRef}
         typesList={upsertType.typesList}
         fields={upsertType.fields}

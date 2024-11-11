@@ -17,7 +17,7 @@ import tableStyles from '../../styles/Table.module.scss'
 function VarsList () {
   const ctx = useContext(ctxData)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
-  const [modifyVarPopup, setModifyVarPopup] = useState({ visible: false, id: 0, type: 0, um: 0, logic_state: 0, name: '' })
+  const [modifyVarPopup, setModifyVarPopup] = useState({ visible: false, id: 0, type: 0, um: 0, logic_state: 0, comment: '', name: '' })
   const [createVarPopup, setCreateVarPopup] = useState({ visible: false })
 
   return(
@@ -29,6 +29,7 @@ function VarsList () {
             <TableCell hAlign="center">Type</TableCell>
             <TableCell hAlign="center">UM</TableCell>
             <TableCell hAlign="center">Logic State</TableCell>
+            <TableCell hAlign="left">Comment</TableCell>
             <TableCell hAlign="center">Actions</TableCell>
           </TableRow>
         </TableHeader>
@@ -45,9 +46,9 @@ function VarsList () {
                   <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
                   <TableCell className={tableStyles.cell}>{umItem !== undefined && item.um !== 0 && item.um !== null && umItem.name}</TableCell>
                   <TableCell className={tableStyles.cell}>{logic_stateItem !== undefined && item.logic_state !== 0 && item.logic_state !== null && logic_stateItem.name}</TableCell>
+                  <TableCell className={tableStyles.cell}>{item.comment !== undefined && item.comment !== '' && item.comment !== null && item.comment}</TableCell>
                   <TableCell className={tableStyles.cell}>
                     <Button
-                      id="icon-button-4"
                       buttonType="icon"
                       theme="error"
                       aria-label="Permanently Delete"
@@ -56,10 +57,9 @@ function VarsList () {
                       <DeleteSVGIcon />
                     </Button>
                     <Button
-                      id="icon-button-4"
                       buttonType="icon"
                       aria-label="Edit"
-                      onClick={()=> setModifyVarPopup({visible: true, id: item.id, type: item.type, um: item.um, logic_state: item.logic_state, name: item.name})}
+                      onClick={()=> setModifyVarPopup({visible: true, id: item.id, type: item.type, um: item.um, logic_state: item.logic_state, comment: item.comment, name: item.name})}
                     >
                       <EditSVGIcon />
                     </Button>
@@ -90,6 +90,7 @@ function VarsList () {
         type={modifyVarPopup.type}
         um={modifyVarPopup.um}
         logic_state={modifyVarPopup.logic_state}
+        comment={modifyVarPopup.comment}
         modalType="full-page"
         typesList={ctx.types}
         umsList={ctx.ums}
@@ -109,6 +110,7 @@ function VarsList () {
         type={0}
         um={0}
         logic_state={0}
+        comment=""
         modalType="full-page"
         typesList={ctx.types}
         umsList={ctx.ums}

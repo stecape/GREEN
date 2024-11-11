@@ -17,22 +17,22 @@ import formStyles from '../../styles/Form.module.scss'
 function UpsertVarPopup (props) {
 
   const ctx = useContext(ctxData)
-  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: 0, um: 0, logic_state: 0 })
+  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: 0, um: 0, logic_state: 0, comment: '' })
   
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.upsertVar({name:modalState.name, type: modalState.type, um: modalState.um === 0 ? null : modalState.um, logic_state: modalState.logic_state === 0 ? null : modalState.logic_state})
-    setModalState((prevState) => ({ ...prevState, name: "", type: 0, um: 0, logic_state: 0}))
+    props.upsertVar({name:modalState.name, type: modalState.type, um: modalState.um === 0 ? null : modalState.um, logic_state: modalState.logic_state === 0 ? null : modalState.logic_state, comment: modalState.comment === '' ? '' : modalState.comment })
+    setModalState((prevState) => ({ ...prevState, name: "", type: 0, um: 0, logic_state: 0, comment: ''}))
   }
   const handleReset = () => {
-    setModalState((prevState) => ({ ...prevState, name: "", type: 0, um: 0, logic_state: 0}))
+    setModalState((prevState) => ({ ...prevState, name: "", type: 0, um: 0, logic_state: 0, comment: ''}))
     props.cancelCommand()
   }
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, logic_state: props.logic_state, visible: props.visible}))
-  },[props.name, props.visible, props.type, props.um, props.logic_state])
+    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, logic_state: props.logic_state, comment: props.comment, visible: props.visible}))
+  },[props.name, props.visible, props.type, props.um, props.logic_state, props.comment])
   
   return (
     <Dialog
@@ -103,6 +103,15 @@ function UpsertVarPopup (props) {
                       label="Logic state"
                       className={formStyles.item}
                       onChange={(value) => setModalState((prevState) => ({ ...prevState, logic_state: Number(value)}))}
+                    />
+                    <TextField
+                      id='comment'
+                      key='comment'
+                      type='string'
+                      label="Var Comment"
+                      className={formStyles.item}
+                      value={modalState.comment}
+                      onChange={(e) => setModalState((prevState) => ({ ...prevState, comment: e.target.value}))}
                     />
                     <div className={formStyles.btn_container}>
                       <Button

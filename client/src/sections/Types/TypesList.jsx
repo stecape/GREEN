@@ -41,20 +41,18 @@ function TypesList () {
                 <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
                 <TableCell className={tableStyles.cell}>
                   <Button
-                    id="icon-button-4"
                     buttonType="icon"
                     theme="error"
                     aria-label="Permanently Delete"
                     onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
-                    disabled={item.base_type}
+                    disabled={item.locked}
                   >
                     <DeleteSVGIcon />
                   </Button>
                   <Button
-                    id="icon-button-4"
                     buttonType="icon"
                     aria-label="Edit"
-                    disabled={item.base_type}
+                    disabled={item.locked}
                     onClick={()=> 
                       //the edit button of each type make an async call to the API, which, given the type Id, it retreives:
                       // - the type name

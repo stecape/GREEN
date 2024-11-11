@@ -22,13 +22,13 @@ export const CtxProvider = ({ children }) => {
 
     const on_connect = () => {
       setSocketStatus({connected: true})
-      axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id", "base_type"]})
+      axios.post('http://localhost:3001/api/getAll', {table: "Type", fields:["name", "id", "base_type", "locked"]})
         .then(response => {
-          setTypes(response.data.result.map((val) => ({name:val[0], id:val[1], base_type:val[2]})))
+          setTypes(response.data.result.map((val) => ({name:val[0], id:val[1], base_type:val[2], locked:val[3]})))
           addMessage({children: response.data.message})
-          axios.post('http://localhost:3001/api/getAll', {table: "Field", fields:['id', 'name', 'type', 'parent_type', 'um', 'logic_state']})
+          axios.post('http://localhost:3001/api/getAll', {table: "Field", fields:['id', 'name', 'type', 'parent_type', 'um', 'logic_state', 'comment']})
             .then(response => {
-              setFields(response.data.result.map((val) => ({id:val[0], name:val[1], type:val[2], parent_type:val[3], um:val[4], logic_state:val[5]})))
+              setFields(response.data.result.map((val) => ({id:val[0], name:val[1], type:val[2], parent_type:val[3], um:val[4], logic_state:val[5], comment:val[6]})))
               addMessage({children: response.data.message})
               axios.post('http://localhost:3001/api/getAll', {table: "um", fields:['id', 'name', 'metric', 'imperial', 'gain', '"offset"']})
                 .then(response => {
@@ -38,13 +38,13 @@ export const CtxProvider = ({ children }) => {
                     .then(response => {
                       setLogicStates(response.data.result.map((val) => ({id:val[0], name:val[1], value:val[2]})))
                       addMessage({children: response.data.message})
-                      axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:['id', 'name', 'type', 'um', 'logic_state']})
+                      axios.post('http://localhost:3001/api/getAll', {table: "Var", fields:['id', 'name', 'type', 'um', 'logic_state', 'comment']})
                         .then(response => {
-                          setVars(response.data.result.map((val) => ({id:val[0], name:val[1], type:val[2], um:val[3], logic_state:val[4]})))
+                          setVars(response.data.result.map((val) => ({id:val[0], name:val[1], type:val[2], um:val[3], logic_state:val[4], comment:val[5]})))
                           addMessage({children: response.data.message})
-                          axios.post('http://localhost:3001/api/getAll', {table: "Tag", fields:['id', 'name', 'var', 'parent_tag', 'type_field', 'um', 'logic_state', 'value']})
+                          axios.post('http://localhost:3001/api/getAll', {table: "Tag", fields:['id', 'name', 'var', 'parent_tag', 'type_field', 'um', 'logic_state', 'comment', 'value']})
                             .then(response => {
-                              setTags(response.data.result.map((val) => ({id:val[0], name:val[1], var:val[2], parent_tag:val[3], type_field:val[4], um:val[5], logic_state:val[6], value:val[7]})))
+                              setTags(response.data.result.map((val) => ({id:val[0], name:val[1], var:val[2], parent_tag:val[3], type_field:val[4], um:val[5], logic_state:val[6], comment:val[7], value:val[8]})))
                               addMessage({children: response.data.message})
                             })
                         })

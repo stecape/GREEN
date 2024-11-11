@@ -219,7 +219,7 @@ module.exports = function (app, pool) {
         })
         .then(data=>{
           //filling up the "fields" part of the response struct
-          response.fields = data.rows.map((field, i) => ({id: field[0], name: field[1], type: field[2], parent_type: field[3], um: field[4], logic_state: field[5], QRef: i}))
+          response.fields = data.rows.map((field, i) => ({id: field[0], name: field[1], type: field[2], parent_type: field[3], um: field[4], logic_state: field[5], comment: field[6], QRef: i}))
           var result = []
           /*
           Questa query per ogni type, dato il type.id, per tutti e soli i fields di quel type, restituisce l'arrey delle coppie [type.id, field.parent_type], prese una volta sola (le coppie non si ripetono: se un type id è presente due volte in un parent type, viene considerato una volta sola. ES: type ambientContitions : {(act) temperature, (act) moisture})
@@ -360,7 +360,7 @@ module.exports = function (app, pool) {
     //Iterate through the types tree until it reaches the leaves, generating the tags
     fieldsList.filter(i => i[3] === type).forEach(f => {
       var tagName = name+'.'+f[1]
-      var queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field, um, logic_state) VALUES (DEFAULT, '${tagName}', ${varId}, ${parent_tag}, ${f[0]}, ${f[4] !== undefined ? f[4] : 'NULL'}, ${f[5] !== undefined ? f[5] : 'NULL'}) RETURNING "id"`
+      var queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field, um, logic_state, comment) VALUES (DEFAULT, '${tagName}', ${varId}, ${parent_tag}, ${f[0]}, ${f[4] !== undefined ? f[4] : 'NULL'}, ${f[5] !== undefined ? f[5] : 'NULL'}, ${f[6] !== undefined ? `'${f[6]}'` : 'NULL'}) RETURNING "id"`
       pool.query({
         text: queryString,
         rowMode: 'array'
@@ -377,7 +377,7 @@ module.exports = function (app, pool) {
     })
   }
 
-  const GenerateTags = (varId, varName, varType, typesList, fieldsList, um, logic_state) => {
+  const GenerateTags = (varId, varName, varType, typesList, fieldsList, um, logic_state, comment) => {
     return new Promise((resolve, reject) => {
       //Delete old tags
       var queryString = `DELETE FROM "Tag" WHERE var = ${varId}`
@@ -387,7 +387,7 @@ module.exports = function (app, pool) {
       })
       .then(() => {
         //Inserting the first Tag corresponding to the var
-        queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field, um, logic_state) VALUES (DEFAULT, '${varName}', ${varId}, NULL,  NULL, ${um !== undefined ? um : 'NULL'}, ${logic_state !== undefined ? logic_state : 'NULL'}) RETURNING "id"`
+        queryString=`INSERT INTO "Tag" (id, name, var, parent_tag, type_field, um, logic_state, comment) VALUES (DEFAULT, '${varName}', ${varId}, NULL,  NULL, ${um !== undefined ? um : 'NULL'}, ${logic_state !== undefined ? logic_state : 'NULL'}, ${comment !== undefined ? `'${comment}'` : 'NULL'}) RETURNING "id"`
         pool.query({
           text: queryString,
           rowMode: 'array'
@@ -433,6 +433,7 @@ module.exports = function (app, pool) {
     var varType = req.body.type
     var varUm = req.body.um
     var varLogicState = req.body.logic_state
+    var varComment = req.body.comment
     //Retreiving the typesList
     var queryString = `SELECT * from "Type"`
     pool.query({
@@ -450,14 +451,14 @@ module.exports = function (app, pool) {
       .then(data => {  
         fieldsList = data.rows 
         //Inserting the Var
-        queryString = `INSERT INTO "Var" (id, name, type, um, logic_state) VALUES (DEFAULT, '${varName}', ${varType}, ${varUm}, ${varLogicState}) RETURNING "id"`
+        queryString = `INSERT INTO "Var" (id, name, type, um, logic_state, comment) VALUES (DEFAULT, '${varName}', ${varType}, ${varUm}, ${varLogicState}, '${varComment}') RETURNING "id"`
         pool.query({
           text: queryString,
           rowMode: 'array'
         })
         .then(data => {
           varId = data.rows[0][0]
-          GenerateTags(varId, varName, varType, typesList, fieldsList, varUm, varLogicState)
+          GenerateTags(varId, varName, varType, typesList, fieldsList, varUm, varLogicState, varComment)
           .then(response => { res.json({result: response, message: "Tags refreshed"})})
           .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
         })
@@ -495,6 +496,7 @@ module.exports = function (app, pool) {
     var varType = req.body.type
     var varUm = req.body.um
     var varLogicState = req.body.logic_state
+    var varComment = req.body.comment
     //Delete old tags
     var queryString = `SELECT * from "Type"`
     pool.query({
@@ -512,14 +514,14 @@ module.exports = function (app, pool) {
       .then(data => {  
         fieldsList = data.rows 
         //Inserting the Var
-        queryString=`UPDATE "Var" SET name = '${varName}', type = ${varType}, um = ${varUm}, logic_state = ${varLogicState} WHERE id = ${req.body.id}`
+        queryString=`UPDATE "Var" SET name = '${varName}', type = ${varType}, um = ${varUm}, logic_state = ${varLogicState}, comment = '${varComment}' WHERE id = ${req.body.id}`
         pool.query({
           text: queryString,
           rowMode: 'array'
         })
         .then(() => {
           varId = req.body.id
-          GenerateTags(varId, varName, varType, typesList, fieldsList, varUm, varLogicState)
+          GenerateTags(varId, varName, varType, typesList, fieldsList, varUm, varLogicState, varComment)
           .then(response => { res.json({result: response, message: "Tags refreshed"})})
           .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))
         })

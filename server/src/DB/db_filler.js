@@ -12,7 +12,8 @@ module.exports = function () {
       type integer NOT NULL,
       parent_type integer NOT NULL,
       um integer,
-      logic_state integer
+      logic_state integer,
+      comment text COLLATE pg_catalog."default"
     );
     
 
@@ -25,6 +26,7 @@ module.exports = function () {
       type_field integer,
       um integer,
       logic_state integer,
+      comment text COLLATE pg_catalog."default",
       value json
     );
     
@@ -33,7 +35,8 @@ module.exports = function () {
     (
       id SERIAL PRIMARY KEY,
       name text COLLATE pg_catalog."default" NOT NULL,
-      base_type bool NOT NULL
+      base_type bool NOT NULL,
+      locked bool NOT NULL
     );
     
 
@@ -43,7 +46,8 @@ module.exports = function () {
       type integer NOT NULL,
       name text COLLATE pg_catalog."default" NOT NULL,
       um integer,
-      logic_state integer
+      logic_state integer,
+      comment text COLLATE pg_catalog."default"
     );
     
 
@@ -63,6 +67,17 @@ module.exports = function () {
         id SERIAL PRIMARY KEY,
         name text COLLATE pg_catalog."default" NOT NULL,
         value text[] COLLATE pg_catalog."default" NOT NULL
+    );
+       
+
+    CREATE TABLE IF NOT EXISTS public."Alarm"
+    (
+      id SERIAL PRIMARY KEY,
+      name text COLLATE pg_catalog."default" NOT NULL,
+      description text COLLATE pg_catalog."default" NOT NULL,
+      status int NOT NULL,
+      reaction int NOT NULL,
+      ts timestamp NOT NULL
     );
 
     CREATE UNIQUE INDEX ui_field_name_and_parent_type 
@@ -174,6 +189,11 @@ module.exports = function () {
       DROP CONSTRAINT IF EXISTS unique_LogicState_name,
       ADD CONSTRAINT unique_LogicState_name UNIQUE (name);
 
+
+    ALTER TABLE IF EXISTS public."Alarm"
+      DROP CONSTRAINT IF EXISTS unique_alarm_name,
+      ADD CONSTRAINT unique_alarm_name UNIQUE (name);
+
   
     ALTER SEQUENCE IF EXISTS public."Type_id_seq"
       START 100;
@@ -191,29 +211,36 @@ module.exports = function () {
       START 100;
     --SELECT setval('public."LogicState_id_seq"', 99, true);
 
-    INSERT INTO "Type"(id,name,base_type) VALUES (1, 'Real', true) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type) VALUES (2, 'Text', true) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type) VALUES (3, 'Int', true) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type) VALUES (4, 'Bool', true) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type) VALUES (5, '_Set', false) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type) VALUES (6, '_Act', false) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type) VALUES (7, '_Limit', false) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type) VALUES (8, 'Set', false) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type) VALUES (9, 'Act', false) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type) VALUES (10, 'SetAct', false) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (1, 'Real', true, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (2, 'Text', true, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (3, 'Int', true, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (4, 'Bool', true, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (5, 'String', true, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (6, 'TimeStamp', true, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (7, '_Set', false, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (8, '_Act', false, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (9, '_Limit', false, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (10, 'Set', false, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (11, 'Act', false, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (12, 'SetAct', false, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (13, 'Alarm', false, true) ON CONFLICT (name) DO NOTHING;
 
-    INSERT INTO "Field"(id, name, type, parent_type) VALUES (1, 'InputValue', 1, 5) ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type) VALUES (2, 'Value', 1, 5) ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type) VALUES (3, 'Value', 1, 6) ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type) VALUES (4, 'Min', 1, 7) ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type) VALUES (5, 'Max', 1, 7) ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type) VALUES (6, 'Set', 5, 8) ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type) VALUES (7, 'Limit', 7, 8) ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type) VALUES (8, 'Act', 6, 9) ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type) VALUES (9, 'Limit', 7, 9) ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type) VALUES (10, 'Set', 5, 10) ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type) VALUES (11, 'Act', 6, 10) ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type) VALUES (12, 'Limit', 7, 10) ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (1, 'InputValue', 1, 7, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (2, 'Value', 1, 7, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (3, 'Value', 1, 8, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (4, 'Min', 1, 9, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (5, 'Max', 1, 9, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (6, 'Set', 7, 10, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (7, 'Limit', 9, 10, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (8, 'Act', 8, 11, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (9, 'Limit', 9, 11, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (10, 'Set', 7, 12, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (11, 'Act', 8, 12, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (12, 'Limit', 9, 12, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (13, 'name', 5, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (14, 'status', 3, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (15, 'reaction', 3, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (16, 'ts', 6, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
     
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (1, 'm_ft', 'm', 'ft', 3.28084, 0) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (2, '°C_°F', '°C', '°F', 1.8, 32) ON CONFLICT (name) DO NOTHING;

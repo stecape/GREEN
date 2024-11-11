@@ -12,7 +12,7 @@ import {ctxData} from "../../../Helpers/CtxProvider"
 
 function ModifyFieldPopup (props) {
   const ctx = useContext(ctxData)
-  const [modalState, setModalState] = useState({ visible: false, name: '', type: 0, um: 0, logic_state: 0, fieldNameNotValid: false })
+  const [modalState, setModalState] = useState({ visible: false, name: '', type: 0, um: 0, logic_state: 0, comment: '', fieldNameNotValid: false })
 
   //Input Validation
   const InlineValidation = (value) => {
@@ -23,7 +23,7 @@ function ModifyFieldPopup (props) {
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.updField({name: modalState.name, type: modalState.type, um: modalState.um, logic_state: modalState.logic_state})
+    props.updField({name: modalState.name, type: modalState.type, um: modalState.um, logic_state: modalState.logic_state, comment: modalState.comment})
   }
   const handleReset = (event) => {
     event.preventDefault()
@@ -31,8 +31,8 @@ function ModifyFieldPopup (props) {
   }
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, logic_state: props.logic_state, visible: props.visible}))
-  },[props.name, props.visible, props.type, props.um, props.logic_state])
+    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, logic_state: props.logic_state, comment: props.comment, visible: props.visible}))
+  },[props.name, props.visible, props.type, props.um, props.logic_state, props.comment])
   
   return (
     <Dialog
@@ -95,6 +95,14 @@ function ModifyFieldPopup (props) {
               value={modalState.logic_state !== null && modalState.logic_state.toString()}
               label="Logic State"
               onChange={(value) => setModalState((prevState) => ({ ...prevState, logic_state: Number(value)}))}
+            />
+            <TextField
+              id='comment'
+              key='comment'
+              type='string'
+              label="comment"
+              value={modalState.comment}
+              onChange={(e) => setModalState((prevState) => ({ ...prevState, comment: e.target.value}))}
             />
           </DialogContent>
           <DialogFooter>

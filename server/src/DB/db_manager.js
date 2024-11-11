@@ -36,7 +36,7 @@ function initialize() {
             resolve(pool)
           })
           .catch((err) => {
-            console.error("Initialize: Error filling the database")
+            console.error("Initialize: Error filling the database", err)
             reject(err)
           })
       }

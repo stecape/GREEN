@@ -1,4 +1,4 @@
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 import {
   Table,
   TableBody,
@@ -8,9 +8,21 @@ import {
 } from '@react-md/table'
 import {ctxData} from "../../Helpers/CtxProvider"
 import tableStyles from '../../styles/Table.module.scss'
+import axios from 'axios'
+import { useAddMessage } from "@react-md/alert"
 
 function TagsList () {
   const ctx = useContext(ctxData)
+  const addMessage = useAddMessage()
+  
+  useEffect(() => {
+    axios.post('http://localhost:3001/api/getAll', {table: "Tag", fields:['id', 'name', 'var', 'parent_tag', 'type_field', 'um', 'logic_state', 'comment', 'value']})
+    .then(response => {
+      ctx.setTags(response.data.result.map((val) => ({id:val[0], name:val[1], var:val[2], parent_tag:val[3], type_field:val[4], um:val[5], logic_state:val[6], comment:val[7], value:val[8]})))
+      addMessage({children: response.data.message})
+    })
+  // eslint-disable-next-line
+  }, [])
   return(
     <>
       <Table fullWidth className={tableStyles.table}>
@@ -21,6 +33,7 @@ function TagsList () {
             <TableCell hAlign="center">Type</TableCell>
             <TableCell hAlign="center">UM</TableCell>
             <TableCell hAlign="center">Logic State</TableCell>
+            <TableCell hAlign="left">Comment</TableCell>
             <TableCell hAlign="center">Value</TableCell>
           </TableRow>
         </TableHeader>
@@ -49,10 +62,11 @@ function TagsList () {
                 <TableRow key={item.id}>
                   <TableCell className={tableStyles.cell} hAlign="center">{item.id}</TableCell>
                   <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
-                  <TableCell className={tableStyles.cell}>{umItem !== undefined && umItem.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{logic_stateItem !== undefined && logic_stateItem.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.value !== null && item.value.value}</TableCell>
+                  <TableCell className={tableStyles.cell} hAlign="center">{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
+                  <TableCell className={tableStyles.cell} hAlign="center">{umItem !== undefined && umItem.name}</TableCell>
+                  <TableCell className={tableStyles.cell} hAlign="center">{logic_stateItem !== undefined && logic_stateItem.name}</TableCell>
+                  <TableCell className={tableStyles.cell} hAlign="left">{item.comment !== undefined && item.comment !== null && item.comment}</TableCell>
+                  <TableCell className={tableStyles.cell} hAlign="center">{item.value !== null && item.value.value}</TableCell>
                 <TableCell />
                 </TableRow>
               )
