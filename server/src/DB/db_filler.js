@@ -223,7 +223,9 @@ module.exports = function () {
     INSERT INTO "Type"(id,name,base_type, locked) VALUES (10, 'Set', false, true) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "Type"(id,name,base_type, locked) VALUES (11, 'Act', false, true) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "Type"(id,name,base_type, locked) VALUES (12, 'SetAct', false, true) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type, locked) VALUES (13, 'Alarm', false, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (13, 'LogicSelection', false, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (14, 'LogicStatus', false, true) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "Type"(id,name,base_type, locked) VALUES (15, 'Alarm', false, true) ON CONFLICT (name) DO NOTHING;
 
     INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (1, 'InputValue', 1, 7, '') ON CONFLICT (name, parent_type) DO NOTHING;
     INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (2, 'Value', 1, 7, '') ON CONFLICT (name, parent_type) DO NOTHING;
@@ -237,15 +239,19 @@ module.exports = function () {
     INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (10, 'Set', 7, 12, '') ON CONFLICT (name, parent_type) DO NOTHING;
     INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (11, 'Act', 8, 12, '') ON CONFLICT (name, parent_type) DO NOTHING;
     INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (12, 'Limit', 9, 12, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (13, 'name', 5, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (14, 'status', 3, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (15, 'reaction', 3, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (16, 'ts', 6, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (13, 'Command', 3, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (14, 'Status', 3, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (15, 'Status', 3, 14, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (16, 'Name', 5, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (17, 'Status', 3, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (18, 'Reaction', 3, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (19, 'Ts', 6, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
     
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (1, 'm_ft', 'm', 'ft', 3.28084, 0) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (2, '°C_°F', '°C', '°F', 1.8, 32) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (3, 'Bar_psi', 'Bar', 'psi', 14.5038, 0) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (4, 'W', 'W', 'W', 1.0, 0) ON CONFLICT (name) DO NOTHING;
+    INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (5, '%', '%', '%', 1.0, 0) ON CONFLICT (name) DO NOTHING;
 
     -- triggers function
     -- FUNCTION: public.return_data()
