@@ -5,6 +5,7 @@ import Types from "./sections/Types/Types"
 import Um from "./sections/Um/Um"
 import LogicState from "./sections/LogicState/LogicState"
 import Vars from "./sections/Vars/Vars"
+import Alarms from "./sections/Alarms/Alarms"
 import Tags from "./sections/Tags/Tags"
 import NoPage from "./sections/NoPage/NoPage"
 
@@ -18,6 +19,7 @@ function App () {
         <Route path="um" element={<Um/>} />
         <Route path="logicState" element={<LogicState/>} />
         <Route path="vars" element={<Vars/>} />
+        <Route path="alarms" element={<Alarms/>} />
         <Route path="tags" element={<Tags/>} />
         <Route path="*" element={<NoPage />} />
       </Routes>

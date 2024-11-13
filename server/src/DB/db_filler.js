@@ -68,17 +68,6 @@ module.exports = function () {
         name text COLLATE pg_catalog."default" NOT NULL,
         value text[] COLLATE pg_catalog."default" NOT NULL
     );
-       
-
-    CREATE TABLE IF NOT EXISTS public."Alarm"
-    (
-      id SERIAL PRIMARY KEY,
-      name text COLLATE pg_catalog."default" NOT NULL,
-      description text COLLATE pg_catalog."default" NOT NULL,
-      status int NOT NULL,
-      reaction int NOT NULL,
-      ts timestamp NOT NULL
-    );
 
     CREATE UNIQUE INDEX ui_field_name_and_parent_type 
       ON public."Field" (name, parent_type);
@@ -189,11 +178,6 @@ module.exports = function () {
       DROP CONSTRAINT IF EXISTS unique_LogicState_name,
       ADD CONSTRAINT unique_LogicState_name UNIQUE (name);
 
-
-    ALTER TABLE IF EXISTS public."Alarm"
-      DROP CONSTRAINT IF EXISTS unique_alarm_name,
-      ADD CONSTRAINT unique_alarm_name UNIQUE (name);
-
   
     ALTER SEQUENCE IF EXISTS public."Type_id_seq"
       START 100;
@@ -242,10 +226,9 @@ module.exports = function () {
     INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (13, 'Command', 3, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
     INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (14, 'Status', 3, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
     INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (15, 'Status', 3, 14, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (16, 'Name', 5, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (17, 'Status', 3, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (18, 'Reaction', 3, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (19, 'Ts', 6, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (16, 'Status', 3, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (17, 'Reaction', 3, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (18, 'Ts', 6, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
     
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (1, 'm_ft', 'm', 'ft', 3.28084, 0) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (2, '°C_°F', '°C', '°F', 1.8, 32) ON CONFLICT (name) DO NOTHING;

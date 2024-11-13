@@ -15,7 +15,7 @@ import axios from 'axios'
 import {ctxData} from "../../Helpers/CtxProvider"
 import tableStyles from '../../styles/Table.module.scss'
 
-function LogicStatesList (props) {
+function LogicStatesList () {
   const ctx = useContext(ctxData)
   const addMessage = useAddMessage()
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })

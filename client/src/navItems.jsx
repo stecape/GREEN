@@ -1,4 +1,4 @@
-import { HomeSVGIcon, AllInclusiveSVGIcon, AllOutSVGIcon, SettingsInputComponentSVGIcon, TransformSVGIcon } from "@react-md/material-icons";
+import { HomeSVGIcon, AllInclusiveSVGIcon, AllOutSVGIcon, SettingsInputComponentSVGIcon, TransformSVGIcon, ErrorSVGIcon } from "@react-md/material-icons";
 
 /**
  * Note: The `parentId` **must** be defaulted to `null` for the navigation tree
@@ -27,6 +27,7 @@ const navItems = {
   "/um": createRoute("/um", "um", <TransformSVGIcon />),
   "/logicState": createRoute("/logicState", "Logic State", <TransformSVGIcon />),
   "/vars": createRoute("/vars", "Vars", <AllInclusiveSVGIcon />),
+  "/alarms": createRoute("/alarms", "Alarms", <ErrorSVGIcon />),
   "/tags": createRoute("/tags", "Tags", <SettingsInputComponentSVGIcon />),
 };
 
