@@ -10,6 +10,7 @@ import {
   TableCell,
   TableHeader,
   TableRow,
+  TableContainer
 } from '@react-md/table'
 import axios from 'axios'
 import {ctxData} from "../../Helpers/CtxProvider"
@@ -25,74 +26,75 @@ function TypesList () {
 
   return(
     <>
-      <Table fullWidth className={tableStyles.table}>
-        <TableHeader>
-          <TableRow>
-            <TableCell hAlign="left" grow >Name</TableCell>
-            <TableCell hAlign="center">Actions</TableCell>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {ctx.types.map((item) => {
-            return (
-              <TableRow
-                key={item.id}
-              >
-                <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
-                <TableCell className={tableStyles.cell}>
-                  <Button
-                    buttonType="icon"
-                    theme="error"
-                    aria-label="Permanently Delete"
-                    onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
-                    disabled={item.locked}
-                  >
-                    <DeleteSVGIcon />
-                  </Button>
-                  <Button
-                    buttonType="icon"
-                    aria-label="Edit"
-                    disabled={item.locked}
-                    onClick={()=> 
-                      //the edit button of each type make an async call to the API, which, given the type Id, it retreives:
-                      // - the type name
-                      // - the type id
-                      // - the type's fields list
-                      // - the list of the types that includes the type in theyr dependencies
-                      //   (we must avoid that one of these types could be included in the type that we are modifying, otherwise we would generate a circular dependency) 
-                      //and then it configures the context:
-                      //the query list is cleared,
-                      //the name of the type to edit is initialized, and so it is the type Id and the relative fields.
-                      //The context is populated also with the "all types" array, to allow the "no duplicate name" validation,
-                      //and with the types list which is included with the types that are not included in the dependencies array, 
-                      //to avoid circular references
-                      axios.post('http://localhost:3001/api/getFields', {type: item.id})
-                      .then((res) => {
-                        console.log(res)
-                        setUpsertType(() => ({
-                          create: false,
-                          typeNameQuery: `UPDATE "Type" SET name='${res.data.result.name}' WHERE id = ${res.data.result.type} RETURNING id INTO typeId;`,
-                          insertQuery:[],
-                          updateQuery:[],
-                          deleteQuery:[],
-                          name: res.data.result.name,
-                          type: res.data.result.type,
-                          fields: res.data.result.fields,
-                          typesList: ctx.types.filter(i => !res.data.result.deps.includes(i.id) ),
-                        }), setUpsertTypePopup((prevState) => ({ ...prevState, visible: true })))  //as callback, tt shows the popup                         
-                      })
-                    }
-                  >
-                    <EditSVGIcon />
-                  </Button>
-              </TableCell>
-              <TableCell />
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
-
+      <TableContainer>
+        <Table fullWidth className={tableStyles.table}>
+          <TableHeader>
+            <TableRow>
+              <TableCell hAlign="left" grow >Name</TableCell>
+              <TableCell hAlign="center">Actions</TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {ctx.types.map((item) => {
+              return (
+                <TableRow
+                  key={item.id}
+                >
+                  <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
+                  <TableCell className={tableStyles.cell}>
+                    <Button
+                      buttonType="icon"
+                      theme="error"
+                      aria-label="Permanently Delete"
+                      onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
+                      disabled={item.locked}
+                    >
+                      <DeleteSVGIcon />
+                    </Button>
+                    <Button
+                      buttonType="icon"
+                      aria-label="Edit"
+                      disabled={item.locked}
+                      onClick={()=> 
+                        //the edit button of each type make an async call to the API, which, given the type Id, it retreives:
+                        // - the type name
+                        // - the type id
+                        // - the type's fields list
+                        // - the list of the types that includes the type in theyr dependencies
+                        //   (we must avoid that one of these types could be included in the type that we are modifying, otherwise we would generate a circular dependency) 
+                        //and then it configures the context:
+                        //the query list is cleared,
+                        //the name of the type to edit is initialized, and so it is the type Id and the relative fields.
+                        //The context is populated also with the "all types" array, to allow the "no duplicate name" validation,
+                        //and with the types list which is included with the types that are not included in the dependencies array, 
+                        //to avoid circular references
+                        axios.post('http://localhost:3001/api/getFields', {type: item.id})
+                        .then((res) => {
+                          console.log(res)
+                          setUpsertType(() => ({
+                            create: false,
+                            typeNameQuery: `UPDATE "Type" SET name='${res.data.result.name}' WHERE id = ${res.data.result.type} RETURNING id INTO typeId;`,
+                            insertQuery:[],
+                            updateQuery:[],
+                            deleteQuery:[],
+                            name: res.data.result.name,
+                            type: res.data.result.type,
+                            fields: res.data.result.fields,
+                            typesList: ctx.types.filter(i => !res.data.result.deps.includes(i.id) ),
+                          }), setUpsertTypePopup((prevState) => ({ ...prevState, visible: true })))  //as callback, tt shows the popup                         
+                        })
+                      }
+                    >
+                      <EditSVGIcon />
+                    </Button>
+                </TableCell>
+                <TableCell />
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <Button 
         floating="bottom-right" 
         onClick={() => {

@@ -9,6 +9,7 @@ import {
   TableCell,
   TableHeader,
   TableRow,
+  TableContainer
 } from '@react-md/table'
 import axios from 'axios'
 import {ctxData} from "../../Helpers/CtxProvider"
@@ -22,55 +23,56 @@ function VarsList () {
 
   return(
     <>
-      <Table fullWidth className={tableStyles.table}>
-        <TableHeader>
-          <TableRow>
-            <TableCell hAlign="left" grow >Name</TableCell>
-            <TableCell hAlign="center">Type</TableCell>
-            <TableCell hAlign="center">UM</TableCell>
-            <TableCell hAlign="center">Logic State</TableCell>
-            <TableCell hAlign="left">Comment</TableCell>
-            <TableCell hAlign="center">Actions</TableCell>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {ctx.vars.map((item) => {
-              var typeItem = ctx.types.find(i => i.id === item.type)
-              var umItem = ctx.ums.find(i => i.id === item.um)
-              var logic_stateItem = ctx.logicStates.find(i => i.id === item.logic_state)
-              return (
-                <TableRow
-                  key={item.id}
-                >
-                  <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
-                  <TableCell className={tableStyles.cell}>{umItem !== undefined && item.um !== 0 && item.um !== null && umItem.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{logic_stateItem !== undefined && item.logic_state !== 0 && item.logic_state !== null && logic_stateItem.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.comment !== undefined && item.comment !== '' && item.comment !== null && item.comment}</TableCell>
-                  <TableCell className={tableStyles.cell}>
-                    <Button
-                      buttonType="icon"
-                      theme="error"
-                      aria-label="Permanently Delete"
-                      onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
-                    >
-                      <DeleteSVGIcon />
-                    </Button>
-                    <Button
-                      buttonType="icon"
-                      aria-label="Edit"
-                      onClick={()=> setModifyVarPopup({visible: true, id: item.id, type: item.type, um: item.um, logic_state: item.logic_state, comment: item.comment, name: item.name})}
-                    >
-                      <EditSVGIcon />
-                    </Button>
-                </TableCell>
-                <TableCell />
-                </TableRow>
-              )
-            })}
-        </TableBody>
-      </Table>
-
+      <TableContainer>
+        <Table fullWidth className={tableStyles.table}>
+          <TableHeader>
+            <TableRow>
+              <TableCell hAlign="left" grow >Name</TableCell>
+              <TableCell hAlign="center">Type</TableCell>
+              <TableCell hAlign="center">UM</TableCell>
+              <TableCell hAlign="center">Logic State</TableCell>
+              <TableCell hAlign="left">Comment</TableCell>
+              <TableCell hAlign="center">Actions</TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {ctx.vars.map((item) => {
+                var typeItem = ctx.types.find(i => i.id === item.type)
+                var umItem = ctx.ums.find(i => i.id === item.um)
+                var logic_stateItem = ctx.logicStates.find(i => i.id === item.logic_state)
+                return (
+                  <TableRow
+                    key={item.id}
+                  >
+                    <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
+                    <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
+                    <TableCell className={tableStyles.cell}>{umItem !== undefined && item.um !== 0 && item.um !== null && umItem.name}</TableCell>
+                    <TableCell className={tableStyles.cell}>{logic_stateItem !== undefined && item.logic_state !== 0 && item.logic_state !== null && logic_stateItem.name}</TableCell>
+                    <TableCell className={tableStyles.cell}>{item.comment !== undefined && item.comment !== '' && item.comment !== null && item.comment}</TableCell>
+                    <TableCell className={tableStyles.cell}>
+                      <Button
+                        buttonType="icon"
+                        theme="error"
+                        aria-label="Permanently Delete"
+                        onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
+                      >
+                        <DeleteSVGIcon />
+                      </Button>
+                      <Button
+                        buttonType="icon"
+                        aria-label="Edit"
+                        onClick={()=> setModifyVarPopup({visible: true, id: item.id, type: item.type, um: item.um, logic_state: item.logic_state, comment: item.comment, name: item.name})}
+                      >
+                        <EditSVGIcon />
+                      </Button>
+                  </TableCell>
+                  <TableCell />
+                  </TableRow>
+                )
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <Button floating="bottom-right" onClick={()=> setCreateVarPopup({visible: true})}><AddSVGIcon /></Button>
       
       <DeleteVarPopup 

@@ -42,29 +42,31 @@ function AlarmsList () {
     alarms.push(alarm)
   })
   return(
-    <Table  fullWidth className={tableStyles.table}>
-      <TableHeader>
-        <TableRow>
-          <TableCell hAlign="left">TimeStamp</TableCell>
-          <TableCell hAlign="left">Name</TableCell>
-          <TableCell hAlign="left" grow>Description</TableCell>
-          <TableCell hAlign="center">Reaction</TableCell>
-          <TableCell hAlign="center">Status</TableCell>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {alarms.map((alarm) => {
-              return (
-              <TableRow key={alarm.Name}>
-                <TableCell className={tableStyles.cell} hAlign="left">{alarm.Ts}</TableCell>
-                <TableCell className={tableStyles.cell} hAlign="left">{alarm.Name}</TableCell>
-                <TableCell className={tableStyles.cell} hAlign="left" grow>{alarm.Description}</TableCell>
-                <TableCell className={tableStyles.cell} hAlign="center">{alarm.Reaction}</TableCell>
-                <TableCell className={tableStyles.cell} hAlign="center">{alarm.Status}</TableCell> 
-              </TableRow>
-            )
-          })}
-      </TableBody>
-    </Table>
+    <TableContainer>
+      <Table fullWidth>
+        <TableHeader>
+          <TableRow>
+            <TableCell hAlign="left">TimeStamp</TableCell>
+            <TableCell hAlign="left" grow>Name</TableCell>
+            <TableCell hAlign="left">Description</TableCell>
+            <TableCell hAlign="center">Reaction</TableCell>
+            <TableCell hAlign="center">Status</TableCell>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {alarms.map((alarm) => {
+                return (
+                <TableRow key={alarm.Name}>
+                  <TableCell className={tableStyles.cell} hAlign="left">{alarm.Ts}</TableCell>
+                  <TableCell className={tableStyles.cell} hAlign="left">{alarm.Name}</TableCell>
+                  <TableCell className={tableStyles.cell} hAlign="left">{alarm.Description}</TableCell>
+                  <TableCell className={tableStyles.cell} hAlign="center">{alarm.Reaction}</TableCell>
+                  <TableCell className={tableStyles.cell} hAlign="center">{alarm.Status}</TableCell> 
+                </TableRow>
+              )
+            })}
+        </TableBody>
+      </Table>
+    </TableContainer>
   )}
 export default AlarmsList

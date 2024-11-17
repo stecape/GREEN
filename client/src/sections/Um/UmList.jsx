@@ -10,6 +10,7 @@ import {
   TableCell,
   TableHeader,
   TableRow,
+  TableContainer
 } from '@react-md/table'
 import axios from 'axios'
 import {ctxData} from "../../Helpers/CtxProvider"
@@ -24,54 +25,55 @@ function UmList () {
 
   return(
     <>
-      <Table fullWidth className={tableStyles.table}>
-        <TableHeader>
-          <TableRow>
-            <TableCell hAlign="left" grow >Name</TableCell>
-            <TableCell hAlign="center">Metric</TableCell>
-            <TableCell hAlign="center">Imperial</TableCell>
-            <TableCell hAlign="center">Gain</TableCell>
-            <TableCell hAlign="center">Offset</TableCell>
-            <TableCell hAlign="center">Actions</TableCell>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {ctx.ums.map((item) => {
-              return (
-                <TableRow
-                  key={item.id}
-                >
-                  <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.metric}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.imperial}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.gain}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.offset}</TableCell>
-                  <TableCell className={tableStyles.cell}>
-                    <Button
-                      id="icon-button-4"
-                      buttonType="icon"
-                      theme="error"
-                      aria-label="Permanently Delete"
-                      onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
-                    >
-                      <DeleteSVGIcon />
-                    </Button>
-                    <Button
-                      id="icon-button-4"
-                      buttonType="icon"
-                      aria-label="Edit"
-                      onClick={()=> setModifyUmPopup({visible: true, id: item.id, name: item.name, metric: item.metric, imperial: item.imperial, gain: item.gain, offset: item.offset})}
-                    >
-                      <EditSVGIcon />
-                    </Button>
-                </TableCell>
-                <TableCell />
-                </TableRow>
-              )
-            })}
-        </TableBody>
-      </Table>
-
+      <TableContainer>
+        <Table fullWidth className={tableStyles.table}>
+          <TableHeader>
+            <TableRow>
+              <TableCell hAlign="left" grow >Name</TableCell>
+              <TableCell hAlign="center">Metric</TableCell>
+              <TableCell hAlign="center">Imperial</TableCell>
+              <TableCell hAlign="center">Gain</TableCell>
+              <TableCell hAlign="center">Offset</TableCell>
+              <TableCell hAlign="center">Actions</TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {ctx.ums.map((item) => {
+                return (
+                  <TableRow
+                    key={item.id}
+                  >
+                    <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
+                    <TableCell className={tableStyles.cell}>{item.metric}</TableCell>
+                    <TableCell className={tableStyles.cell}>{item.imperial}</TableCell>
+                    <TableCell className={tableStyles.cell}>{item.gain}</TableCell>
+                    <TableCell className={tableStyles.cell}>{item.offset}</TableCell>
+                    <TableCell className={tableStyles.cell}>
+                      <Button
+                        id="icon-button-4"
+                        buttonType="icon"
+                        theme="error"
+                        aria-label="Permanently Delete"
+                        onClick={()=> setDeletePopup({visible: true, id: item.id, name: item.name})}
+                      >
+                        <DeleteSVGIcon />
+                      </Button>
+                      <Button
+                        id="icon-button-4"
+                        buttonType="icon"
+                        aria-label="Edit"
+                        onClick={()=> setModifyUmPopup({visible: true, id: item.id, name: item.name, metric: item.metric, imperial: item.imperial, gain: item.gain, offset: item.offset})}
+                      >
+                        <EditSVGIcon />
+                      </Button>
+                  </TableCell>
+                  <TableCell />
+                  </TableRow>
+                )
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <Button floating="bottom-right" onClick={()=> setCreateUmPopup({visible: true})}><AddSVGIcon /></Button>
       
       <DeleteUmPopup 

@@ -9,6 +9,7 @@ import {
   TableCell,
   TableHeader,
   TableRow,
+  TableContainer
 } from '@react-md/table'
 import {ctxData} from "../../../Helpers/CtxProvider"
 import { UpsertTypeContext } from './UpsertTypeContext'
@@ -105,58 +106,59 @@ function FieldsList () {
 
   return(
     <>
-      <Table fullWidth className={tableStyles.table}>
-        <TableHeader>
-          <TableRow>
-            <TableCell hAlign="left" grow >Name</TableCell>
-            <TableCell hAlign="center">Type</TableCell>
-            <TableCell hAlign="center">um</TableCell>
-            <TableCell hAlign="center">LogicState</TableCell>
-            <TableCell hAlign="left">Comment</TableCell>
-            <TableCell hAlign="center">Actions</TableCell>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {upsertType.fields.map((item) => {
-            //console.log(upsertType)
-            var typeItem = ctx.types.find(i => i.id === item.type)
-            var umItem = ctx.ums.find(i => i.id === item.um)
-            var logic_stateItem = ctx.logicStates.find(i => i.id === item.logic_state)
-            //console.log(upsertType, umItem, logic_stateItem, item)
-              return (
-                <TableRow
-                  key={item.QRef}
-                >
-                  <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.um !== undefined && item.um !== 0 && item.um !== null && umItem.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.logic_state !== undefined && item.logic_state !== 0 && item.logic_state !== null && logic_stateItem.name}</TableCell>
-                  <TableCell className={tableStyles.cell}>{item.comment !== undefined && item.comment !== null && item.comment}</TableCell>
-                  <TableCell className={tableStyles.cell}>
-                    <Button
-                      id="icon-button-4"
-                      buttonType="icon"
-                      theme="error"
-                      aria-label="Permanently Delete"
-                      onClick={() => setDeletePopup({visible: true, name: item.name, QRef: item.QRef})}
-                    >
-                      <DeleteSVGIcon />
-                    </Button>
-                    <Button
-                      id="icon-button-5"
-                      buttonType="icon"
-                      aria-label="Edit"
-                      onClick={() => setModifyFieldPopup({visible: true, type: item.type, um: item.um, logic_state: item.logic_state, comment: item.comment, name: item.name, QRef: item.QRef})}
-                    >
-                      <EditSVGIcon />
-                    </Button>
-                </TableCell>
-                </TableRow>
-              )
-            })}
-        </TableBody>
-      </Table>
-
+      <TableContainer>
+        <Table fullWidth className={tableStyles.table}>
+          <TableHeader>
+            <TableRow>
+              <TableCell hAlign="left" grow >Name</TableCell>
+              <TableCell hAlign="center">Type</TableCell>
+              <TableCell hAlign="center">um</TableCell>
+              <TableCell hAlign="center">LogicState</TableCell>
+              <TableCell hAlign="left">Comment</TableCell>
+              <TableCell hAlign="center">Actions</TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {upsertType.fields.map((item) => {
+              //console.log(upsertType)
+              var typeItem = ctx.types.find(i => i.id === item.type)
+              var umItem = ctx.ums.find(i => i.id === item.um)
+              var logic_stateItem = ctx.logicStates.find(i => i.id === item.logic_state)
+              //console.log(upsertType, umItem, logic_stateItem, item)
+                return (
+                  <TableRow
+                    key={item.QRef}
+                  >
+                    <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
+                    <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
+                    <TableCell className={tableStyles.cell}>{item.um !== undefined && item.um !== 0 && item.um !== null && umItem.name}</TableCell>
+                    <TableCell className={tableStyles.cell}>{item.logic_state !== undefined && item.logic_state !== 0 && item.logic_state !== null && logic_stateItem.name}</TableCell>
+                    <TableCell className={tableStyles.cell}>{item.comment !== undefined && item.comment !== null && item.comment}</TableCell>
+                    <TableCell className={tableStyles.cell}>
+                      <Button
+                        id="icon-button-4"
+                        buttonType="icon"
+                        theme="error"
+                        aria-label="Permanently Delete"
+                        onClick={() => setDeletePopup({visible: true, name: item.name, QRef: item.QRef})}
+                      >
+                        <DeleteSVGIcon />
+                      </Button>
+                      <Button
+                        id="icon-button-5"
+                        buttonType="icon"
+                        aria-label="Edit"
+                        onClick={() => setModifyFieldPopup({visible: true, type: item.type, um: item.um, logic_state: item.logic_state, comment: item.comment, name: item.name, QRef: item.QRef})}
+                      >
+                        <EditSVGIcon />
+                      </Button>
+                  </TableCell>
+                  </TableRow>
+                )
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <DeleteFieldPopup 
         visible={deletePopup.visible}
         name={deletePopup.name}

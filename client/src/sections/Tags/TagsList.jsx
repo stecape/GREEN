@@ -5,6 +5,7 @@ import {
   TableCell,
   TableHeader,
   TableRow,
+  TableContainer
 } from '@react-md/table'
 import {ctxData} from "../../Helpers/CtxProvider"
 import tableStyles from '../../styles/Table.module.scss'
@@ -25,6 +26,7 @@ function TagsList () {
   }, [])
   return(
     <>
+    <TableContainer>
       <Table fullWidth className={tableStyles.table}>
         <TableHeader>
           <TableRow>
@@ -73,6 +75,7 @@ function TagsList () {
             })}
         </TableBody>
       </Table>
+      </TableContainer>
     </>
   )}
 export default TagsList
