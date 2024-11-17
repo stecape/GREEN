@@ -47,8 +47,8 @@ function AlarmsList () {
         <TableHeader>
           <TableRow>
             <TableCell hAlign="left">TimeStamp</TableCell>
-            <TableCell hAlign="left" grow>Name</TableCell>
-            <TableCell hAlign="left">Description</TableCell>
+            <TableCell hAlign="left" style={{ minWidth: '200px' }}>Name</TableCell>
+            <TableCell hAlign="left" grow>Description</TableCell>
             <TableCell hAlign="center">Reaction</TableCell>
             <TableCell hAlign="center">Status</TableCell>
           </TableRow>

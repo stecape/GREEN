@@ -31,7 +31,7 @@ function TagsList () {
         <TableHeader>
           <TableRow>
             <TableCell hAlign="center">Id</TableCell>
-            <TableCell hAlign="left" grow >Name</TableCell>
+            <TableCell hAlign="left" style={{ minWidth: '300px' }} grow >Name</TableCell>
             <TableCell hAlign="center">Type</TableCell>
             <TableCell hAlign="center">UM</TableCell>
             <TableCell hAlign="center">Logic State</TableCell>
