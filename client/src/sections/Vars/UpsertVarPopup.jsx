@@ -22,7 +22,7 @@ function UpsertVarPopup (props) {
 
   //Input Validation
   const InlineValidation = (value) => {
-    let pattern = /[^A-Za-z0-9\-_<>%&]/g;
+    let pattern = /[^A-Za-z0-9_]|^[^A-Za-z_]/
     const isPatternInvalid = pattern.test(value)
     setModalState((prevState) => ({...prevState, name: value, varNameNotValid: isPatternInvalid || ctx.vars.find(i => i.name === value)}))
   }

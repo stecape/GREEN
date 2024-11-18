@@ -23,7 +23,7 @@ function NewField () {
   //Input Validation
   const InlineNameValidation = (value) => {
     setName(value)
-    let pattern = /[^A-Za-z0-9\-_<>%&]/g;
+    let pattern = /[^A-Za-z0-9_]|^[^A-Za-z_]/
     const isPatternInvalid = pattern.test(value)
     setUpsertType((prevState) => ({
       ...prevState, 
@@ -42,7 +42,7 @@ function NewField () {
   const handleSubmit = (event) => {
     event.preventDefault()
     //it begins validating the input and then, if both type and name are valid, it proceed with the insert of the field and of the query
-    let pattern = /[^A-Za-z0-9\-_<> ]/g
+    let pattern = /[^A-Za-z0-9_]|^[^A-Za-z_]/
     var fieldNameNotValid = pattern.test(name) || upsertType.fields.find(i => i.name === name) || name === ""
     var fieldTypeNotValid = type === 0
     setUpsertType((prevState) => ({
