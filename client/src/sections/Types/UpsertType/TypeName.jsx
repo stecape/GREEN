@@ -19,8 +19,9 @@ function TypeName (props) {
 
   //Input Validation
   const InlineValidation = (value) => {
-    let pattern = /[^A-Za-z0-9\-_<> ]/g
-    setUpsertType((prevState) => ({...prevState, name: value, typeNameNotValid: pattern.test(value) || ctx.types.find(i => i.name === value && i.id !== upsertType.type) || value === ""}))
+    let pattern = /[^A-Za-z0-9\-_<>%&]/g;
+    const isPatternInvalid = pattern.test(value)
+    setUpsertType((prevState) => ({...prevState, name: value, typeNameNotValid: isPatternInvalid || ctx.types.find(i => i.name === value && i.id !== upsertType.type) || value === ""}))
   }
 
 

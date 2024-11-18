@@ -23,10 +23,11 @@ function NewField () {
   //Input Validation
   const InlineNameValidation = (value) => {
     setName(value)
-    let pattern = /[^A-Za-z0-9\-_<> ]/g
+    let pattern = /[^A-Za-z0-9\-_<>%&]/g;
+    const isPatternInvalid = pattern.test(value)
     setUpsertType((prevState) => ({
       ...prevState, 
-      fieldNameNotValid: pattern.test(value) || upsertType.fields.find(i => i.name === value)
+      fieldNameNotValid: isPatternInvalid || upsertType.fields.find(i => i.name === value) || value === ""
     }))
   }
   const InlineTypeValidation = (value) => {

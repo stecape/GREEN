@@ -17,8 +17,17 @@ import formStyles from '../../styles/Form.module.scss'
 function UpsertVarPopup (props) {
 
   const ctx = useContext(ctxData)
-  const [modalState, setModalState] = useState({ visible: false, name: '', modalType: props.modalType, type: 0, um: 0, logic_state: 0, comment: '' })
+  const [modalState, setModalState] = useState({ visible: false, varNameNotValid: true, name: '', modalType: props.modalType, type: 0, um: 0, logic_state: 0, comment: '' })
+  const [prevName, setPrevName] = useState("")
+
+  //Input Validation
+  const InlineValidation = (value) => {
+    let pattern = /[^A-Za-z0-9\-_<>%&]/g;
+    const isPatternInvalid = pattern.test(value)
+    setModalState((prevState) => ({...prevState, name: value, varNameNotValid: isPatternInvalid || ctx.vars.find(i => i.name === value)}))
+  }
   
+
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -31,8 +40,8 @@ function UpsertVarPopup (props) {
   }
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, logic_state: props.logic_state, comment: props.comment, visible: props.visible}))
-  },[props.name, props.visible, props.type, props.um, props.logic_state, props.comment])
+    setModalState((prevState) => ({ ...prevState, varNameNotValid: props.varNameNotValid, name: props.name, type: props.type, um: props.um, logic_state: props.logic_state, comment: props.comment, visible: props.visible}))
+  },[props.name, props.visible, props.type, props.um, props.logic_state, props.comment, props.varNameNotValid])
   
   return (
     <Dialog
@@ -63,7 +72,13 @@ function UpsertVarPopup (props) {
                       label="Var Name"
                       className={formStyles.item}
                       value={modalState.name}
-                      onChange={(e) => setModalState((prevState) => ({ ...prevState, name: e.target.value}))}
+                      onChange={(e) => InlineValidation(e.target.value)}
+                      onBlur={(e) => {
+                        if (prevName !== modalState.name && !modalState.varNameNotValid) {
+                          setPrevName(modalState.name)
+                        }
+                      }}
+                      error={modalState.varNameNotValid}
                     />
                     <Select
                       id='type'
@@ -119,6 +134,7 @@ function UpsertVarPopup (props) {
                         theme="primary"
                         themeType="outline"
                         className={formStyles.btn}
+                        disabled={modalState.varNameNotValid || modalState.name.length === 0}
                       >
                         {props.create ? "Create" : "Save"}
                       </Button>

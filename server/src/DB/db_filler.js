@@ -196,7 +196,7 @@ module.exports = function () {
     --SELECT setval('public."LogicState_id_seq"', 99, true);
 
     INSERT INTO "Type"(id,name,base_type, locked) VALUES (1, 'Real', true, true) ON CONFLICT (name) DO NOTHING;
-    INSERT INTO "Type"(id,name,base_type, locked) VALUES (2, 'Text', true, true) ON CONFLICT (name) DO NOTHING;
+    --INSERT INTO "Type"(id,name,base_type, locked) VALUES (2, 'Text', true, true) ON CONFLICT (name) DO NOTHING; !!!!!!SPARE!!!!!!
     INSERT INTO "Type"(id,name,base_type, locked) VALUES (3, 'Int', true, true) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "Type"(id,name,base_type, locked) VALUES (4, 'Bool', true, true) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "Type"(id,name,base_type, locked) VALUES (5, 'String', true, true) ON CONFLICT (name) DO NOTHING;
