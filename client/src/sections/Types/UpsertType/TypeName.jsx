@@ -11,7 +11,7 @@ import { UpsertTypeContext } from './UpsertTypeContext'
 import formStyles from '../../../styles/Form.module.scss'
 
 function TypeName (props) {
-  const { state: ctx } = useContext(ctxData)
+  const ctx = useContext(ctxData)
   const addMessage = useAddMessage()
   const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [prevName, setPrevName] = useState(upsertType.name)

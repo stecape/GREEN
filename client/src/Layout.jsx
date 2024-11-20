@@ -32,7 +32,7 @@ const appBar = (pathname, socketConnected) => {
 }
 
 export default function MyLayout() {
-  const { state: ctx } = useContext(ctxData)
+  const ctx = useContext(ctxData)
   const { pathname } = useLocation()
   const prevPathname = useRef(pathname)
   const { elementProps, transitionTo } = useCrossFadeTransition()

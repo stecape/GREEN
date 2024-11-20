@@ -11,7 +11,7 @@ import {
 import {ctxData} from "../../../Helpers/CtxProvider"
 
 function ModifyFieldPopup (props) {
-  const { state: ctx } = useContext(ctxData)
+  const ctx = useContext(ctxData)
   const [modalState, setModalState] = useState({ visible: false, name: '', type: 0, um: 0, logic_state: 0, comment: '', fieldNameNotValid: false })
 
   //Input Validation

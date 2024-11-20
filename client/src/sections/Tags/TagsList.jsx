@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react"
+import { useContext } from "react"
 import {
   Table,
   TableBody,
@@ -9,21 +9,9 @@ import {
 } from '@react-md/table'
 import {ctxData} from "../../Helpers/CtxProvider"
 import tableStyles from '../../styles/Table.module.scss'
-import axios from 'axios'
-import { useAddMessage } from "@react-md/alert"
 
 function TagsList () {
-  const { state: ctx } = useContext(ctxData)
-  const addMessage = useAddMessage()
-  
-  useEffect(() => {
-    axios.post('http://localhost:3001/api/getAll', {table: "Tag", fields:['id', 'name', 'var', 'parent_tag', 'type_field', 'um', 'logic_state', 'comment', 'value']})
-    .then(response => {
-      ctx.setTags(response.data.result.map((val) => ({id:val[0], name:val[1], var:val[2], parent_tag:val[3], type_field:val[4], um:val[5], logic_state:val[6], comment:val[7], value:val[8]})))
-      addMessage({children: response.data.message})
-    })
-  // eslint-disable-next-line
-  }, [])
+  const ctx = useContext(ctxData)
   return(
     <>
     <TableContainer>

@@ -17,7 +17,7 @@ import {ctxData} from "../../Helpers/CtxProvider"
 import tableStyles from '../../styles/Table.module.scss'
 
 function LogicStatesList () {
-  const { state: ctx } = useContext(ctxData)
+  const ctx = useContext(ctxData)
   const addMessage = useAddMessage()
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyLogicStatePopup, setModifyLogicStatePopup] = useState({ visible: false, id: 0, name: '', value: []})
