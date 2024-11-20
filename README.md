@@ -1,4 +1,4 @@
-# What is GREEN
+# What is AMARILLO
 It's a concept project in which is implemented a model manager and the model itself.
 It relies on a PostgreSQL database..
 # Getting Started
