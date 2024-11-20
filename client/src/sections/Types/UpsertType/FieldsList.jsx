@@ -24,7 +24,7 @@ import tableStyles from '../../../styles/Table.module.scss'
 //The QRef is valid only during the active round, the next round it could change.
 
 function FieldsList () {
-  const ctx = useContext(ctxData)
+  const { state: ctx } = useContext(ctxData)
   const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyFieldPopup, setModifyFieldPopup] = useState({ visible: false, type: 0, um: 0, logic_state: 0, comment: '', name: '', QRef: undefined })

@@ -12,7 +12,7 @@ import formStyles from '../../../styles/Form.module.scss'
 
 
 function NewField () {
-  const ctx = useContext(ctxData)
+  const { state: ctx } = useContext(ctxData)
   const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [name, setName] = useState("")
   const [type, setType] = useState(0)

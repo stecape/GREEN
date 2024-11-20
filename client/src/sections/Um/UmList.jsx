@@ -17,7 +17,7 @@ import {ctxData} from "../../Helpers/CtxProvider"
 import tableStyles from '../../styles/Table.module.scss'
 
 function UmList () {
-  const ctx = useContext(ctxData)
+  const { state: ctx } = useContext(ctxData)
   const addMessage = useAddMessage()
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [modifyUmPopup, setModifyUmPopup] = useState({ visible: false, id: 0, name: '', metric: '', imperial: '', gain: 1.0, offset: 0.0})

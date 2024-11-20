@@ -20,7 +20,7 @@ const IsBaseType = (x, data, types)=> {
 }
 
 export default function NoPage() {
-  const ctx = useContext(ctxData)
+  const { state: ctx } = useContext(ctxData)
   let structs = { types: [], vars: [], tagType: [], tagId: [], tagPointer: [] }
 
   //Generazione dei tipi di dati

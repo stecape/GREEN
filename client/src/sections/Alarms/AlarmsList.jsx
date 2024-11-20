@@ -16,7 +16,7 @@ const FIELD_ID_REACTION = 17
 const FIELD_ID_TS = 18
 
 function AlarmsList () {
-  const ctx = useContext(ctxData)
+  const { state: ctx } = useContext(ctxData)
   let alarmVars = ctx.vars.filter(t => t.type===TYPE_ID_ALARM)
   let alarms = alarmVars.map(i => {
     let alarmVar = ctx.vars.find(t => t.name === i.name)

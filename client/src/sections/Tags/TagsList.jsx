@@ -13,7 +13,7 @@ import axios from 'axios'
 import { useAddMessage } from "@react-md/alert"
 
 function TagsList () {
-  const ctx = useContext(ctxData)
+  const { state: ctx } = useContext(ctxData)
   const addMessage = useAddMessage()
   
   useEffect(() => {

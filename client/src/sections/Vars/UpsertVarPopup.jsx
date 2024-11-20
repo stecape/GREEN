@@ -16,7 +16,7 @@ import formStyles from '../../styles/Form.module.scss'
 
 function UpsertVarPopup (props) {
 
-  const ctx = useContext(ctxData)
+  const { state: ctx } = useContext(ctxData)
   const [modalState, setModalState] = useState({ visible: false, varNameNotValid: true, name: '', modalType: props.modalType, type: 0, um: 0, logic_state: 0, comment: '' })
   const [prevName, setPrevName] = useState("")
 

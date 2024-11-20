@@ -18,7 +18,7 @@ import { UpsertTypeContext } from "./UpsertType/UpsertTypeContext";
 import tableStyles from '../../styles/Table.module.scss'
 
 function TypesList () {
-  const ctx = useContext(ctxData)
+  const { state: ctx } = useContext(ctxData)
   const addMessage = useAddMessage()
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
   const [upsertTypePopup, setUpsertTypePopup] = useState({ visible: false })
