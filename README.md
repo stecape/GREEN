@@ -18,3 +18,7 @@ In the server directory, you can run:
 
 ### `npm install`
 ### `npm run watch`
+
+##TODO
+
+- Scarica il dump del DB (tipo backup del progetto) ed i file di ESP32. Mettere un riferimento al nome del dump del DB (es: timestamp?)
